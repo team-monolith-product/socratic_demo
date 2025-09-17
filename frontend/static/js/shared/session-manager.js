@@ -1,8 +1,8 @@
 // Session Manager Utility
 
 class SessionManager {
-    constructor(apiBaseUrl = '/api/v1') {
-        this.apiBaseUrl = apiBaseUrl;
+    constructor(apiBaseUrl = null) {
+        this.apiBaseUrl = apiBaseUrl || window.__API_BASE__ || '/api/v1';
         this.sessions = [];
         this.currentSession = null;
     }
