@@ -21,6 +21,12 @@ app = FastAPI(
 )
 
 allow_origin_regex = settings.allow_origin_regex
+
+# Debug CORS settings
+print(f"🔧 CORS DEBUG - Allowed origins: {settings.allow_origins}")
+print(f"🔧 CORS DEBUG - Origin regex: {allow_origin_regex}")
+print(f"🔧 CORS DEBUG - ALLOWED_ORIGINS env: {settings._allowed_origins_raw}")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.allow_origins,
