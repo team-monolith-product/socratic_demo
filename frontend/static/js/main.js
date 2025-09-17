@@ -8,8 +8,10 @@ class TopicInputHandler {
 
     getApiBase() {
         if (typeof window !== 'undefined' && window.__API_BASE__) {
+            console.log('Using API_BASE from config:', window.__API_BASE__);
             return window.__API_BASE__;
         }
+        console.warn('No API_BASE found in config, using relative path');
         return '/api/v1';
     }
 
