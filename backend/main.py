@@ -76,6 +76,14 @@ async def root():
 async def health():
     return {"status": "healthy"}
 
+@app.get("/s/{session_id}")
+async def student_session(session_id: str):
+    """Serve student session page for QR code access"""
+    student_session_file = FRONTEND_DIR / "pages" / "student-session.html"
+    if student_session_file.exists():
+        return FileResponse(student_session_file)
+    return {"error": "Student session page not found"}
+
 # OPTIONS 요청 전역 처리 (CORS preflight 대응)
 @app.options("/{full_path:path}")
 async def options_handler(full_path: str):

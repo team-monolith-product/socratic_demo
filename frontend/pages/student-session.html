@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>학생 세션 - 소크라테스 아카데미</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/main.css?v=2">
+    <link rel="stylesheet" href="/static/css/chat.css?v=3">
+</head>
+<body class="modern-body">
+    <div class="modern-container">
+        <!-- Loading Screen -->
+        <div id="loading-screen" class="loading-screen">
+            <div class="loading-content">
+                <div class="brand-icon">🏛️</div>
+                <h1>소크라테스 아카데미</h1>
+                <p>세션에 참여하는 중...</p>
+                <div class="loading-spinner"></div>
+            </div>
+        </div>
+
+        <!-- Error Screen -->
+        <div id="error-screen" class="error-screen hidden">
+            <div class="error-content">
+                <div class="error-icon">⚠️</div>
+                <h2>세션 참여 오류</h2>
+                <p id="error-message">세션을 찾을 수 없습니다.</p>
+                <button onclick="location.reload()" class="retry-button">다시 시도</button>
+            </div>
+        </div>
+
+        <!-- Session Info Screen -->
+        <div id="session-info-screen" class="session-info-screen hidden">
+            <div class="session-info-content">
+                <div class="brand-icon">🏛️</div>
+                <h1 id="session-topic">세션 주제</h1>
+                <p id="session-description">세션 설명</p>
+
+                <div class="session-details">
+                    <div class="detail-item">
+                        <span class="detail-label">난이도:</span>
+                        <span id="session-difficulty">보통</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">시간 제한:</span>
+                        <span id="session-time-limit">60분</span>
+                    </div>
+                </div>
+
+                <div class="student-form">
+                    <input type="text" id="student-name" placeholder="학생 이름을 입력하세요" maxlength="50">
+                    <button id="join-session-btn" class="join-button">세션 참여하기</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Interface (hidden initially) -->
+        <div id="chat-interface" class="hidden">
+            <!-- This will be loaded from the existing chat interface -->
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/static/config.js"></script>
+    <script src="/static/js/shared/session-manager.js"></script>
+    <script src="/static/js/student-session.js"></script>
+
+    <style>
+        .loading-screen, .error-screen, .session-info-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .loading-content, .error-content, .session-info-content {
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .loading-spinner {
+            margin: 2rem auto;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .retry-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 1rem;
+        }
+
+        .retry-button:hover {
+            background: #0056b3;
+        }
+
+        .session-details {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #6c757d;
+        }
+
+        .student-form {
+            margin-top: 2rem;
+        }
+
+        .student-form input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .student-form input:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        .join-button {
+            width: 100%;
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .join-button:hover {
+            background: #218838;
+        }
+
+        .join-button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</body>
+</html>

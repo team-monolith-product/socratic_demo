@@ -106,6 +106,28 @@ class SessionManager {
         }
     }
 
+    async joinSession(sessionId, studentInfo) {
+        try {
+            const response = await fetch(`${this.apiBaseUrl}/session/${sessionId}/join`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(studentInfo)
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            return result;
+        } catch (error) {
+            console.error('Error joining session:', error);
+            throw error;
+        }
+    }
+
     formatDuration(minutes) {
         if (minutes < 60) {
             return `${minutes}분`;
