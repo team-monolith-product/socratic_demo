@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>선생님 대시보드 - 소크라테스 아카데미</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/main.css?v=2">
+    <link rel="stylesheet" href="/static/css/teacher.css?v=4">
+</head>
+<body class="modern-body">
+    <div class="modern-container">
+        <!-- Modern Header -->
+        <header class="modern-header">
+            <div class="header-content">
+                <div class="brand">
+                    <div class="brand-icon">🏛️</div>
+                    <div class="brand-text">
+                        <h1>소크라테스 아카데미</h1>
+                        <span class="brand-subtitle">선생님 대시보드</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="modern-main">
+            <!-- Main Grid Layout -->
+            <div class="main-grid">
+                <!-- Session Creation Card -->
+                <div class="content-card session-creation-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <span class="card-icon">✨</span>
+                            <h2>새 학습 세션 만들기</h2>
+                        </div>
+                        <div class="card-description">
+                            몇 분 안에 학급 전체가 소크라테스 학습을 시작할 수 있어요
+                        </div>
+                    </div>
+
+                    <form id="sessionForm" class="modern-form">
+                        <!-- Topic Input -->
+                        <div class="form-section">
+                            <div class="form-group">
+                                <label for="sessionTopic" class="form-label">
+                                    <span class="label-icon">📚</span>
+                                    학습 주제
+                                    <span class="required">*</span>
+                                </label>
+                                <textarea
+                                    id="sessionTopic"
+                                    name="topic"
+                                    class="form-input"
+                                    placeholder="예: 기후변화의 원인과 해결책"
+                                    rows="2"
+                                    required
+                                ></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="sessionDescription" class="form-label">
+                                    <span class="label-icon">📝</span>
+                                    주제 설명 (선택사항)
+                                </label>
+                                <textarea
+                                    id="sessionDescription"
+                                    name="description"
+                                    class="form-input"
+                                    placeholder="학생들에게 제공할 추가 맥락이나 학습 목표"
+                                    rows="2"
+                                ></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Settings Grid -->
+                        <div class="settings-grid">
+                            <!-- Difficulty -->
+                            <div class="setting-group">
+                                <label class="setting-label">
+                                    <span class="label-icon">🎓</span>
+                                    난이도 레벨
+                                </label>
+                                <div class="button-group">
+                                    <input type="radio" id="difficultyEasy" name="difficulty" value="easy">
+                                    <label for="difficultyEasy" class="button-option">
+                                        <span class="option-icon">🌱</span>
+                                        <div class="option-content">
+                                            <div class="option-title">쉬움</div>
+                                            <div class="option-desc">기본 개념 중심</div>
+                                        </div>
+                                    </label>
+
+                                    <input type="radio" id="difficultyNormal" name="difficulty" value="normal" checked>
+                                    <label for="difficultyNormal" class="button-option">
+                                        <span class="option-icon">📚</span>
+                                        <div class="option-content">
+                                            <div class="option-title">보통</div>
+                                            <div class="option-desc">중학생 수준</div>
+                                        </div>
+                                    </label>
+
+                                    <input type="radio" id="difficultyHard" name="difficulty" value="hard">
+                                    <label for="difficultyHard" class="button-option">
+                                        <span class="option-icon">🎓</span>
+                                        <div class="option-content">
+                                            <div class="option-title">어려움</div>
+                                            <div class="option-desc">깊이 있는 탐구</div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Score Display -->
+                            <div class="setting-group">
+                                <label class="setting-label">
+                                    <span class="label-icon">📊</span>
+                                    학습 진행률 표시
+                                </label>
+                                <div class="toggle-group">
+                                    <input type="radio" id="showScoreTrue" name="showScore" value="true" checked>
+                                    <label for="showScoreTrue" class="toggle-option">
+                                        <span class="option-icon">📊</span>
+                                        <div class="option-content">
+                                            <div class="option-title">보기</div>
+                                            <div class="option-desc">실시간 점수 표시</div>
+                                        </div>
+                                    </label>
+
+                                    <input type="radio" id="showScoreFalse" name="showScore" value="false">
+                                    <label for="showScoreFalse" class="toggle-option">
+                                        <span class="option-icon">🎯</span>
+                                        <div class="option-content">
+                                            <div class="option-title">숨김</div>
+                                            <div class="option-desc">순수한 탐구 집중</div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Time and Students -->
+                            <div class="setting-group">
+                                <label class="setting-label">
+                                    <span class="label-icon">⏱️</span>
+                                    세션 설정
+                                </label>
+                                <div class="inline-controls">
+                                    <div class="control-group">
+                                        <label for="timeLimit" class="control-label">제한시간</label>
+                                        <select id="timeLimit" name="timeLimit" class="modern-select">
+                                            <option value="30">30분</option>
+                                            <option value="45">45분</option>
+                                            <option value="60" selected>60분</option>
+                                            <option value="90">90분</option>
+                                            <option value="120">120분</option>
+                                            <option value="180">180분</option>
+                                        </select>
+                                    </div>
+                                    <div class="control-group">
+                                        <label for="maxStudents" class="control-label">최대인원</label>
+                                        <select id="maxStudents" name="maxStudents" class="modern-select">
+                                            <option value="10">10명</option>
+                                            <option value="20">20명</option>
+                                            <option value="30">30명</option>
+                                            <option value="50" selected>50명</option>
+                                            <option value="100">100명</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="primary-button">
+                            <span class="button-icon">🚀</span>
+                            <span class="button-text">QR 코드 생성하기</span>
+                            <span class="button-arrow">→</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Session Management Card -->
+                <div class="content-card session-management-card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <span class="card-icon">📋</span>
+                            <h2>세션 관리</h2>
+                        </div>
+                        <div class="session-tabs">
+                            <button class="tab-button active" data-tab="active">
+                                <span class="tab-indicator active"></span>
+                                활성 <span class="tab-count" id="activeSessionCount">0</span>
+                            </button>
+                            <button class="tab-button" data-tab="waiting">
+                                <span class="tab-indicator waiting"></span>
+                                대기 <span class="tab-count" id="waitingSessionCount">0</span>
+                            </button>
+                            <button class="tab-button" data-tab="completed">
+                                <span class="tab-indicator completed"></span>
+                                완료 <span class="tab-count" id="completedSessionCount">0</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="session-content">
+                        <div id="activeSessionsList" class="session-tab-content active">
+                            <div class="empty-state">
+                                <div class="empty-icon">🎯</div>
+                                <div class="empty-title">활성 세션이 없습니다</div>
+                                <div class="empty-description">새 세션을 만들어 학생들과 함께 학습을 시작해보세요</div>
+                            </div>
+                        </div>
+
+                        <div id="waitingSessionsList" class="session-tab-content">
+                            <div class="empty-state">
+                                <div class="empty-icon">⏳</div>
+                                <div class="empty-title">대기 중인 세션이 없습니다</div>
+                                <div class="empty-description">QR 코드를 생성하고 학생들의 참여를 기다려보세요</div>
+                            </div>
+                        </div>
+
+                        <div id="completedSessionsList" class="session-tab-content">
+                            <div class="empty-state">
+                                <div class="empty-icon">📊</div>
+                                <div class="empty-title">완료된 세션이 없습니다</div>
+                                <div class="empty-description">세션을 완료하면 여기에서 결과를 확인할 수 있어요</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- QR 코드 모달 -->
+        <div id="qrModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>🎉 QR 코드 생성 완료!</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="qr-display">
+                        <canvas id="qrCanvas" width="200" height="200"></canvas>
+                        <div class="qr-info">
+                            <p>📱 학생들에게 이 QR 코드를 보여주세요</p>
+                            <div class="session-details">
+                                <div class="detail-item">
+                                    <strong>🔗 세션 ID:</strong> <span id="sessionId"></span>
+                                </div>
+                                <div class="detail-item">
+                                    <strong>🌐 직접 링크:</strong>
+                                    <a id="sessionLink" href="#" target="_blank"></a>
+                                </div>
+                            </div>
+                            <div class="qr-actions">
+                                <button id="copyLinkBtn" class="action-btn">📋 링크 복사</button>
+                                <button id="downloadQRBtn" class="action-btn">🖼️ QR 다운로드</button>
+                                <button id="monitorSessionBtn" class="action-btn primary">📊 실시간 모니터링</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="session-summary">
+                        <h4>📚 세션 정보</h4>
+                        <div id="sessionSummary"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 세션 모니터링 모달 -->
+        <div id="monitorModal" class="modal" style="display: none;">
+            <div class="modal-content large">
+                <div class="modal-header">
+                    <h3>📊 실시간 세션 모니터링</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="monitorContent">
+                        <!-- 모니터링 내용이 여기에 동적으로 로드됩니다 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 로딩 오버레이 -->
+        <div id="loading" class="loading-overlay" style="display: none;">
+            <div class="loading-content">
+                <div class="spinner"></div>
+                <p>세션을 준비하고 있습니다...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/config.js"></script>
+    <script src="/static/js/shared/qr-generator.js?v=1"></script>
+    <script src="/static/js/shared/session-manager.js?v=1"></script>
+    <script src="/static/js/teacher-dashboard.js?v=1"></script>
+</body>
+</html>

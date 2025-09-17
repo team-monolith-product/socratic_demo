@@ -1,0 +1,5 @@
+{
+  "buildCommand": "bash scripts/generate-config.sh",
+  "outputDirectory": "frontend",
+  "framework": "static"
+}

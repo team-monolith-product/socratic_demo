@@ -1,0 +1,16 @@
+name: CI (placeholder)
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  placeholder:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Show TODO
+        run: |
+          echo "TODO: add lint/test steps"

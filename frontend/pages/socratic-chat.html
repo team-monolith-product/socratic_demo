@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>소크라테스식 대화 - LLM Classroom Proto4</title>
+    <link rel="stylesheet" href="/static/css/chat.css?v=2">
+</head>
+<body>
+    <div class="chat-container">
+        <header class="chat-header">
+            <div class="topic-info">
+                <h1>🏛️ <span id="topicTitle">학습 주제</span></h1>
+                <button id="backBtn" class="back-btn">← 주제 변경</button>
+            </div>
+        </header>
+        
+        <main class="chat-main">
+            <div class="chat-section">
+                <div class="messages-container" id="messagesContainer">
+                    <div id="loadingMessage" class="loading-message">
+                        <div class="loading-spinner"></div>
+                        <p>AI 튜터가 첫 질문을 준비하고 있습니다...</p>
+                    </div>
+                </div>
+                
+                <!-- 데스크톱용 입력창 -->
+                <div class="input-section">
+                    <form id="chatForm" class="chat-form">
+                        <div class="input-group">
+                            <textarea 
+                                id="messageInput"
+                                placeholder="생각을 자유롭게 입력해주세요..."
+                                rows="3"
+                                disabled
+                            ></textarea>
+                            <button type="submit" id="sendBtn" disabled>
+                                📤 전송
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- 모바일용 독립 입력창 -->
+            <div class="input-section-mobile" id="inputSectionMobile">
+                <form id="chatFormMobile" class="chat-form">
+                    <textarea 
+                        id="messageInputMobile"
+                        placeholder="생각을 자유롭게 입력해주세요..."
+                        rows="2"
+                        disabled
+                    ></textarea>
+                    <button type="submit" id="sendBtnMobile" disabled>
+                        📤
+                    </button>
+                </form>
+            </div>
+            
+            <!-- 핸들을 위한 고정 배경 영역 -->
+            <div class="drawer-handle-fixed-area"></div>
+            
+            <!-- 하단 드로어로 변경된 진행률 섹션 -->
+            <div class="progress-section" id="scoreDrawer">
+                <div class="drawer-handle-area" id="drawerHandleArea">
+                    <div class="drawer-handle"></div>
+                    <div class="drawer-handle-text">📊 점수 보기</div>
+                </div>
+                
+                <div class="drawer-content">
+                    <div class="understanding-gauge">
+                        <div class="gauge-container">
+                            <div class="gauge-background">
+                                <div class="gauge-fill" id="gaugeFill" style="width: 0%"></div>
+                            </div>
+                            <div class="gauge-text">
+                                <span id="scoreText">0</span>%
+                            </div>
+                        </div>
+                        <div class="progress-feedback" id="progressFeedback">
+                            학습을 시작해보세요!
+                        </div>
+                    </div>
+                    
+                    <div class="completion-celebration" id="completionCelebration" style="display: none;">
+                        <div class="celebration-content">
+                            <h2>🎉 축하합니다!</h2>
+                            <p>완벽한 이해에 도달했습니다!</p>
+                            <div class="celebration-animation">🌟✨🎊</div>
+                            <p class="continue-text">계속해서 더 깊이 탐구해보세요!</p>
+                        </div>
+                    </div>
+                    
+                    <div class="learning-tips">
+                        <h4>💡 소크라테스식 대화 팁</h4>
+                        <ul>
+                            <li>의견과 그 근거를 함께 말해보세요</li>
+                            <li>막히면 "모르겠어요"라고 솔직히 말해보세요</li>
+                            <li>AI의 질문에 질문으로 답해도 좋아요</li>
+                            <li>틀려도 괜찮아요, 탐구 과정이 중요합니다</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="/static/config.js"></script>
+    <script src="/static/js/chat.js"></script>
+</body>
+</html>

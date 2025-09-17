@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.swp
+.venv/
+venv/
+.env
+.env.*
+
+# FastAPI/Uvicorn
+*.log
+
+# Frontend
+node_modules/
+frontend/static/config.js
+
+# OS files
+.DS_Store
+Thumbs.db
