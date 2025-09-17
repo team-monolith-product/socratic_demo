@@ -76,6 +76,14 @@ async def root():
 async def health():
     return {"status": "healthy"}
 
+@app.get("/favicon.ico")
+async def favicon():
+    """Handle favicon requests"""
+    favicon_file = FRONTEND_DIR / "static" / "favicon.ico"
+    if favicon_file.exists():
+        return FileResponse(favicon_file)
+    return {"status": "no favicon"}
+
 @app.get("/s/{session_id}")
 async def student_session(session_id: str):
     """Serve student session page for QR code access"""
