@@ -1,0 +1,3 @@
+Force Railway rebuild - $(date)
+This file forces Railway to rebuild from scratch by changing the project structure.
+Railway deployment timestamp: $(date)
