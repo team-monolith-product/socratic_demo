@@ -44,7 +44,15 @@ class StudentSession {
 
         } catch (error) {
             console.error('Failed to initialize student session:', error);
-            this.showError('세션 정보를 불러올 수 없습니다.');
+            const technicalInfo = `
+Session ID: ${this.sessionId}
+API URL: ${this.sessionManager.apiBaseUrl}
+Error: ${error.message}
+Type: ${error.constructor.name}
+Online: ${navigator.onLine}
+URL: ${window.location.href}
+            `.trim();
+            this.showError('세션 정보를 불러올 수 없습니다.', technicalInfo);
         }
     }
 
@@ -196,7 +204,7 @@ class StudentSession {
         return `${timeLimit}분`;
     }
 
-    showError(message) {
+    showError(message, technicalDetails = null) {
         // Hide loading screen
         const loadingScreen = document.getElementById('loading-screen');
         if (loadingScreen) loadingScreen.classList.add('hidden');
@@ -206,7 +214,15 @@ class StudentSession {
         const errorMessage = document.getElementById('error-message');
 
         if (errorScreen) errorScreen.classList.remove('hidden');
-        if (errorMessage) errorMessage.textContent = message;
+        if (errorMessage) {
+            errorMessage.innerHTML = `
+                <p>${message}</p>
+                ${technicalDetails ? `<details style="margin-top: 1rem; text-align: left;">
+                    <summary style="cursor: pointer; color: #666;">기술적 세부사항</summary>
+                    <pre style="background: #f8f9fa; padding: 1rem; border-radius: 4px; margin-top: 0.5rem; overflow-x: auto; font-size: 0.8rem;">${technicalDetails}</pre>
+                </details>` : ''}
+            `;
+        }
     }
 }
 

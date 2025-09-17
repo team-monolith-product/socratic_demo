@@ -52,18 +52,42 @@ class SessionManager {
     }
 
     async getSessionDetails(sessionId) {
+        const url = `${this.apiBaseUrl}/teacher/sessions/${sessionId}`;
+        console.log('🔍 Fetching session details from:', url);
+
         try {
-            const response = await fetch(`${this.apiBaseUrl}/teacher/sessions/${sessionId}`);
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                mode: 'cors'
+            });
+
+            console.log('📡 Response status:', response.status);
+            console.log('📡 Response headers:', [...response.headers.entries()]);
 
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.detail || 'Failed to fetch session details');
+                let errorMessage = `HTTP ${response.status}`;
+                try {
+                    const errorData = await response.json();
+                    errorMessage = errorData.detail || errorMessage;
+                } catch (e) {
+                    console.warn('Could not parse error response as JSON');
+                }
+                throw new Error(errorMessage);
             }
 
-            return await response.json();
+            const data = await response.json();
+            console.log('✅ Session data received:', data);
+            return data;
 
         } catch (error) {
-            console.error('Error fetching session details:', error);
+            console.error('❌ Error fetching session details:', error);
+            console.error('❌ Error type:', error.constructor.name);
+            console.error('❌ Error message:', error.message);
+            console.error('❌ Full error:', error);
             throw error;
         }
     }
