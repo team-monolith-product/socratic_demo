@@ -50,11 +50,20 @@ class StudentSession {
 
     async loadSessionInfo() {
         try {
+            console.log('Loading session info for:', this.sessionId);
+            console.log('API Base URL:', this.sessionManager.apiBaseUrl);
+
             const sessionDetails = await this.sessionManager.getSessionDetails(this.sessionId);
             this.sessionData = sessionDetails.session;
             console.log('Session data loaded:', this.sessionData);
         } catch (error) {
             console.error('Failed to load session info:', error);
+            console.error('Error details:', {
+                message: error.message,
+                stack: error.stack,
+                sessionId: this.sessionId,
+                apiBaseUrl: this.sessionManager.apiBaseUrl
+            });
             throw new Error('세션을 찾을 수 없습니다.');
         }
     }
