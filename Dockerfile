@@ -9,10 +9,8 @@ COPY backend/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY backend /app/backend
-COPY start.sh /app/start.sh
-
-RUN chmod +x /app/start.sh
 
 EXPOSE 8000
 
-CMD ["/app/start.sh"]
+# Use a Python script to handle port properly
+CMD python -c "import os; import subprocess; port = os.environ.get('PORT', '8000'); subprocess.run(['uvicorn', 'backend.main:app', '--host', '0.0.0.0', '--port', port])"
