@@ -24,6 +24,9 @@ class SocraticChatHandler {
         this.topic = urlParams.topic;
         this.difficulty = urlParams.difficulty || 'normal';
         this.showScore = urlParams.showScore === 'true';
+        this.mode = urlParams.mode || 'teacher';
+        this.sessionId = urlParams.session_id || '';
+        this.studentName = urlParams.student_name || '';
         
         if (!this.topic) {
             alert('주제가 설정되지 않았습니다.');
@@ -46,7 +49,10 @@ class SocraticChatHandler {
         return {
             topic: decodeURIComponent(urlParams.get('topic') || ''),
             difficulty: urlParams.get('difficulty') || 'normal',
-            showScore: urlParams.get('showScore') || 'true'
+            showScore: urlParams.get('showScore') || 'true',
+            mode: urlParams.get('mode') || 'teacher',
+            session_id: urlParams.get('session_id') || '',
+            student_name: decodeURIComponent(urlParams.get('student_name') || '')
         };
     }
     
@@ -56,7 +62,15 @@ class SocraticChatHandler {
         if (topicTitle) {
             topicTitle.textContent = this.topic;
         }
-        
+
+        // 학생 모드일 때 주제 변경 버튼 숨기기
+        if (this.mode === 'student') {
+            const backBtn = document.getElementById('backBtn');
+            if (backBtn) {
+                backBtn.style.display = 'none';
+            }
+        }
+
         // 점수 표시 옵션에 따라 UI 조정
         const progressSection = document.querySelector('.progress-section');
         const chatContainer = document.querySelector('.chat-container');
