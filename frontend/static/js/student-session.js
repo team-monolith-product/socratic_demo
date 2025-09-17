@@ -128,13 +128,14 @@ class StudentSession {
 
     redirectToChatInterface() {
         // Redirect to the main socratic chat interface with session configuration
+        const config = this.sessionData.config || {};
         const params = new URLSearchParams({
             session_id: this.sessionId,
             student_name: encodeURIComponent(this.studentName),
-            topic: this.sessionData.topic || '소크라테스 학습',
-            difficulty: this.sessionData.difficulty || 'normal',
-            show_score: this.sessionData.show_score || false,
-            time_limit: this.sessionData.time_limit || 0,
+            topic: config.topic || '소크라테스 학습',
+            difficulty: config.difficulty || 'normal',
+            showScore: config.show_score || false,
+            time_limit: config.time_limit || 0,
             mode: 'student'
         });
 
@@ -158,11 +159,12 @@ class StudentSession {
     }
 
     populateSessionInfo() {
+        const config = this.sessionData.config || {};
         const elements = {
-            'session-topic': this.sessionData.topic || '소크라테스 세션',
-            'session-description': this.sessionData.description || '소크라테스 방식으로 학습해보세요.',
-            'session-difficulty': this.getDifficultyText(this.sessionData.difficulty),
-            'session-time-limit': this.getTimeLimitText(this.sessionData.time_limit)
+            'session-topic': config.topic || '소크라테스 세션',
+            'session-description': config.description || '소크라테스 방식으로 학습해보세요.',
+            'session-difficulty': this.getDifficultyText(config.difficulty),
+            'session-time-limit': this.getTimeLimitText(config.time_limit)
         };
 
         Object.entries(elements).forEach(([id, text]) => {
