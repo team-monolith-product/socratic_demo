@@ -12,8 +12,12 @@ echo "VERCEL: ${VERCEL:-NOT_SET}"
 echo "VERCEL_ENV: ${VERCEL_ENV:-NOT_SET}"
 echo "==================================="
 
-# Use environment variable or fallback to relative path
-API_BASE_URL="${API_BASE_URL:-/api/v1}"
+# Use environment variable or fallback to Railway URL for production
+if [ "$VERCEL_ENV" = "production" ]; then
+    API_BASE_URL="${API_BASE_URL:-https://web-production-7b060.up.railway.app/api/v1}"
+else
+    API_BASE_URL="${API_BASE_URL:-/api/v1}"
+fi
 
 cat > "${STATIC_DIR}/config.js" <<CONFIG
 // Generated at build time: $(date)

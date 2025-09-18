@@ -1,4 +1,10 @@
 {
   "buildCommand": "bash scripts/generate-config.sh",
-  "outputDirectory": "frontend"
+  "outputDirectory": "frontend",
+  "rewrites": [
+    {
+      "source": "/s/:sessionId",
+      "destination": "/pages/student-session.html"
+    }
+  ]
 }

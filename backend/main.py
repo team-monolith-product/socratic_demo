@@ -86,11 +86,12 @@ async def favicon():
 
 @app.get("/s/{session_id}")
 async def student_session(session_id: str):
-    """Serve student session page for QR code access"""
-    student_session_file = FRONTEND_DIR / "pages" / "student-session.html"
-    if student_session_file.exists():
-        return FileResponse(student_session_file)
-    return {"error": "Student session page not found"}
+    """Redirect to Vercel frontend for student session access"""
+    from fastapi.responses import RedirectResponse
+
+    # Redirect to Vercel frontend with session ID
+    vercel_url = f"https://socratic-nine.vercel.app/s/{session_id}"
+    return RedirectResponse(url=vercel_url, status_code=302)
 
 # OPTIONS 요청 전역 처리 (CORS preflight 대응)
 @app.options("/{full_path:path}")
