@@ -76,6 +76,18 @@ async def get_teacher_sessions(request: Request):
         # Get sessions
         sessions = await session_service.get_teacher_sessions(teacher_fingerprint)
 
+        # Convert datetime objects to ISO strings with timezone info
+        for session in sessions:
+            for field in ['created_at', 'expires_at', 'last_activity', 'ended_at']:
+                if field in session and hasattr(session[field], 'isoformat'):
+                    session[field] = session[field].isoformat()
+
+            # Also convert datetime objects in live_stats if any
+            if 'live_stats' in session and 'recent_activities' in session['live_stats']:
+                for activity in session['live_stats']['recent_activities']:
+                    if 'timestamp' in activity and hasattr(activity['timestamp'], 'isoformat'):
+                        activity['timestamp'] = activity['timestamp'].isoformat()
+
         # Calculate summary stats
         total_sessions = len(sessions)
         total_students = sum(s.get('live_stats', {}).get('total_joined', 0) for s in sessions)
@@ -130,6 +142,17 @@ async def get_session_details(session_id: str, request: Request):
 
         session_data = session_details['session']
         students = session_details['students']
+
+        # Convert datetime objects to ISO strings with timezone info
+        for field in ['created_at', 'expires_at', 'last_activity', 'ended_at']:
+            if field in session_data and hasattr(session_data[field], 'isoformat'):
+                session_data[field] = session_data[field].isoformat()
+
+        # Convert datetime objects in students
+        for student in students:
+            for field in ['last_activity']:
+                if field in student and hasattr(student[field], 'isoformat'):
+                    student[field] = student[field].isoformat()
 
         # Prepare response
         session_info = SessionInfo(
@@ -236,7 +259,7 @@ async def join_session(session_id: str, request: SessionJoinRequest):
         socratic_service = get_socratic_service()
 
         # Join session
-        join_result = await session_service.join_session(session_id)
+        join_result = await session_service.join_session(session_id, request.student_name)
         if not join_result:
             raise HTTPException(status_code=404, detail="Session not found or expired")
 

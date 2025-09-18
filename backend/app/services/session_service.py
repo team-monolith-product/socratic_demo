@@ -3,6 +3,7 @@ import uuid
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any
 import asyncio
+import pytz
 from app.models.session_models import (
     SessionConfig, SessionInfo, StudentProgress, LiveStats,
     SessionActivity, QRCodeInfo
@@ -13,10 +14,16 @@ class SessionService:
         # In-memory storage for active sessions
         self.active_sessions: Dict[str, Dict[str, Any]] = {}
         self.session_students: Dict[str, Dict[str, Any]] = {}  # session_id -> {student_id -> student_data}
+        self.kst = pytz.timezone('Asia/Seoul')
+
+    def get_korea_time(self):
+        """Get current time in Korea Standard Time"""
+        utc_now = datetime.now(pytz.UTC)
+        return utc_now.astimezone(self.kst)
 
     def generate_session_id(self) -> str:
         """Generate unique session ID"""
-        timestamp = str(int(datetime.now().timestamp()))[-8:]  # Last 8 digits
+        timestamp = str(int(self.get_korea_time().timestamp()))[-8:]  # Last 8 digits
         random_part = str(uuid.uuid4()).replace('-', '')[:6].upper()
         checksum = hashlib.md5((timestamp + random_part).encode()).hexdigest()[:3].upper()
         return f"{timestamp}{random_part}{checksum}"
@@ -31,17 +38,22 @@ class SessionService:
     async def create_session(self, config: SessionConfig, teacher_fingerprint: str, base_url: str) -> Dict[str, Any]:
         """Create new session"""
         session_id = self.generate_session_id()
-        now = datetime.now()
+        now = self.get_korea_time()
         expires_at = now + timedelta(hours=2)  # Sessions expire after 2 hours
+
+        # Debug timing
+        print(f"🕐 DEBUG - Current Korea time: {now}")
+        print(f"🕐 DEBUG - ISO format: {now.isoformat()}")
+        print(f"🕐 DEBUG - Timezone: {now.tzinfo}")
 
         session_data = {
             'id': session_id,
             'teacher_fingerprint': teacher_fingerprint,
             'config': config.dict(),
             'status': 'waiting',  # waiting, active, completed, expired
-            'created_at': now,
-            'expires_at': expires_at,
-            'last_activity': now,
+            'created_at': now.isoformat(),  # Convert to ISO string with timezone
+            'expires_at': expires_at.isoformat(),  # Convert to ISO string with timezone
+            'last_activity': now.isoformat(),  # Convert to ISO string with timezone
             'students': {},
             'live_stats': {
                 'current_students': 0,
@@ -75,11 +87,43 @@ class SessionService:
     async def get_teacher_sessions(self, teacher_fingerprint: str) -> List[Dict[str, Any]]:
         """Get all sessions for a teacher"""
         teacher_sessions = []
+        current_korea_time = self.get_korea_time()
+        print(f"🕐 DEBUG - get_teacher_sessions current Korea time: {current_korea_time}")
+
+        print(f"🔍 DEBUG - Total active sessions: {len(self.active_sessions)}")
+        print(f"🔍 DEBUG - Looking for fingerprint: {teacher_fingerprint}")
+
         for session_id, session_data in self.active_sessions.items():
+            session_fingerprint = session_data['teacher_fingerprint']
+            print(f"🔍 DEBUG - Session {session_id} has fingerprint: {session_fingerprint}")
+
             if session_data['teacher_fingerprint'] == teacher_fingerprint:
+                print(f"🔍 DEBUG - MATCH! Processing session {session_id}")
                 # Add calculated fields
                 session_copy = session_data.copy()
                 session_copy['students_count'] = len(session_data['students'])
+
+                # Calculate session duration in minutes (server-side)
+                created_at_str = session_data.get('created_at')
+                if created_at_str:
+                    from datetime import datetime
+                    # Parse the ISO string back to datetime
+                    created_at = datetime.fromisoformat(created_at_str)
+                    # Ensure it's in Korean timezone
+                    if created_at.tzinfo is None:
+                        created_at = self.kst.localize(created_at)
+                    elif created_at.tzinfo != self.kst:
+                        created_at = created_at.astimezone(self.kst)
+
+                    duration_minutes = int((current_korea_time - created_at).total_seconds() / 60)
+                    session_copy['duration_minutes'] = max(0, duration_minutes)
+                else:
+                    session_copy['duration_minutes'] = 0
+
+                # Debug the created_at time
+                print(f"🕐 DEBUG - Session {session_id} created_at: {created_at_str} (type: {type(created_at_str)})")
+                print(f"🕐 DEBUG - Session {session_id} duration: {session_copy['duration_minutes']} minutes")
+
                 teacher_sessions.append(session_copy)
 
         # Sort by created_at desc
@@ -92,6 +136,27 @@ class SessionService:
         if not session_data or session_data['teacher_fingerprint'] != teacher_fingerprint:
             return None
 
+        # Add session duration to session data
+        session_copy = session_data.copy()
+        current_korea_time = self.get_korea_time()
+
+        # Calculate session duration in minutes (server-side)
+        created_at_str = session_data.get('created_at')
+        if created_at_str:
+            from datetime import datetime
+            # Parse the ISO string back to datetime
+            created_at = datetime.fromisoformat(created_at_str)
+            # Ensure it's in Korean timezone
+            if created_at.tzinfo is None:
+                created_at = self.kst.localize(created_at)
+            elif created_at.tzinfo != self.kst:
+                created_at = created_at.astimezone(self.kst)
+
+            duration_minutes = int((current_korea_time - created_at).total_seconds() / 60)
+            session_copy['duration_minutes'] = max(0, duration_minutes)
+        else:
+            session_copy['duration_minutes'] = 0
+
         # Get student progress details
         students = []
         for student_id, student_data in self.session_students.get(session_id, {}).items():
@@ -99,11 +164,11 @@ class SessionService:
             students.append(progress)
 
         return {
-            'session': session_data,
+            'session': session_copy,
             'students': students
         }
 
-    async def join_session(self, session_id: str) -> Optional[Dict[str, Any]]:
+    async def join_session(self, session_id: str, student_name: str = "익명") -> Optional[Dict[str, Any]]:
         """Student joins a session"""
         session_data = self.active_sessions.get(session_id)
         if not session_data:
@@ -114,14 +179,15 @@ class SessionService:
 
         # Generate student ID
         student_id = str(uuid.uuid4())
-        now = datetime.now()
+        now = self.get_korea_time()
 
         # Create student data
         student_data = {
             'id': student_id,
+            'name': student_name,
             'session_id': session_id,
-            'joined_at': now,
-            'last_active': now,
+            'joined_at': now.isoformat(),  # Convert to ISO string with timezone
+            'last_active': now.isoformat(),  # Convert to ISO string with timezone
             'progress': {
                 'conversation_turns': 0,
                 'current_score': 0,
@@ -155,7 +221,8 @@ class SessionService:
         activity = {
             'type': 'student_joined',
             'student_id': student_id,
-            'timestamp': now,
+            'student_name': student_name,
+            'timestamp': now.isoformat(),  # Convert to ISO string with timezone
             'data': {'students_count': session_data['live_stats']['current_students']}
         }
         session_data['live_stats']['recent_activities'].append(activity)
@@ -187,8 +254,8 @@ class SessionService:
         if not student_data:
             return False
 
-        now = datetime.now()
-        student_data['last_active'] = now
+        now = self.get_korea_time()
+        student_data['last_active'] = now.isoformat()  # Convert to ISO string with timezone
         student_data['progress']['current_score'] = understanding_score
         student_data['progress']['dimensions'] = dimensions
         student_data['progress']['conversation_turns'] += 1
@@ -196,13 +263,13 @@ class SessionService:
         if last_message:
             student_data['messages'].append({
                 'content': last_message,
-                'timestamp': now,
+                'timestamp': now.isoformat(),  # Convert to ISO string with timezone
                 'type': 'user'
             })
 
         if is_completed and not student_data['progress']['is_completed']:
             student_data['progress']['is_completed'] = True
-            student_data['progress']['completed_at'] = now
+            student_data['progress']['completed_at'] = now.isoformat()  # Convert to ISO string with timezone
 
             # Log completion activity
             session_data = self.active_sessions.get(session_id)
@@ -210,7 +277,8 @@ class SessionService:
                 activity = {
                     'type': 'student_completed',
                     'student_id': student_id,
-                    'timestamp': now,
+                    'student_name': student_data.get('name', '익명'),
+                    'timestamp': now.isoformat(),  # Convert to ISO string with timezone
                     'data': {'final_score': understanding_score}
                 }
                 session_data['live_stats']['recent_activities'].append(activity)
@@ -226,7 +294,7 @@ class SessionService:
             return None
 
         session_data['status'] = 'completed'
-        session_data['ended_at'] = datetime.now()
+        session_data['ended_at'] = self.get_korea_time().isoformat()  # Convert to ISO string with timezone
 
         # Calculate final stats
         final_stats = await self._calculate_final_stats(session_id)
@@ -247,7 +315,7 @@ class SessionService:
 
     async def cleanup_expired_sessions(self):
         """Remove expired sessions"""
-        now = datetime.now()
+        now = self.get_korea_time()
         expired_sessions = []
 
         for session_id, session_data in self.active_sessions.items():
@@ -265,8 +333,21 @@ class SessionService:
     def _calculate_student_progress(self, student_data: Dict[str, Any]) -> Dict[str, Any]:
         """Calculate student progress for display"""
         progress = student_data['progress']
-        now = datetime.now()
-        joined_at = student_data['joined_at']
+        now = self.get_korea_time()
+
+        # Parse joined_at from ISO string
+        if isinstance(student_data['joined_at'], str):
+            from datetime import datetime
+            # Parse Korean timezone ISO string back to datetime
+            joined_at = datetime.fromisoformat(student_data['joined_at'])
+            # Make sure it's in Korean timezone
+            if joined_at.tzinfo is None:
+                joined_at = self.kst.localize(joined_at)
+            elif joined_at.tzinfo != self.kst:
+                joined_at = joined_at.astimezone(self.kst)
+        else:
+            joined_at = student_data['joined_at']
+
         time_spent = int((now - joined_at).total_seconds() / 60)  # minutes
 
         # Calculate overall progress percentage
@@ -275,6 +356,7 @@ class SessionService:
 
         return {
             'student_id': student_data['id'],
+            'student_name': student_data.get('name', '익명'),
             'progress_percentage': progress_percentage,
             'conversation_turns': progress['conversation_turns'],
             'time_spent': time_spent,

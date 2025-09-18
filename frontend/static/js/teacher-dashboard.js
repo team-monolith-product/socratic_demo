@@ -1,4 +1,4 @@
-// Teacher Dashboard Main JavaScript
+// Teacher Dashboard Main JavaScript - Updated for New Layout
 
 class TeacherDashboard {
     constructor() {
@@ -6,6 +6,7 @@ class TeacherDashboard {
         this.qrGenerator = new QRGenerator();
         this.sessions = [];
         this.refreshInterval = null;
+        this.currentModalSession = null;
 
         // Initialize when DOM is loaded
         if (document.readyState === 'loading') {
@@ -29,6 +30,12 @@ class TeacherDashboard {
     }
 
     setupEventListeners() {
+        // Create session button
+        const createSessionBtn = document.getElementById('createSessionBtn');
+        if (createSessionBtn) {
+            createSessionBtn.addEventListener('click', () => this.showCreateSessionModal());
+        }
+
         // Session creation form
         const sessionForm = document.getElementById('sessionForm');
         if (sessionForm) {
@@ -54,6 +61,11 @@ class TeacherDashboard {
             });
         });
 
+        // Cancel buttons
+        document.querySelectorAll('[data-action="cancel"]').forEach(button => {
+            button.addEventListener('click', (e) => this.closeModal(e.target.closest('.modal')));
+        });
+
         // QR actions
         const copyLinkBtn = document.getElementById('copyLinkBtn');
         if (copyLinkBtn) {
@@ -68,6 +80,14 @@ class TeacherDashboard {
         const monitorSessionBtn = document.getElementById('monitorSessionBtn');
         if (monitorSessionBtn) {
             monitorSessionBtn.addEventListener('click', () => this.openSessionMonitoring());
+        }
+    }
+
+    showCreateSessionModal() {
+        const modal = document.getElementById('createSessionModal');
+        if (modal) {
+            modal.style.display = 'flex';
+            modal.classList.add('fade-in');
         }
     }
 
@@ -91,6 +111,9 @@ class TeacherDashboard {
 
             const result = await this.sessionManager.createSession(sessionConfig);
             console.log('Session created successfully:', result);
+
+            // Close create session modal
+            this.closeModal(document.getElementById('createSessionModal'));
 
             // Show QR code modal
             this.showQRModal(result);
@@ -146,7 +169,7 @@ class TeacherDashboard {
                 <strong>👥 최대인원:</strong> ${config.max_students}명
             </div>
             <div class="summary-item">
-                <strong>📅 생성시간:</strong> ${new Date(sessionData.session.created_at).toLocaleString('ko-KR')}
+                <strong>📅 생성시간:</strong> ${this.formatKoreanTime(sessionData.session.created_at)}
             </div>
         `;
 
@@ -234,7 +257,7 @@ class TeacherDashboard {
                 <div class="overview-stats">
                     <div class="overview-stat">
                         <span class="stat-label">진행시간:</span>
-                        <span class="stat-value">${this.calculateSessionDuration(session.created_at)}</span>
+                        <span class="stat-value">${this.calculateSessionDuration(session.created_at, session.duration_minutes)}</span>
                     </div>
                     <div class="overview-stat">
                         <span class="stat-label">참여학생:</span>
@@ -272,7 +295,7 @@ class TeacherDashboard {
                     ${students.map((student, index) => `
                         <div class="student-item">
                             <div class="student-header">
-                                <span class="student-name">학생 #${String(index + 1).padStart(3, '0')}</span>
+                                <span class="student-name">${student.student_name || `학생 #${String(index + 1).padStart(3, '0')}`}</span>
                                 <span class="student-progress ${this.getProgressClass(student.progress_percentage)}">
                                     ${student.progress_percentage}%
                                 </span>
@@ -320,19 +343,31 @@ class TeacherDashboard {
     }
 
     updateSessionsDisplay() {
-        const activeSessions = this.sessions.filter(s => s.status === 'active');
-        const waitingSessions = this.sessions.filter(s => s.status === 'waiting');
-        const completedSessions = this.sessions.filter(s => s.status === 'completed');
+        // Render all sessions in the new grid layout
+        this.renderSessionsGrid();
+    }
 
-        // Update counts
-        document.getElementById('activeSessionCount').textContent = activeSessions.length;
-        document.getElementById('waitingSessionCount').textContent = waitingSessions.length;
-        document.getElementById('completedSessionCount').textContent = completedSessions.length;
+    updateOverviewStats() {
+        const totalSessions = this.sessions.length;
+        const totalStudents = this.sessions.reduce((sum, s) => sum + (s.live_stats?.total_joined || 0), 0);
+        const activeSessions = this.sessions.filter(s => s.status === 'active').length;
 
-        // Update lists
-        this.renderSessionsList('activeSessionsList', activeSessions);
-        this.renderSessionsList('waitingSessionsList', waitingSessions);
-        this.renderSessionsList('completedSessionsList', completedSessions);
+        // Calculate average score from active sessions
+        const activeSessionsWithScores = this.sessions.filter(s => s.status === 'active' && s.live_stats?.average_score);
+        const averageScore = activeSessionsWithScores.length > 0
+            ? Math.round(activeSessionsWithScores.reduce((sum, s) => sum + s.live_stats.average_score, 0) / activeSessionsWithScores.length)
+            : 0;
+
+        // Update DOM elements
+        const totalSessionsEl = document.getElementById('totalSessions');
+        const totalStudentsEl = document.getElementById('totalStudents');
+        const activeSessionsEl = document.getElementById('activeSessions');
+        const averageScoreEl = document.getElementById('averageScore');
+
+        if (totalSessionsEl) totalSessionsEl.textContent = totalSessions;
+        if (totalStudentsEl) totalStudentsEl.textContent = totalStudents;
+        if (activeSessionsEl) activeSessionsEl.textContent = activeSessions;
+        if (averageScoreEl) averageScoreEl.textContent = `${averageScore}%`;
     }
 
     switchTab(tabName) {
@@ -349,6 +384,26 @@ class TeacherDashboard {
         document.getElementById(`${tabName}SessionsList`).classList.add('active');
     }
 
+    renderSessionsGrid() {
+        const container = document.getElementById('sessionsGrid');
+        if (!container) return;
+
+        if (this.sessions.length === 0) {
+            // Show empty state
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">📚</div>
+                    <div class="empty-title">아직 생성된 세션이 없습니다</div>
+                    <div class="empty-description">새 세션을 만들어 학생들과 함께 학습을 시작해보세요</div>
+                </div>
+            `;
+            return;
+        }
+
+        // Render session cards
+        container.innerHTML = this.sessions.map(session => this.generateSessionCardHTML(session)).join('');
+    }
+
     renderSessionsList(containerId, sessions) {
         const container = document.getElementById(containerId);
         if (!container) return;
@@ -362,39 +417,108 @@ class TeacherDashboard {
         container.innerHTML = sessions.map(session => this.generateSessionItemHTML(session)).join('');
     }
 
+    generateSessionCardHTML(session) {
+        const config = session.config;
+        const stats = session.live_stats || {};
+
+        return `
+            <div class="session-card" data-session-id="${session.id}" onclick="dashboard.viewSessionDetail('${session.id}')">
+                <div class="session-card-header">
+                    <div>
+                        <div class="session-card-title">${config.topic}</div>
+                        ${config.description ? `<div class="session-card-description">${config.description}</div>` : ''}
+                    </div>
+                    <div class="session-card-status ${session.status}">
+                        ${this.sessionManager.getStatusText(session.status)}
+                    </div>
+                </div>
+
+                <div class="session-card-meta">
+                    <span>${this.sessionManager.getDifficultyIcon(config.difficulty)} ${this.sessionManager.getDifficultyText(config.difficulty)}</span>
+                    <span>⏱️ ${this.sessionManager.formatDuration(config.time_limit)}</span>
+                    <span>👥 최대 ${config.max_students}명</span>
+                    <span>📅 ${this.sessionManager.formatTimestamp(session.created_at)}</span>
+                </div>
+
+                ${session.status === 'active' ? `
+                    <div class="session-card-stats">
+                        <div class="stat-item">
+                            <span class="stat-item-value">${stats.current_students || 0}</span>
+                            <span class="stat-item-label">참여 학생</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-item-value">${Math.round(stats.average_score || 0)}%</span>
+                            <span class="stat-item-label">평균 점수</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-item-value">${Math.round(stats.completion_rate || 0)}%</span>
+                            <span class="stat-item-label">완료율</span>
+                        </div>
+                    </div>
+                ` : ''}
+
+                <div class="session-card-actions" onclick="event.stopPropagation()">
+                    ${this.generateSessionActions(session)}
+                </div>
+            </div>
+        `;
+    }
+
     generateSessionItemHTML(session) {
         const config = session.config;
         const stats = session.live_stats || {};
 
         return `
-            <div class="session-item" data-session-id="${session.id}">
-                <div class="session-header">
-                    <div class="session-title">${config.topic}</div>
-                    <div class="session-status" style="color: ${this.sessionManager.getStatusColor(session.status)}">
+            <div class="session-card" data-session-id="${session.id}">
+                <div class="session-card-header">
+                    <div>
+                        <div class="session-card-title">${config.topic}</div>
+                        ${config.description ? `<div class="session-card-description">${config.description}</div>` : ''}
+                    </div>
+                    <div class="session-card-status ${session.status}">
                         ${this.sessionManager.getStatusText(session.status)}
                     </div>
                 </div>
 
-                <div class="session-meta">
+                <div class="session-card-meta">
                     <span>${this.sessionManager.getDifficultyIcon(config.difficulty)} ${this.sessionManager.getDifficultyText(config.difficulty)}</span>
                     <span>⏱️ ${this.sessionManager.formatDuration(config.time_limit)}</span>
-                    <span>👥 ${config.max_students}명</span>
+                    <span>👥 최대 ${config.max_students}명</span>
                     <span>📅 ${this.sessionManager.formatTimestamp(session.created_at)}</span>
                 </div>
 
+                ${this.generateStudentsSection(session)}
+
                 ${session.status === 'active' ? `
-                    <div class="session-stats">
+                    <div class="session-card-stats">
                         <div class="stat-item">👥 참여: ${stats.current_students || 0}명</div>
                         <div class="stat-item">📊 평균: ${Math.round(stats.average_score || 0)}%</div>
                         <div class="stat-item">✅ 완료율: ${Math.round(stats.completion_rate || 0)}%</div>
                     </div>
                 ` : ''}
 
-                <div class="session-actions">
+                <div class="session-card-actions">
                     ${this.generateSessionActions(session)}
                 </div>
             </div>
         `;
+    }
+
+    generateStudentsSection(session) {
+        // This would be populated from session details when available
+        if (session.students && session.students.length > 0) {
+            return `
+                <div class="session-card-students">
+                    <h5>참여 학생 (${session.students.length}명)</h5>
+                    <div class="students-list">
+                        ${session.students.map(student => `
+                            <span class="student-tag">${student.student_name || student.name || '익명'}</span>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+        return '';
     }
 
     generateSessionActions(session) {
@@ -418,6 +542,85 @@ class TeacherDashboard {
 
 
     // Session action handlers
+    async viewSessionDetail(sessionId) {
+        // Hide dashboard view and show detail view
+        document.getElementById('dashboardView').style.display = 'none';
+        document.getElementById('sessionDetailView').style.display = 'block';
+
+        // Load session details
+        try {
+            const sessionDetails = await this.sessionManager.getSessionDetails(sessionId);
+            this.populateSessionDetail(sessionDetails);
+        } catch (error) {
+            console.error('Failed to load session details:', error);
+            this.showError('세션 상세 정보를 불러올 수 없습니다');
+        }
+    }
+
+    populateSessionDetail(sessionDetails) {
+        const session = sessionDetails.session;
+        const stats = session.live_stats || {};
+        const students = sessionDetails.students || [];
+
+        // Update header
+        document.getElementById('sessionDetailTitle').textContent = session.config.topic;
+        document.getElementById('sessionDetailStatus').textContent = this.sessionManager.getStatusText(session.status);
+        document.getElementById('sessionDetailStatus').className = `session-status-badge ${session.status}`;
+
+        // Update info cards
+        document.getElementById('detailStudentCount').textContent = stats.current_students || 0;
+        document.getElementById('detailDuration').textContent = this.calculateSessionDuration(session.created_at, session.duration_minutes);
+        document.getElementById('detailAvgScore').textContent = `${Math.round(stats.average_score || 0)}%`;
+        document.getElementById('detailTotalMessages').textContent = students.reduce((sum, s) => sum + (s.conversation_turns || 0), 0);
+
+        // Update students table
+        this.populateStudentsTable(students);
+
+        // Set up back button
+        document.getElementById('backToDashboard').onclick = () => this.showDashboard();
+    }
+
+    populateStudentsTable(students) {
+        const tableBody = document.getElementById('studentsTableBody');
+        const emptyState = document.getElementById('tableEmptyState');
+
+        if (students.length === 0) {
+            tableBody.innerHTML = '';
+            emptyState.style.display = 'block';
+            return;
+        }
+
+        emptyState.style.display = 'none';
+        tableBody.innerHTML = students.map((student, index) => `
+            <tr>
+                <td>${student.student_name || `학생 #${String(index + 1).padStart(3, '0')}`}</td>
+                <td>${student.time_spent || 0}분</td>
+                <td>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${student.progress_percentage || 0}%"></div>
+                    </div>
+                    <span class="progress-text">${student.progress_percentage || 0}%</span>
+                </td>
+                <td>${student.conversation_turns || 0}</td>
+                <td>${Math.round((student.current_dimensions?.depth || 0) + (student.current_dimensions?.breadth || 0) + (student.current_dimensions?.application || 0) + (student.current_dimensions?.metacognition || 0) + (student.current_dimensions?.engagement || 0)) / 5}%</td>
+                <td>
+                    <span class="student-status ${student.is_completed ? 'completed' : 'active'}">
+                        ${student.is_completed ? '완료' : '진행중'}
+                    </span>
+                </td>
+                <td>
+                    <button class="table-action-btn primary" onclick="dashboard.viewStudentDetail('${student.student_id}')">상세</button>
+                    <button class="table-action-btn" onclick="dashboard.downloadStudentReport('${student.student_id}')">보고서</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    showDashboard() {
+        document.getElementById('sessionDetailView').style.display = 'none';
+        document.getElementById('dashboardView').style.display = 'block';
+    }
+
     async monitorSession(sessionId) {
         await this.showMonitoringModal(sessionId);
     }
@@ -506,12 +709,30 @@ class TeacherDashboard {
         }
     }
 
-    calculateSessionDuration(startTime) {
+    calculateSessionDuration(startTime, sessionDurationMinutes = null) {
+        // If server provided duration_minutes, use that instead of calculating
+        if (sessionDurationMinutes !== null && sessionDurationMinutes !== undefined) {
+            console.log('🕐 Using server-calculated duration:', sessionDurationMinutes, 'minutes');
+            return this.sessionManager.formatDuration(sessionDurationMinutes);
+        }
+
+        // Fallback to client-side calculation
         const start = new Date(startTime);
         const now = new Date();
+
+        // Log for debugging
+        console.log('🕐 Duration calculation (fallback):', {
+            startTime: startTime,
+            parsedStart: start.toISOString(),
+            now: now.toISOString(),
+            startTimestamp: start.getTime(),
+            nowTimestamp: now.getTime()
+        });
+
         const diffMs = now - start;
         const diffMinutes = Math.floor(diffMs / (1000 * 60));
-        return this.sessionManager.formatDuration(diffMinutes);
+
+        return this.sessionManager.formatDuration(Math.max(0, diffMinutes));
     }
 
     getDimensionName(key) {
@@ -540,6 +761,21 @@ class TeacherDashboard {
         if (percentage >= 80) return 'high';
         if (percentage >= 50) return 'medium';
         return 'low';
+    }
+
+    formatKoreanTime(timestamp) {
+        const date = new Date(timestamp);
+
+        // Convert to Korean Standard Time
+        return date.toLocaleString('ko-KR', {
+            timeZone: 'Asia/Seoul',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
     }
 }
 
