@@ -209,6 +209,7 @@ class SessionManager {
     formatTimestamp(timestamp) {
         const date = new Date(timestamp);
         const now = new Date();
+
         const diffMs = now - date;
         const diffMinutes = Math.floor(diffMs / (1000 * 60));
         const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
@@ -226,7 +227,8 @@ class SessionManager {
             return date.toLocaleDateString('ko-KR', {
                 year: 'numeric',
                 month: 'short',
-                day: 'numeric'
+                day: 'numeric',
+                timeZone: 'Asia/Seoul'
             });
         }
     }

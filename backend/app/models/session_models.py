@@ -33,6 +33,7 @@ class SessionCreateResponse(BaseModel):
 
 class StudentProgress(BaseModel):
     student_id: str
+    student_name: str
     progress_percentage: int
     conversation_turns: int
     time_spent: int  # minutes
@@ -61,7 +62,7 @@ class SessionDetailsResponse(BaseModel):
     students: List[StudentProgress]
 
 class SessionJoinRequest(BaseModel):
-    pass  # No additional data needed for joining
+    student_name: str
 
 class SessionJoinResponse(BaseModel):
     success: bool
