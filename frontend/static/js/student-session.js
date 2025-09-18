@@ -63,7 +63,16 @@ URL: ${window.location.href}
 
             // Use public session API for students instead of teacher API
             const sessionInfo = await this.sessionManager.getPublicSessionInfo(this.sessionId);
-            this.sessionData = { config: sessionInfo };  // Wrap in expected structure
+            // Public API returns flat structure, wrap to match teacher API structure
+            this.sessionData = {
+                config: {
+                    topic: sessionInfo.session.topic,
+                    description: sessionInfo.session.description,
+                    difficulty: sessionInfo.session.difficulty,
+                    show_score: sessionInfo.session.show_score,
+                    time_limit: parseInt(sessionInfo.session.estimated_time) || 60
+                }
+            };
             console.log('Session data loaded:', this.sessionData);
         } catch (error) {
             console.error('Failed to load session info:', error);
