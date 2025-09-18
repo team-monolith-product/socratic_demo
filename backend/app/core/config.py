@@ -17,6 +17,7 @@ class Settings:
         self.static_root: str | None = os.getenv("STATIC_ROOT")
         self.database_url: str = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./socratic.db")
         self.use_database: bool = os.getenv("USE_DATABASE", "false").lower() == "true"
+        self.frontend_url: str = os.getenv("FRONTEND_URL", "https://socratic-nine.vercel.app")
 
     @property
     def allow_origins(self) -> List[str]:

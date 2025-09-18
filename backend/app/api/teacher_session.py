@@ -27,11 +27,13 @@ async def create_session(request: Request, config: SessionConfig):
         # Generate teacher fingerprint from request headers
         teacher_fingerprint = session_service.generate_browser_fingerprint(dict(request.headers))
 
-        # Get base URL from request
-        base_url = f"{request.url.scheme}://{request.headers.get('host', 'localhost:8001')}"
+        # Use frontend URL from config for student access
+        from app.core.config import get_settings
+        settings = get_settings()
+        frontend_url = settings.frontend_url
 
         # Create session
-        session_result = await session_service.create_session(config, teacher_fingerprint, base_url)
+        session_result = await session_service.create_session(config, teacher_fingerprint, frontend_url)
         session_id = session_result['session_id']
         session_data = session_result['session_data']
         session_url = session_result['session_url']
@@ -279,7 +281,7 @@ async def join_session(session_id: str, request: SessionJoinRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/qr/{session_id}.png")
-async def download_qr_code(session_id: str):
+async def download_qr_code(session_id: str, request: Request):
     """Download QR code image"""
     try:
         session_service = get_session_service()
@@ -290,8 +292,8 @@ async def download_qr_code(session_id: str):
         if not session_data:
             raise HTTPException(status_code=404, detail="Session not found")
 
-        # Generate QR code for download (larger size)
-        base_url = "https://yourapp.com"  # This should come from config
+        # Generate QR code for download (larger size) - use Vercel frontend URL
+        base_url = "https://socratic-nine.vercel.app"
         session_url = f"{base_url}/s/{session_id}"
 
         qr_data = qr_service.get_qr_download_data(session_url, size=400)
