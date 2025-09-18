@@ -15,6 +15,8 @@ class Settings:
         self.openai_model: str = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
         self._allowed_origins_raw = os.getenv("ALLOWED_ORIGINS", "*")
         self.static_root: str | None = os.getenv("STATIC_ROOT")
+        self.database_url: str = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./socratic.db")
+        self.use_database: bool = os.getenv("USE_DATABASE", "false").lower() == "true"
 
     @property
     def allow_origins(self) -> List[str]:

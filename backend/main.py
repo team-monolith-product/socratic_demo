@@ -9,6 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from app.api.socratic_chat import router as chat_router
 from app.api.teacher_session import router as teacher_router
 from app.core.config import get_settings
+from app.core.database import create_tables
 
 load_dotenv()
 
@@ -26,6 +27,8 @@ allow_origin_regex = settings.allow_origin_regex
 print(f"🔧 CORS DEBUG - Allowed origins: {settings.allow_origins}")
 print(f"🔧 CORS DEBUG - Origin regex: {allow_origin_regex}")
 print(f"🔧 CORS DEBUG - ALLOWED_ORIGINS env: {settings._allowed_origins_raw}")
+print(f"💾 Storage mode: {'Database' if settings.use_database else 'File-based'}")
+print(f"🗄️ Database URL: {settings.database_url}")
 
 app.add_middleware(
     CORSMiddleware,
@@ -61,6 +64,21 @@ if pages_dir.exists():
 
 app.include_router(chat_router, prefix="/api/v1")
 app.include_router(teacher_router, prefix="/api/v1")
+
+
+@app.on_event("startup")
+async def startup_event():
+    """Initialize database on startup if using database storage."""
+    if settings.use_database:
+        try:
+            print("🗄️ Initializing database...")
+            await create_tables()
+            print("✅ Database tables created/verified successfully")
+        except Exception as e:
+            print(f"❌ Database initialization failed: {e}")
+            # Don't crash the app, fall back to file storage
+            settings.use_database = False
+            print("⚠️ Falling back to file-based storage")
 
 
 @app.get("/")

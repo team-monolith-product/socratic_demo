@@ -152,8 +152,16 @@ class StorageService:
             "data_directory": str(self.data_dir.absolute())
         }
 
-# Singleton instance
+# Singleton instances
 _storage_service = StorageService()
 
-def get_storage_service() -> StorageService:
-    return _storage_service
+def get_storage_service():
+    """Get storage service based on configuration."""
+    from app.core.config import get_settings
+    settings = get_settings()
+
+    if settings.use_database:
+        from app.services.database_service import get_database_service
+        return get_database_service()
+    else:
+        return _storage_service
