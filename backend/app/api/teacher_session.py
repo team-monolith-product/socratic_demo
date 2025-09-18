@@ -238,7 +238,6 @@ async def get_session_info(session_id: str):
                 "description": config.description,
                 "difficulty": config.difficulty,
                 "show_score": config.show_score,
-                "estimated_time": f"{config.time_limit}분",
                 "is_active": True
             }
         }

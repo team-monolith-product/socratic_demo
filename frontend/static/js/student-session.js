@@ -69,8 +69,7 @@ URL: ${window.location.href}
                     topic: sessionInfo.session.topic,
                     description: sessionInfo.session.description,
                     difficulty: sessionInfo.session.difficulty,
-                    show_score: sessionInfo.session.show_score,
-                    time_limit: parseInt(sessionInfo.session.estimated_time) || 60
+                    show_score: sessionInfo.session.show_score
                 }
             };
             console.log('Session data loaded:', this.sessionData);
@@ -162,7 +161,6 @@ URL: ${window.location.href}
             topic: config.topic || '소크라테스 학습',
             difficulty: config.difficulty || 'normal',
             showScore: config.show_score || false,
-            time_limit: config.time_limit || 0,
             mode: 'student'
         });
 
@@ -191,7 +189,6 @@ URL: ${window.location.href}
             'session-topic': config.topic || '소크라테스 세션',
             'session-description': config.description || '소크라테스 방식으로 학습해보세요.',
             'session-difficulty': this.getDifficultyText(config.difficulty),
-            'session-time-limit': this.getTimeLimitText(config.time_limit)
         };
 
         Object.entries(elements).forEach(([id, text]) => {
@@ -209,10 +206,6 @@ URL: ${window.location.href}
         return difficultyMap[difficulty] || '보통';
     }
 
-    getTimeLimitText(timeLimit) {
-        if (!timeLimit) return '제한 없음';
-        return `${timeLimit}분`;
-    }
 
     showError(message, technicalDetails = null) {
         // Hide loading screen

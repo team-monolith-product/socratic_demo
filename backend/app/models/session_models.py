@@ -8,8 +8,6 @@ class SessionConfig(BaseModel):
     description: Optional[str] = None
     difficulty: str = "normal"  # easy, normal, hard
     show_score: bool = True
-    time_limit: int = 60  # minutes
-    max_students: int = 50
 
 class SessionCreateRequest(BaseModel):
     config: SessionConfig

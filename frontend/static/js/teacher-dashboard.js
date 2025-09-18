@@ -106,9 +106,7 @@ class TeacherDashboard {
                 topic: formData.get('topic'),
                 description: formData.get('description') || null,
                 difficulty: formData.get('difficulty'),
-                show_score: formData.get('showScore') === 'true',
-                time_limit: parseInt(formData.get('timeLimit')),
-                max_students: parseInt(formData.get('maxStudents'))
+                show_score: formData.get('showScore') === 'true'
             };
 
             console.log('Creating session with config:', sessionConfig);
@@ -165,12 +163,6 @@ class TeacherDashboard {
             </div>
             <div class="summary-item">
                 <strong>📊 점수표시:</strong> ${config.show_score ? '보기' : '숨김'}
-            </div>
-            <div class="summary-item">
-                <strong>⏱️ 제한시간:</strong> ${this.sessionManager.formatDuration(config.time_limit)}
-            </div>
-            <div class="summary-item">
-                <strong>👥 최대인원:</strong> ${config.max_students}명
             </div>
             <div class="summary-item">
                 <strong>📅 생성시간:</strong> ${this.formatKoreanTime(sessionData.session.created_at)}
@@ -255,7 +247,7 @@ class TeacherDashboard {
                     </div>
                     <div class="overview-stat">
                         <span class="stat-label">참여학생:</span>
-                        <span class="stat-value">${stats.current_students}명 / ${session.config.max_students}명</span>
+                        <span class="stat-value">${stats.current_students}명</span>
                     </div>
                     <div class="overview-stat">
                         <span class="stat-label">평균 이해도:</span>
@@ -427,8 +419,6 @@ class TeacherDashboard {
 
                 <div class="session-card-meta">
                     <span>${this.sessionManager.getDifficultyIcon(config.difficulty)} ${this.sessionManager.getDifficultyText(config.difficulty)}</span>
-                    <span>⏱️ ${this.sessionManager.formatDuration(config.time_limit)}</span>
-                    <span>👥 최대 ${config.max_students}명</span>
                     <span>📅 ${this.sessionManager.formatTimestamp(session.created_at)}</span>
                 </div>
 
@@ -470,8 +460,6 @@ class TeacherDashboard {
 
                 <div class="session-card-meta">
                     <span>${this.sessionManager.getDifficultyIcon(config.difficulty)} ${this.sessionManager.getDifficultyText(config.difficulty)}</span>
-                    <span>⏱️ ${this.sessionManager.formatDuration(config.time_limit)}</span>
-                    <span>👥 최대 ${config.max_students}명</span>
                     <span>📅 ${this.sessionManager.formatTimestamp(session.created_at)}</span>
                 </div>
 
