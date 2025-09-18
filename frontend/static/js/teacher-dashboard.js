@@ -350,12 +350,12 @@ class TeacherDashboard {
     updateOverviewStats() {
         const totalSessions = this.sessions.length;
         const totalStudents = this.sessions.reduce((sum, s) => sum + (s.live_stats?.total_joined || 0), 0);
-        const activeSessions = this.sessions.filter(s => s.status === 'active').length;
+        const activeSessions = this.sessions.length;
 
-        // Calculate average score from active sessions
-        const activeSessionsWithScores = this.sessions.filter(s => s.status === 'active' && s.live_stats?.average_score);
-        const averageScore = activeSessionsWithScores.length > 0
-            ? Math.round(activeSessionsWithScores.reduce((sum, s) => sum + s.live_stats.average_score, 0) / activeSessionsWithScores.length)
+        // Calculate average score from all sessions
+        const sessionsWithScores = this.sessions.filter(s => s.live_stats?.average_score);
+        const averageScore = sessionsWithScores.length > 0
+            ? Math.round(sessionsWithScores.reduce((sum, s) => sum + s.live_stats.average_score, 0) / sessionsWithScores.length)
             : 0;
 
         // Update DOM elements
@@ -440,22 +440,20 @@ class TeacherDashboard {
                     <span>📅 ${this.sessionManager.formatTimestamp(session.created_at)}</span>
                 </div>
 
-                ${session.status === 'active' ? `
-                    <div class="session-card-stats">
-                        <div class="stat-item">
-                            <span class="stat-item-value">${stats.current_students || 0}</span>
-                            <span class="stat-item-label">참여 학생</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-item-value">${Math.round(stats.average_score || 0)}%</span>
-                            <span class="stat-item-label">평균 점수</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-item-value">${Math.round(stats.completion_rate || 0)}%</span>
-                            <span class="stat-item-label">완료율</span>
-                        </div>
+                <div class="session-card-stats">
+                    <div class="stat-item">
+                        <span class="stat-item-value">${stats.current_students || 0}</span>
+                        <span class="stat-item-label">참여 학생</span>
                     </div>
-                ` : ''}
+                    <div class="stat-item">
+                        <span class="stat-item-value">${Math.round(stats.average_score || 0)}%</span>
+                        <span class="stat-item-label">평균 점수</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-item-value">${Math.round(stats.completion_rate || 0)}%</span>
+                        <span class="stat-item-label">완료율</span>
+                    </div>
+                </div>
 
                 <div class="session-card-actions" onclick="event.stopPropagation()">
                     ${this.generateSessionActions(session)}
@@ -489,13 +487,11 @@ class TeacherDashboard {
 
                 ${this.generateStudentsSection(session)}
 
-                ${session.status === 'active' ? `
-                    <div class="session-card-stats">
-                        <div class="stat-item">👥 참여: ${stats.current_students || 0}명</div>
-                        <div class="stat-item">📊 평균: ${Math.round(stats.average_score || 0)}%</div>
-                        <div class="stat-item">✅ 완료율: ${Math.round(stats.completion_rate || 0)}%</div>
-                    </div>
-                ` : ''}
+                <div class="session-card-stats">
+                    <div class="stat-item">👥 참여: ${stats.current_students || 0}명</div>
+                    <div class="stat-item">📊 평균: ${Math.round(stats.average_score || 0)}%</div>
+                    <div class="stat-item">✅ 완료율: ${Math.round(stats.completion_rate || 0)}%</div>
+                </div>
 
                 <div class="session-card-actions">
                     ${this.generateSessionActions(session)}
@@ -524,18 +520,9 @@ class TeacherDashboard {
     generateSessionActions(session) {
         const actions = [];
 
-        if (session.status === 'waiting') {
-            actions.push(`<button class="action-btn" onclick="dashboard.showSessionQR('${session.id}')">🔗 QR보기</button>`);
-            actions.push(`<button class="action-btn primary" onclick="dashboard.startSession('${session.id}')">▶️ 시작</button>`);
-            actions.push(`<button class="action-btn danger" onclick="dashboard.deleteSession('${session.id}')">🗑️ 삭제</button>`);
-        } else if (session.status === 'active') {
-            actions.push(`<button class="action-btn primary" onclick="dashboard.monitorSession('${session.id}')">📊 모니터링</button>`);
-            actions.push(`<button class="action-btn" onclick="dashboard.showSessionQR('${session.id}')">🔗 QR보기</button>`);
-            actions.push(`<button class="action-btn danger" onclick="dashboard.endSession('${session.id}')">⏹️ 종료</button>`);
-        } else if (session.status === 'completed') {
-            actions.push(`<button class="action-btn" onclick="dashboard.viewSessionResults('${session.id}')">📈 결과보기</button>`);
-            actions.push(`<button class="action-btn danger" onclick="dashboard.deleteSession('${session.id}')">🗑️ 삭제</button>`);
-        }
+        actions.push(`<button class="action-btn primary" onclick="dashboard.monitorSession('${session.id}')">📊 모니터링</button>`);
+        actions.push(`<button class="action-btn" onclick="dashboard.showSessionQR('${session.id}')">🔗 QR보기</button>`);
+        actions.push(`<button class="action-btn danger" onclick="dashboard.deleteSession('${session.id}')">🗑️ 삭제</button>`);
 
         return actions.join('');
     }
@@ -655,12 +642,72 @@ class TeacherDashboard {
         }
     }
 
+    async showSessionQR(sessionId) {
+        try {
+            this.showLoading(true);
+
+            // Find session in current sessions list
+            const session = this.sessions.find(s => s.id === sessionId);
+            if (!session) {
+                this.showError('세션을 찾을 수 없습니다');
+                return;
+            }
+
+            // Create session data structure for QR modal
+            const base_url = window.location.origin;
+            const session_url = `${base_url}/s/${sessionId}`;
+
+            // Try to get QR code from backend first
+            let qrImageData = null;
+            try {
+                const qrResponse = await fetch(`${this.sessionManager.apiBaseUrl}/qr/${sessionId}.png`);
+                if (qrResponse.ok) {
+                    const blob = await qrResponse.blob();
+                    qrImageData = await new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result);
+                        reader.readAsDataURL(blob);
+                    });
+                }
+            } catch (qrError) {
+                console.log('Backend QR not available, generating client-side');
+            }
+
+            // If backend QR not available, generate client-side
+            if (!qrImageData) {
+                const qrCanvas = document.createElement('canvas');
+                await this.qrGenerator.generateQRCode(qrCanvas, session_url);
+                qrImageData = qrCanvas.toDataURL();
+            }
+
+            const sessionData = {
+                session: {
+                    id: sessionId,
+                    config: session.config,
+                    created_at: session.created_at
+                },
+                qr_code: {
+                    url: session_url,
+                    image_data: qrImageData
+                }
+            };
+
+            // Show QR modal
+            this.showQRModal(sessionData);
+
+        } catch (error) {
+            console.error('Failed to show QR code:', error);
+            this.showError('QR 코드를 표시할 수 없습니다: ' + error.message);
+        } finally {
+            this.showLoading(false);
+        }
+    }
+
 
     startAutoRefresh() {
-        // Refresh every 30 seconds for active sessions
+        // Refresh every 30 seconds if there are any sessions
         this.refreshInterval = setInterval(() => {
-            const hasActiveSessions = this.sessions.some(s => s.status === 'active');
-            if (hasActiveSessions) {
+            if (this.sessions.length > 0) {
                 this.loadSessions();
             }
         }, 30000);

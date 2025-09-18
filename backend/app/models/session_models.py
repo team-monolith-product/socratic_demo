@@ -22,7 +22,7 @@ class QRCodeInfo(BaseModel):
 class SessionInfo(BaseModel):
     id: str
     config: SessionConfig
-    status: str  # waiting, active, completed, expired
+    status: str  # active (single state)
     created_at: datetime
     expires_at: datetime
 

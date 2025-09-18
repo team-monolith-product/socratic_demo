@@ -7,3 +7,4 @@ pydantic==2.5.0
 httpx==0.25.2
 qrcode[pil]==7.4.2
 pytz==2023.3
+aiofiles==23.2.1

@@ -234,23 +234,11 @@ class SessionManager {
     }
 
     getStatusText(status) {
-        const statusMap = {
-            'waiting': '대기 중',
-            'active': '진행 중',
-            'completed': '완료됨',
-            'expired': '만료됨'
-        };
-        return statusMap[status] || status;
+        return '진행 중';
     }
 
     getStatusColor(status) {
-        const colorMap = {
-            'waiting': '#ffd700',
-            'active': '#28a745',
-            'completed': '#6c757d',
-            'expired': '#dc3545'
-        };
-        return colorMap[status] || '#6c757d';
+        return '#28a745';
     }
 
     getDifficultyText(difficulty) {

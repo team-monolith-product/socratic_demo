@@ -8,6 +8,7 @@ from app.models.session_models import (
 from app.services.session_service import get_session_service
 from app.services.qr_service import get_qr_service
 from app.services.socratic_service import SocraticService
+from app.services.storage_service import get_storage_service
 from datetime import datetime
 import io
 
@@ -92,10 +93,9 @@ async def get_teacher_sessions(request: Request):
         total_sessions = len(sessions)
         total_students = sum(s.get('live_stats', {}).get('total_joined', 0) for s in sessions)
 
-        # Calculate average score from active sessions
-        active_sessions = [s for s in sessions if s['status'] == 'active']
-        if active_sessions:
-            avg_score = sum(s.get('live_stats', {}).get('average_score', 0) for s in active_sessions) / len(active_sessions)
+        # Calculate average score from all sessions
+        if sessions:
+            avg_score = sum(s.get('live_stats', {}).get('average_score', 0) for s in sessions) / len(sessions)
         else:
             avg_score = 0
 
@@ -229,9 +229,6 @@ async def get_session_info(session_id: str):
         if not session_data:
             raise HTTPException(status_code=404, detail="Session not found")
 
-        if session_data['status'] == 'expired':
-            raise HTTPException(status_code=410, detail="Session has expired")
-
         config = SessionConfig(**session_data['config'])
 
         return {
@@ -242,7 +239,7 @@ async def get_session_info(session_id: str):
                 "difficulty": config.difficulty,
                 "show_score": config.show_score,
                 "estimated_time": f"{config.time_limit}분",
-                "is_active": session_data['status'] in ['waiting', 'active']
+                "is_active": True
             }
         }
 
@@ -307,5 +304,15 @@ async def download_qr_code(session_id: str):
             headers={"Content-Disposition": f"attachment; filename=session_{session_id}.png"}
         )
 
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/teacher/storage/stats")
+async def get_storage_stats():
+    """Get storage statistics"""
+    try:
+        storage_service = get_storage_service()
+        stats = await storage_service.get_storage_stats()
+        return {"success": True, "stats": stats}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

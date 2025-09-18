@@ -1,0 +1,11 @@
+[phases.build]
+cmds = ["echo 'Building with Nixpacks'"]
+
+[phases.install]
+cmds = ["pip install -r backend/requirements.txt"]
+
+[start]
+cmd = "python backend/main.py"
+
+[variables]
+PORT = "8000"

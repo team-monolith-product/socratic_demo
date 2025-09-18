@@ -8,13 +8,37 @@ from app.models.session_models import (
     SessionConfig, SessionInfo, StudentProgress, LiveStats,
     SessionActivity, QRCodeInfo
 )
+from app.services.storage_service import get_storage_service
 
 class SessionService:
     def __init__(self):
-        # In-memory storage for active sessions
+        # In-memory storage for active sessions (with file backup)
         self.active_sessions: Dict[str, Dict[str, Any]] = {}
         self.session_students: Dict[str, Dict[str, Any]] = {}  # session_id -> {student_id -> student_data}
         self.kst = pytz.timezone('Asia/Seoul')
+        self.storage_service = get_storage_service()
+
+        # Load existing data on startup
+        asyncio.create_task(self._load_persisted_data())
+
+    async def _load_persisted_data(self):
+        """Load persisted session and student data on startup"""
+        try:
+            print("🔄 Loading persisted session data...")
+
+            # Load sessions
+            persisted_sessions = await self.storage_service.load_sessions()
+            self.active_sessions.update(persisted_sessions)
+            print(f"✅ Loaded {len(persisted_sessions)} sessions from storage")
+
+            # Load students
+            persisted_students = await self.storage_service.load_students()
+            self.session_students.update(persisted_students)
+            total_students = sum(len(session_students) for session_students in persisted_students.values())
+            print(f"✅ Loaded {total_students} students from storage")
+
+        except Exception as e:
+            print(f"❌ Error loading persisted data: {e}")
 
     def get_korea_time(self):
         """Get current time in Korea Standard Time"""
@@ -50,7 +74,7 @@ class SessionService:
             'id': session_id,
             'teacher_fingerprint': teacher_fingerprint,
             'config': config.dict(),
-            'status': 'waiting',  # waiting, active, completed, expired
+            'status': 'active',  # single state: active
             'created_at': now.isoformat(),  # Convert to ISO string with timezone
             'expires_at': expires_at.isoformat(),  # Convert to ISO string with timezone
             'last_activity': now.isoformat(),  # Convert to ISO string with timezone
@@ -74,6 +98,14 @@ class SessionService:
 
         self.active_sessions[session_id] = session_data
         self.session_students[session_id] = {}
+
+        # Save to persistent storage
+        try:
+            await self.storage_service.save_session(session_id, session_data)
+            await self.storage_service.save_session_students(session_id, {})
+            print(f"💾 Session {session_id} saved to persistent storage")
+        except Exception as e:
+            print(f"❌ Failed to save session {session_id}: {e}")
 
         # Generate QR code URL
         session_url = f"{base_url}/s/{session_id}"
@@ -174,8 +206,6 @@ class SessionService:
         if not session_data:
             return None
 
-        if session_data['status'] == 'expired':
-            return None
 
         # Generate student ID
         student_id = str(uuid.uuid4())
@@ -213,9 +243,6 @@ class SessionService:
         session_data['live_stats']['total_joined'] += 1
         session_data['live_stats']['current_students'] = len(self.session_students[session_id])
 
-        # Change status to active if first student
-        if session_data['status'] == 'waiting':
-            session_data['status'] = 'active'
 
         # Log activity
         activity = {
@@ -230,6 +257,14 @@ class SessionService:
         # Keep only last 10 activities
         if len(session_data['live_stats']['recent_activities']) > 10:
             session_data['live_stats']['recent_activities'] = session_data['live_stats']['recent_activities'][-10:]
+
+        # Save updated data to persistent storage
+        try:
+            await self.storage_service.save_session(session_id, session_data)
+            await self.storage_service.save_session_students(session_id, self.session_students[session_id])
+            print(f"💾 Updated session {session_id} with new student {student_id}")
+        except Exception as e:
+            print(f"❌ Failed to save student join for session {session_id}: {e}")
 
         return {
             'student_id': student_id,
@@ -285,21 +320,19 @@ class SessionService:
 
         # Update session live stats
         await self._update_session_live_stats(session_id)
+
+        # Save updated student progress to persistent storage
+        try:
+            await self.storage_service.save_session_students(session_id, self.session_students[session_id])
+            await self.storage_service.save_session(session_id, self.active_sessions[session_id])
+        except Exception as e:
+            print(f"❌ Failed to save student progress for session {session_id}: {e}")
+
         return True
 
     async def end_session(self, session_id: str, teacher_fingerprint: str) -> Optional[Dict[str, Any]]:
-        """End a session"""
-        session_data = self.active_sessions.get(session_id)
-        if not session_data or session_data['teacher_fingerprint'] != teacher_fingerprint:
-            return None
-
-        session_data['status'] = 'completed'
-        session_data['ended_at'] = self.get_korea_time().isoformat()  # Convert to ISO string with timezone
-
-        # Calculate final stats
-        final_stats = await self._calculate_final_stats(session_id)
-
-        return final_stats
+        """Delete a session (simplified from end)"""
+        return await self.delete_session(session_id, teacher_fingerprint)
 
     async def delete_session(self, session_id: str, teacher_fingerprint: str) -> bool:
         """Delete a session"""
@@ -311,6 +344,13 @@ class SessionService:
         self.active_sessions.pop(session_id, None)
         self.session_students.pop(session_id, None)
 
+        # Remove from persistent storage
+        try:
+            await self.storage_service.delete_session(session_id)
+            print(f"💾 Deleted session {session_id} from persistent storage")
+        except Exception as e:
+            print(f"❌ Failed to delete session {session_id} from storage: {e}")
+
         return True
 
     async def cleanup_expired_sessions(self):
@@ -319,16 +359,32 @@ class SessionService:
         expired_sessions = []
 
         for session_id, session_data in self.active_sessions.items():
-            if session_data['expires_at'] < now:
-                session_data['status'] = 'expired'
-                expired_sessions.append(session_id)
+            expires_at_str = session_data.get('expires_at')
+            if expires_at_str:
+                try:
+                    expires_at = datetime.fromisoformat(expires_at_str)
+                    if expires_at.tzinfo is None:
+                        expires_at = self.kst.localize(expires_at)
+                    elif expires_at.tzinfo != self.kst:
+                        expires_at = expires_at.astimezone(self.kst)
 
-        # Remove expired sessions after 1 hour
+                    if expires_at < now:
+                        expired_sessions.append(session_id)
+                except Exception as e:
+                    print(f"❌ Error parsing expires_at for session {session_id}: {e}")
+
+        # Remove expired sessions immediately
         for session_id in expired_sessions:
-            session_data = self.active_sessions[session_id]
-            if session_data['expires_at'] < (now - timedelta(hours=1)):
-                self.active_sessions.pop(session_id, None)
-                self.session_students.pop(session_id, None)
+            print(f"🗑️ Cleaning up expired session: {session_id}")
+            self.active_sessions.pop(session_id, None)
+            self.session_students.pop(session_id, None)
+
+            # Remove from persistent storage
+            try:
+                await self.storage_service.delete_session(session_id)
+                print(f"💾 Removed expired session {session_id} from storage")
+            except Exception as e:
+                print(f"❌ Failed to remove expired session {session_id} from storage: {e}")
 
     def _calculate_student_progress(self, student_data: Dict[str, Any]) -> Dict[str, Any]:
         """Calculate student progress for display"""
@@ -390,26 +446,6 @@ class SessionService:
 
         session_data['live_stats']['current_students'] = total_students
 
-    async def _calculate_final_stats(self, session_id: str) -> Dict[str, Any]:
-        """Calculate final session statistics"""
-        session_data = self.active_sessions.get(session_id)
-        students = self.session_students.get(session_id, {})
-
-        if not session_data:
-            return {}
-
-        total_students = len(students)
-        completed_students = sum(1 for s in students.values() if s['progress']['is_completed'])
-
-        final_stats = {
-            'total_students': total_students,
-            'completed_students': completed_students,
-            'completion_rate': (completed_students / total_students * 100) if total_students > 0 else 0,
-            'average_score': session_data['live_stats']['average_score'],
-            'dimension_averages': session_data['live_stats']['dimension_averages'].copy()
-        }
-
-        return final_stats
 
 # Singleton instance
 _session_service = SessionService()
