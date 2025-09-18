@@ -1689,6 +1689,14 @@
     letter-spacing: -0.022em;
 }
 
+.session-card-topic {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin: 0 0 var(--space-1) 0;
+    line-height: 1.4;
+    font-weight: 400;
+}
+
 .session-card-description {
     font-size: 0.875rem;
     color: var(--text-secondary);

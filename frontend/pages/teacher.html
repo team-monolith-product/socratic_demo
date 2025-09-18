@@ -167,8 +167,21 @@
 
                     <form id="sessionForm" class="learning-form">
                         <div class="form-card">
-                            <!-- Topic Input Section -->
+                            <!-- Title and Topic Input Section -->
                             <div class="input-section">
+                                <div class="input-group">
+                                    <label for="sessionTitle" class="input-label">세션 제목</label>
+                                    <div class="input-wrapper">
+                                        <input
+                                            id="sessionTitle"
+                                            name="title"
+                                            class="form-input"
+                                            placeholder="예: 기후변화 토론"
+                                            maxlength="50"
+                                            required
+                                        />
+                                    </div>
+                                </div>
                                 <div class="input-group">
                                     <label for="sessionTopic" class="input-label">학습 주제</label>
                                     <div class="input-wrapper">
@@ -176,7 +189,7 @@
                                             id="sessionTopic"
                                             name="topic"
                                             class="topic-input"
-                                            placeholder="예: 기후변화의 원인과 해결책"
+                                            placeholder="예: 기후변화의 원인과 해결책을 탐구하고 개인과 사회 차원의 대응방안을 토론해보세요"
                                             rows="3"
                                             required
                                         ></textarea>

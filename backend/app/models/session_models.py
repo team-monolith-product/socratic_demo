@@ -3,6 +3,7 @@ from typing import Optional, List, Dict, Any
 from datetime import datetime
 
 class SessionConfig(BaseModel):
+    title: str
     topic: str
     description: Optional[str] = None
     difficulty: str = "normal"  # easy, normal, hard

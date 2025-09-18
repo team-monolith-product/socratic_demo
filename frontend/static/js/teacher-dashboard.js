@@ -102,6 +102,7 @@ class TeacherDashboard {
 
             const formData = new FormData(event.target);
             const sessionConfig = {
+                title: formData.get('title'),
                 topic: formData.get('topic'),
                 description: formData.get('description') || null,
                 difficulty: formData.get('difficulty'),
@@ -152,6 +153,9 @@ class TeacherDashboard {
         const config = sessionData.session.config;
         const sessionSummary = document.getElementById('sessionSummary');
         sessionSummary.innerHTML = `
+            <div class="summary-item">
+                <strong>📋 제목:</strong> ${config.title}
+            </div>
             <div class="summary-item">
                 <strong>📚 주제:</strong> ${config.topic}
             </div>
@@ -243,7 +247,7 @@ class TeacherDashboard {
 
         return `
             <div class="monitoring-overview">
-                <h4>📊 ${session.config.topic}</h4>
+                <h4>📊 ${session.config.title}</h4>
                 <div class="overview-stats">
                     <div class="overview-stat">
                         <span class="stat-label">진행시간:</span>
@@ -415,7 +419,8 @@ class TeacherDashboard {
             <div class="session-card" data-session-id="${session.id}" onclick="dashboard.viewSessionDetail('${session.id}')">
                 <div class="session-card-header">
                     <div>
-                        <div class="session-card-title">${config.topic}</div>
+                        <div class="session-card-title">${config.title}</div>
+                        <div class="session-card-topic">${config.topic}</div>
                         ${config.description ? `<div class="session-card-description">${config.description}</div>` : ''}
                     </div>
                 </div>
@@ -457,7 +462,8 @@ class TeacherDashboard {
             <div class="session-card" data-session-id="${session.id}">
                 <div class="session-card-header">
                     <div>
-                        <div class="session-card-title">${config.topic}</div>
+                        <div class="session-card-title">${config.title}</div>
+                        <div class="session-card-topic">${config.topic}</div>
                         ${config.description ? `<div class="session-card-description">${config.description}</div>` : ''}
                     </div>
                 </div>
@@ -537,7 +543,7 @@ class TeacherDashboard {
         this.currentDetailSession = sessionDetails;
 
         // Update header
-        document.getElementById('sessionDetailTitle').textContent = session.config.topic;
+        document.getElementById('sessionDetailTitle').textContent = session.config.title;
 
         // Update info cards
         document.getElementById('detailStudentCount').textContent = stats.current_students || 0;
