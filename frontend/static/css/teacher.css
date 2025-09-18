@@ -1231,9 +1231,10 @@
 /* QR Display Layout */
 .qr-display {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: auto 1fr;
     gap: var(--space-8);
     margin-bottom: var(--space-6);
+    align-items: start;
 }
 
 .qr-code-section {
@@ -1243,11 +1244,17 @@
     gap: var(--space-4);
 }
 
+.qr-code-section canvas {
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+}
+
 .session-summary-section {
     padding: var(--space-6);
     background: var(--secondary-50);
     border-radius: var(--radius-lg);
     border: 1px solid var(--secondary-200);
+    text-align: right;
 }
 
 .session-summary-section h4 {
@@ -1255,6 +1262,30 @@
     font-size: 1rem;
     font-weight: 600;
     color: var(--secondary-900);
+    text-align: right;
+}
+
+.qr-info {
+    text-align: right;
+    margin-bottom: var(--space-4);
+}
+
+.qr-info p {
+    text-align: right;
+    margin-bottom: var(--space-3);
+}
+
+.session-details {
+    text-align: right;
+}
+
+.detail-item {
+    text-align: right;
+    margin-bottom: var(--space-2);
+}
+
+.detail-item strong {
+    text-align: right;
 }
 
 /* Modal Actions */
@@ -1441,6 +1472,35 @@
     .qr-display {
         grid-template-columns: 1fr;
         gap: var(--space-6);
+    }
+
+    .qr-code-section canvas {
+        width: 250px;
+        height: 250px;
+    }
+
+    .session-summary-section {
+        text-align: center;
+    }
+
+    .qr-info {
+        text-align: center;
+    }
+
+    .qr-info p {
+        text-align: center;
+    }
+
+    .session-details {
+        text-align: center;
+    }
+
+    .detail-item {
+        text-align: center;
+    }
+
+    .session-summary-section h4 {
+        text-align: center;
     }
 
     .session-setup-steps {

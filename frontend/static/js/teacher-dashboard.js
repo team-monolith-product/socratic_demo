@@ -7,6 +7,7 @@ class TeacherDashboard {
         this.sessions = [];
         this.refreshInterval = null;
         this.currentModalSession = null;
+        this.currentDetailSession = null;
 
         // Initialize when DOM is loaded
         if (document.readyState === 'loading') {
@@ -77,9 +78,11 @@ class TeacherDashboard {
             downloadQRBtn.addEventListener('click', () => this.downloadQRCode());
         }
 
-        const monitorSessionBtn = document.getElementById('monitorSessionBtn');
-        if (monitorSessionBtn) {
-            monitorSessionBtn.addEventListener('click', () => this.openSessionMonitoring());
+
+        // Session detail QR button
+        const sessionQRBtn = document.getElementById('sessionQRBtn');
+        if (sessionQRBtn) {
+            sessionQRBtn.addEventListener('click', () => this.showDetailSessionQR());
         }
     }
 
@@ -134,12 +137,9 @@ class TeacherDashboard {
 
     showQRModal(sessionData) {
         const modal = document.getElementById('qrModal');
-        const sessionId = sessionData.session.id;
         const qrCode = sessionData.qr_code;
 
         // Update modal content
-        document.getElementById('sessionId').textContent = sessionId;
-
         const sessionLink = document.getElementById('sessionLink');
         sessionLink.href = qrCode.url;
         sessionLink.textContent = qrCode.url;
@@ -213,16 +213,6 @@ class TeacherDashboard {
         }
     }
 
-    openSessionMonitoring() {
-        if (!this.currentModalSession) return;
-
-        const sessionId = this.currentModalSession.session.id;
-        // Close QR modal first
-        this.closeModal(document.getElementById('qrModal'));
-
-        // Open monitoring modal
-        this.showMonitoringModal(sessionId);
-    }
 
     async showMonitoringModal(sessionId) {
         const modal = document.getElementById('monitorModal');
@@ -428,9 +418,6 @@ class TeacherDashboard {
                         <div class="session-card-title">${config.topic}</div>
                         ${config.description ? `<div class="session-card-description">${config.description}</div>` : ''}
                     </div>
-                    <div class="session-card-status ${session.status}">
-                        ${this.sessionManager.getStatusText(session.status)}
-                    </div>
                 </div>
 
                 <div class="session-card-meta">
@@ -472,9 +459,6 @@ class TeacherDashboard {
                     <div>
                         <div class="session-card-title">${config.topic}</div>
                         ${config.description ? `<div class="session-card-description">${config.description}</div>` : ''}
-                    </div>
-                    <div class="session-card-status ${session.status}">
-                        ${this.sessionManager.getStatusText(session.status)}
                     </div>
                 </div>
 
@@ -549,10 +533,11 @@ class TeacherDashboard {
         const stats = session.live_stats || {};
         const students = sessionDetails.students || [];
 
+        // Store current session for QR button
+        this.currentDetailSession = sessionDetails;
+
         // Update header
         document.getElementById('sessionDetailTitle').textContent = session.config.topic;
-        document.getElementById('sessionDetailStatus').textContent = this.sessionManager.getStatusText(session.status);
-        document.getElementById('sessionDetailStatus').className = `session-status-badge ${session.status}`;
 
         // Update info cards
         document.getElementById('detailStudentCount').textContent = stats.current_students || 0;
@@ -652,6 +637,68 @@ class TeacherDashboard {
                 this.showError('세션을 찾을 수 없습니다');
                 return;
             }
+
+            // Create session data structure for QR modal
+            const base_url = window.location.origin;
+            const session_url = `${base_url}/s/${sessionId}`;
+
+            // Try to get QR code from backend first
+            let qrImageData = null;
+            try {
+                const qrResponse = await fetch(`${this.sessionManager.apiBaseUrl}/qr/${sessionId}.png`);
+                if (qrResponse.ok) {
+                    const blob = await qrResponse.blob();
+                    qrImageData = await new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result);
+                        reader.readAsDataURL(blob);
+                    });
+                }
+            } catch (qrError) {
+                console.log('Backend QR not available, generating client-side');
+            }
+
+            // If backend QR not available, generate client-side
+            if (!qrImageData) {
+                const qrCanvas = document.createElement('canvas');
+                await this.qrGenerator.generateQRCode(qrCanvas, session_url);
+                qrImageData = qrCanvas.toDataURL();
+            }
+
+            const sessionData = {
+                session: {
+                    id: sessionId,
+                    config: session.config,
+                    created_at: session.created_at
+                },
+                qr_code: {
+                    url: session_url,
+                    image_data: qrImageData
+                }
+            };
+
+            // Show QR modal
+            this.showQRModal(sessionData);
+
+        } catch (error) {
+            console.error('Failed to show QR code:', error);
+            this.showError('QR 코드를 표시할 수 없습니다: ' + error.message);
+        } finally {
+            this.showLoading(false);
+        }
+    }
+
+    async showDetailSessionQR() {
+        if (!this.currentDetailSession) {
+            this.showError('세션 정보를 찾을 수 없습니다');
+            return;
+        }
+
+        try {
+            this.showLoading(true);
+
+            const session = this.currentDetailSession.session;
+            const sessionId = session.id;
 
             // Create session data structure for QR modal
             const base_url = window.location.origin;

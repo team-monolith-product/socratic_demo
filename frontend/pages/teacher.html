@@ -61,13 +61,8 @@
                     </button>
                     <div class="detail-title-section">
                         <h1 id="sessionDetailTitle">세션 상세</h1>
-                        <div class="session-status-badge" id="sessionDetailStatus">활성</div>
                     </div>
                     <div class="detail-actions">
-                        <button class="action-btn" id="sessionSettingsBtn">
-                            <span class="btn-icon">⚙️</span>
-                            설정
-                        </button>
                         <button class="action-btn primary" id="sessionQRBtn">
                             <span class="btn-icon">📱</span>
                             QR 코드
@@ -316,41 +311,24 @@
         <div id="qrModal" class="modal" style="display: none;">
             <div class="modal-content large">
                 <div class="modal-header">
-                    <h3>🎉 QR 코드 생성 완료!</h3>
+                    <h3>📱 학생들에게 이 QR 코드를 보여주세요!</h3>
                     <button class="modal-close">&times;</button>
                 </div>
                 <div class="modal-body">
-                    <div class="session-setup-steps">
-                        <div class="step completed">
-                            <div class="step-number">✓</div>
-                            <div class="step-label">세션 설정</div>
-                        </div>
-                        <div class="step-connector"></div>
-                        <div class="step active">
-                            <div class="step-number">2</div>
-                            <div class="step-label">QR 코드 생성</div>
-                        </div>
-                    </div>
-
                     <div class="qr-display">
                         <div class="qr-code-section">
-                            <canvas id="qrCanvas" width="200" height="200"></canvas>
+                            <canvas id="qrCanvas" width="300" height="300"></canvas>
+                        </div>
+
+                        <div class="session-summary-section">
                             <div class="qr-info">
-                                <p>📱 학생들에게 이 QR 코드를 보여주세요</p>
                                 <div class="session-details">
-                                    <div class="detail-item">
-                                        <strong>🔗 세션 ID:</strong> <span id="sessionId"></span>
-                                    </div>
                                     <div class="detail-item">
                                         <strong>🌐 직접 링크:</strong>
                                         <a id="sessionLink" href="#" target="_blank"></a>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-
-                        <div class="session-summary-section">
-                            <h4>📚 세션 정보</h4>
                             <div id="sessionSummary"></div>
                         </div>
                     </div>
@@ -358,7 +336,6 @@
                     <div class="modal-actions">
                         <button id="copyLinkBtn" class="secondary-button">📋 링크 복사</button>
                         <button id="downloadQRBtn" class="secondary-button">🖼️ QR 다운로드</button>
-                        <button id="monitorSessionBtn" class="primary-button">📊 실시간 모니터링</button>
                     </div>
                 </div>
             </div>
