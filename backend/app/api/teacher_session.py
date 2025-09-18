@@ -150,7 +150,7 @@ async def get_session_details(session_id: str, request: Request):
 
         # Convert datetime objects in students
         for student in students:
-            for field in ['last_activity']:
+            for field in ['last_activity', 'joined_at']:
                 if field in student and hasattr(student[field], 'isoformat'):
                     student[field] = student[field].isoformat()
 

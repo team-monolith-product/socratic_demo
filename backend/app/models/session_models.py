@@ -33,11 +33,15 @@ class SessionCreateResponse(BaseModel):
 class StudentProgress(BaseModel):
     student_id: str
     student_name: str
+    latest_score: int  # 최근 점수
+    message_count: int  # 학생이 보낸 메시지 수
+    joined_at: datetime  # 최초 접속 시간
+    last_activity: datetime  # 최근 활동 시간
+    minutes_since_last_activity: int  # 마지막 활동으로부터 몇 분 전
+    time_spent: int  # 총 참여 시간 (분)
     progress_percentage: int
     conversation_turns: int
-    time_spent: int  # minutes
     current_dimensions: Dict[str, int]
-    last_activity: datetime
     last_message: Optional[str] = None
     is_completed: bool = False
 

@@ -417,20 +417,40 @@ class SessionService:
         else:
             joined_at = student_data['joined_at']
 
+        # Parse last_active from ISO string
+        if isinstance(student_data['last_active'], str):
+            from datetime import datetime
+            last_active = datetime.fromisoformat(student_data['last_active'])
+            if last_active.tzinfo is None:
+                last_active = self.kst.localize(last_active)
+            elif last_active.tzinfo != self.kst:
+                last_active = last_active.astimezone(self.kst)
+        else:
+            last_active = student_data['last_active']
+
         time_spent = int((now - joined_at).total_seconds() / 60)  # minutes
+        minutes_since_last_activity = int((now - last_active).total_seconds() / 60)  # minutes
 
         # Calculate overall progress percentage
         avg_dimension = sum(progress['dimensions'].values()) / len(progress['dimensions'])
         progress_percentage = min(100, int(avg_dimension))
 
+        # Count actual user messages (not system messages)
+        user_messages = [msg for msg in student_data['messages'] if msg.get('type') == 'user']
+        message_count = len(user_messages)
+
         return {
             'student_id': student_data['id'],
             'student_name': student_data.get('name', '익명'),
+            'latest_score': progress['current_score'],  # 최근 점수
+            'message_count': message_count,  # 학생이 보낸 메시지 수
+            'joined_at': joined_at,  # 최초 접속 시간
+            'last_activity': last_active,  # 최근 활동 시간
+            'minutes_since_last_activity': minutes_since_last_activity,  # 마지막 활동으로부터 몇 분 전
+            'time_spent': time_spent,  # 총 참여 시간
             'progress_percentage': progress_percentage,
             'conversation_turns': progress['conversation_turns'],
-            'time_spent': time_spent,
             'current_dimensions': progress['dimensions'],
-            'last_activity': student_data['last_active'],
             'last_message': student_data['messages'][-1]['content'] if student_data['messages'] else None,
             'is_completed': progress['is_completed']
         }

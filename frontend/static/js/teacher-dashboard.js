@@ -560,15 +560,10 @@ class TeacherDashboard {
         tableBody.innerHTML = students.map((student, index) => `
             <tr>
                 <td>${student.student_name || `학생 #${String(index + 1).padStart(3, '0')}`}</td>
-                <td>${student.time_spent || 0}분</td>
-                <td>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${student.progress_percentage || 0}%"></div>
-                    </div>
-                    <span class="progress-text">${student.progress_percentage || 0}%</span>
-                </td>
-                <td>${student.conversation_turns || 0}</td>
-                <td>${Math.round((student.current_dimensions?.depth || 0) + (student.current_dimensions?.breadth || 0) + (student.current_dimensions?.application || 0) + (student.current_dimensions?.metacognition || 0) + (student.current_dimensions?.engagement || 0)) / 5}%</td>
+                <td><span class="score-badge">${student.latest_score || 0}점</span></td>
+                <td>${student.message_count || 0}개</td>
+                <td>${this.formatJoinTime(student.joined_at)}</td>
+                <td>${this.formatLastActivity(student.minutes_since_last_activity)}</td>
                 <td>
                     <span class="student-status ${student.is_completed ? 'completed' : 'active'}">
                         ${student.is_completed ? '완료' : '진행중'}
@@ -864,6 +859,28 @@ class TeacherDashboard {
             minute: '2-digit',
             second: '2-digit'
         });
+    }
+
+    formatJoinTime(timestamp) {
+        if (!timestamp) return '-';
+        const date = new Date(timestamp);
+        return date.toLocaleString('ko-KR', {
+            timeZone: 'Asia/Seoul',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+
+    formatLastActivity(minutes) {
+        if (minutes === undefined || minutes === null) return '-';
+        if (minutes === 0) return '방금 전';
+        if (minutes < 60) return `${minutes}분 전`;
+        const hours = Math.floor(minutes / 60);
+        const remainingMinutes = minutes % 60;
+        if (remainingMinutes === 0) return `${hours}시간 전`;
+        return `${hours}시간 ${remainingMinutes}분 전`;
     }
 }
 
