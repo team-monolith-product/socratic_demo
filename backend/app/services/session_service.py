@@ -17,12 +17,15 @@ class SessionService:
         self.session_students: Dict[str, Dict[str, Any]] = {}  # session_id -> {student_id -> student_data}
         self.kst = pytz.timezone('Asia/Seoul')
         self.storage_service = get_storage_service()
+        self._data_loaded = False
 
-        # Load existing data on startup
-        asyncio.create_task(self._load_persisted_data())
+        # Load existing data will be called when first accessed
 
-    async def _load_persisted_data(self):
-        """Load persisted session and student data on startup"""
+    async def _ensure_data_loaded(self):
+        """Ensure data is loaded from storage (lazy initialization)"""
+        if self._data_loaded:
+            return
+
         try:
             print("🔄 Loading persisted session data...")
 
@@ -37,8 +40,11 @@ class SessionService:
             total_students = sum(len(session_students) for session_students in persisted_students.values())
             print(f"✅ Loaded {total_students} students from storage")
 
+            self._data_loaded = True
+
         except Exception as e:
             print(f"❌ Error loading persisted data: {e}")
+            self._data_loaded = True  # Mark as loaded to avoid retry loops
 
     def get_korea_time(self):
         """Get current time in Korea Standard Time"""
@@ -61,6 +67,7 @@ class SessionService:
 
     async def create_session(self, config: SessionConfig, teacher_fingerprint: str, base_url: str) -> Dict[str, Any]:
         """Create new session"""
+        await self._ensure_data_loaded()
         session_id = self.generate_session_id()
         now = self.get_korea_time()
         expires_at = now + timedelta(hours=2)  # Sessions expire after 2 hours
@@ -118,6 +125,7 @@ class SessionService:
 
     async def get_teacher_sessions(self, teacher_fingerprint: str) -> List[Dict[str, Any]]:
         """Get all sessions for a teacher"""
+        await self._ensure_data_loaded()
         teacher_sessions = []
         current_korea_time = self.get_korea_time()
         print(f"🕐 DEBUG - get_teacher_sessions current Korea time: {current_korea_time}")
@@ -164,6 +172,7 @@ class SessionService:
 
     async def get_session_details(self, session_id: str, teacher_fingerprint: str) -> Optional[Dict[str, Any]]:
         """Get detailed session information for monitoring"""
+        await self._ensure_data_loaded()
         session_data = self.active_sessions.get(session_id)
         if not session_data or session_data['teacher_fingerprint'] != teacher_fingerprint:
             return None
@@ -202,6 +211,7 @@ class SessionService:
 
     async def join_session(self, session_id: str, student_name: str = "익명") -> Optional[Dict[str, Any]]:
         """Student joins a session"""
+        await self._ensure_data_loaded()
         session_data = self.active_sessions.get(session_id)
         if not session_data:
             return None
@@ -282,6 +292,7 @@ class SessionService:
         last_message: str = ""
     ):
         """Update student progress and session stats"""
+        await self._ensure_data_loaded()
         if session_id not in self.session_students:
             return False
 
@@ -336,6 +347,7 @@ class SessionService:
 
     async def delete_session(self, session_id: str, teacher_fingerprint: str) -> bool:
         """Delete a session"""
+        await self._ensure_data_loaded()
         session_data = self.active_sessions.get(session_id)
         if not session_data or session_data['teacher_fingerprint'] != teacher_fingerprint:
             return False
@@ -355,6 +367,7 @@ class SessionService:
 
     async def cleanup_expired_sessions(self):
         """Remove expired sessions"""
+        await self._ensure_data_loaded()
         now = self.get_korea_time()
         expired_sessions = []
 
