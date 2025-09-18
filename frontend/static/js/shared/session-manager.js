@@ -130,6 +130,46 @@ class SessionManager {
         }
     }
 
+    async getPublicSessionInfo(sessionId) {
+        const url = `${this.apiBaseUrl}/session/${sessionId}`;
+        console.log('🔍 Fetching public session info from:', url);
+
+        try {
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                mode: 'cors'
+            });
+
+            console.log('📡 Response status:', response.status);
+            console.log('📡 Response headers:', [...response.headers.entries()]);
+
+            if (!response.ok) {
+                let errorMessage = `HTTP ${response.status}`;
+                try {
+                    const errorData = await response.json();
+                    errorMessage = errorData.detail || errorMessage;
+                } catch (e) {
+                    console.warn('Could not parse error response as JSON');
+                }
+                throw new Error(errorMessage);
+            }
+
+            const data = await response.json();
+            console.log('✅ Public session data received:', data);
+            return data;
+
+        } catch (error) {
+            console.error('❌ Error fetching public session info:', error);
+            console.error('❌ Error type:', error.constructor.name);
+            console.error('❌ Error message:', error.message);
+            throw error;
+        }
+    }
+
     async joinSession(sessionId, studentInfo) {
         try {
             const response = await fetch(`${this.apiBaseUrl}/session/${sessionId}/join`, {

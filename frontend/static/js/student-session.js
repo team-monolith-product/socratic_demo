@@ -61,8 +61,9 @@ URL: ${window.location.href}
             console.log('Loading session info for:', this.sessionId);
             console.log('API Base URL:', this.sessionManager.apiBaseUrl);
 
-            const sessionDetails = await this.sessionManager.getSessionDetails(this.sessionId);
-            this.sessionData = sessionDetails.session;
+            // Use public session API for students instead of teacher API
+            const sessionInfo = await this.sessionManager.getPublicSessionInfo(this.sessionId);
+            this.sessionData = { config: sessionInfo };  // Wrap in expected structure
             console.log('Session data loaded:', this.sessionData);
         } catch (error) {
             console.error('Failed to load session info:', error);

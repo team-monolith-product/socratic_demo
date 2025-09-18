@@ -104,15 +104,28 @@ async def get_teacher_sessions(request: Request):
 @router.get("/teacher/sessions/{session_id}", response_model=SessionDetailsResponse)
 async def get_session_details(session_id: str, request: Request):
     """Get detailed session information for monitoring"""
+    print(f"🔍 GET /teacher/sessions/{session_id}")
+    print(f"🔍 Request headers: {dict(request.headers)}")
+
     try:
         session_service = get_session_service()
 
         # Generate teacher fingerprint
         teacher_fingerprint = session_service.generate_browser_fingerprint(dict(request.headers))
+        print(f"🔍 Generated fingerprint: {teacher_fingerprint}")
+
+        # Check if session exists in memory
+        active_sessions = getattr(session_service, 'active_sessions', {})
+        print(f"🔍 Active sessions: {list(active_sessions.keys())}")
+        print(f"🔍 Looking for session: {session_id}")
+        print(f"🔍 Session exists: {session_id in active_sessions}")
 
         # Get session details
         session_details = await session_service.get_session_details(session_id, teacher_fingerprint)
+        print(f"🔍 Session details result: {session_details}")
+
         if not session_details:
+            print(f"❌ Session not found: {session_id}")
             raise HTTPException(status_code=404, detail="Session not found")
 
         session_data = session_details['session']
