@@ -370,14 +370,33 @@ async def session_chat(session_id: str, request: SessionChatRequest):
         )
 
         # Store AI response in database
+        message_id = None
         if storage_service and await storage_service.is_database_enabled():
             try:
+                # Get the message ID from the saved AI response for score record
+                from app.models.database_models import Message
+                from app.core.database import AsyncSessionLocal
+
                 await storage_service.save_message(
                     session_id=session_id,
                     student_id=request.student_id,
                     content=socratic_response,
                     message_type="assistant"
                 )
+
+                # Get the user message ID for score record
+                async with AsyncSessionLocal() as db_session:
+                    from sqlalchemy import select, and_, desc
+                    stmt = select(Message.id).where(
+                        and_(
+                            Message.session_id == session_id,
+                            Message.student_id == request.student_id,
+                            Message.message_type == "user"
+                        )
+                    ).order_by(desc(Message.timestamp)).limit(1)
+                    result = await db_session.execute(stmt)
+                    message_id = result.scalar_one_or_none()
+
             except Exception as e:
                 print(f"Warning: Could not save AI message: {e}")
 
@@ -392,6 +411,26 @@ async def session_chat(session_id: str, request: SessionChatRequest):
 
         understanding_score = evaluation_result["overall_score"]
         is_completed = evaluation_result["is_completed"]
+
+        # Save score record to database
+        if storage_service and await storage_service.is_database_enabled() and message_id:
+            try:
+                await storage_service.save_score_record(
+                    session_id=session_id,
+                    student_id=request.student_id,
+                    message_id=message_id,
+                    overall_score=understanding_score,
+                    dimensions=evaluation_result["dimensions"],
+                    is_completed=is_completed,
+                    evaluation_data={
+                        "insights": evaluation_result["insights"],
+                        "growth_indicators": evaluation_result["growth_indicators"],
+                        "next_focus": evaluation_result["next_focus"]
+                    }
+                )
+                print(f"✅ Score record saved for student {request.student_id}, message {message_id}")
+            except Exception as e:
+                print(f"Warning: Could not save score record: {e}")
 
         # Update student progress in session service
         try:
