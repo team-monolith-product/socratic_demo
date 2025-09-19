@@ -180,6 +180,19 @@ class SessionManager {
                 body: JSON.stringify(studentInfo)
             });
 
+            if (!response.ok) {
+                const result = await response.json();
+
+                // Check if it's a name_taken error based on the message
+                if (result.detail && result.detail.includes('이름은 이미 사용 중입니다')) {
+                    const error = new Error(result.detail);
+                    error.type = 'name_taken';
+                    throw error;
+                }
+
+                throw new Error(result.detail || `HTTP error! status: ${response.status}`);
+            }
+
             const result = await response.json();
 
             // Check if the response indicates an error (even with 200 status)
@@ -187,10 +200,6 @@ class SessionManager {
                 const error = new Error(result.message || 'Join session failed');
                 error.type = result.error;
                 throw error;
-            }
-
-            if (!response.ok) {
-                throw new Error(result.detail || `HTTP error! status: ${response.status}`);
             }
 
             return result;

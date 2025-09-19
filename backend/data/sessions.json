@@ -16,8 +16,8 @@
     "last_activity": "2025-09-18T23:03:05.472812+09:00",
     "students": {},
     "live_stats": {
-      "current_students": 0,
-      "total_joined": 0,
+      "current_students": 1,
+      "total_joined": 1,
       "average_score": 0.0,
       "completion_rate": 0.0,
       "dimension_averages": {
@@ -27,7 +27,17 @@
         "metacognition": 0.0,
         "engagement": 0.0
       },
-      "recent_activities": []
+      "recent_activities": [
+        {
+          "type": "student_joined",
+          "student_id": "6d0d8f5c-40af-4651-8d45-52eaab42803c",
+          "student_name": "테스트학생1",
+          "timestamp": "2025-09-19T14:20:21.075239+09:00",
+          "data": {
+            "students_count": 1
+          }
+        }
+      ]
     },
     "events": []
   }

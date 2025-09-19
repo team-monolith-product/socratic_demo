@@ -1,3 +1,26 @@
 {
-  "5820418586B918693": {}
+  "5820418586B918693": {
+    "6d0d8f5c-40af-4651-8d45-52eaab42803c": {
+      "id": "6d0d8f5c-40af-4651-8d45-52eaab42803c",
+      "name": "테스트학생1",
+      "session_id": "5820418586B918693",
+      "fingerprint": "406b6fbf4a223c27",
+      "joined_at": "2025-09-19T14:20:21.075239+09:00",
+      "last_active": "2025-09-19T14:20:46.590965+09:00",
+      "progress": {
+        "conversation_turns": 0,
+        "current_score": 0,
+        "dimensions": {
+          "depth": 0,
+          "breadth": 0,
+          "application": 0,
+          "metacognition": 0,
+          "engagement": 0
+        },
+        "is_completed": false,
+        "completed_at": null
+      },
+      "messages": []
+    }
+  }
 }

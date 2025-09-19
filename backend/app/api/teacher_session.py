@@ -266,6 +266,10 @@ async def join_session(session_id: str, request: SessionJoinRequest, http_reques
         if not join_result:
             raise HTTPException(status_code=404, detail="Session not found or expired")
 
+        # Check if join_result contains an error
+        if 'error' in join_result:
+            raise HTTPException(status_code=400, detail=join_result['message'])
+
         student_id = join_result['student_id']
         session_config = join_result['session_config']
         is_returning = join_result.get('is_returning', False)
