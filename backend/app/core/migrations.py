@@ -5,21 +5,45 @@ from sqlalchemy import text
 from app.core.database import AsyncSessionLocal
 
 
+async def _detect_database_type(session: AsyncSession) -> str:
+    """Detect the database type (sqlite or postgresql)."""
+    try:
+        # Try PostgreSQL specific query
+        await session.execute(text("SELECT version();"))
+        return "postgresql"
+    except:
+        # If PostgreSQL query fails, assume SQLite
+        return "sqlite"
+
+
 async def drop_session_activities_table():
     """Drop the session_activities table if it exists."""
     async with AsyncSessionLocal() as session:
         try:
-            # For SQLite, use sqlite_master to check table existence
-            check_query = text("""
-                SELECT name FROM sqlite_master
-                WHERE type='table' AND name='session_activities';
-            """)
+            db_type = await _detect_database_type(session)
+
+            if db_type == "postgresql":
+                # PostgreSQL: use information_schema
+                check_query = text("""
+                    SELECT table_name FROM information_schema.tables
+                    WHERE table_schema = 'public' AND table_name = 'session_activities';
+                """)
+            else:
+                # SQLite: use sqlite_master
+                check_query = text("""
+                    SELECT name FROM sqlite_master
+                    WHERE type='table' AND name='session_activities';
+                """)
+
             result = await session.execute(check_query)
             table_exists = result.fetchone() is not None
 
             if table_exists:
-                # Drop the table (SQLite doesn't support CASCADE)
-                drop_query = text("DROP TABLE IF EXISTS session_activities;")
+                if db_type == "postgresql":
+                    drop_query = text("DROP TABLE IF EXISTS session_activities CASCADE;")
+                else:
+                    drop_query = text("DROP TABLE IF EXISTS session_activities;")
+
                 await session.execute(drop_query)
                 await session.commit()
                 print("✅ session_activities table dropped successfully")
@@ -36,11 +60,20 @@ async def add_deleted_at_column():
     """Add deleted_at column to sessions table if it doesn't exist."""
     async with AsyncSessionLocal() as session:
         try:
+            db_type = await _detect_database_type(session)
+
             # First check if sessions table exists
-            table_check_query = text("""
-                SELECT name FROM sqlite_master
-                WHERE type='table' AND name='sessions';
-            """)
+            if db_type == "postgresql":
+                table_check_query = text("""
+                    SELECT table_name FROM information_schema.tables
+                    WHERE table_schema = 'public' AND table_name = 'sessions';
+                """)
+            else:
+                table_check_query = text("""
+                    SELECT name FROM sqlite_master
+                    WHERE type='table' AND name='sessions';
+                """)
+
             table_result = await session.execute(table_check_query)
             table_exists = table_result.fetchone() is not None
 
@@ -48,15 +81,26 @@ async def add_deleted_at_column():
                 print("ℹ️ sessions table does not exist yet, skipping column addition")
                 return
 
-            # For SQLite, use PRAGMA to check column existence
-            check_query = text("PRAGMA table_info(sessions);")
-            result = await session.execute(check_query)
-            columns = result.fetchall()
-            column_exists = any(col[1] == 'deleted_at' for col in columns)
+            # Check if column exists
+            if db_type == "postgresql":
+                check_query = text("""
+                    SELECT column_name FROM information_schema.columns
+                    WHERE table_schema = 'public' AND table_name = 'sessions' AND column_name = 'deleted_at';
+                """)
+                result = await session.execute(check_query)
+                column_exists = result.fetchone() is not None
+            else:
+                check_query = text("PRAGMA table_info(sessions);")
+                result = await session.execute(check_query)
+                columns = result.fetchall()
+                column_exists = any(col[1] == 'deleted_at' for col in columns)
 
             if not column_exists:
-                # Add the column (SQLite uses DATETIME instead of TIMESTAMP WITH TIME ZONE)
-                add_column_query = text("ALTER TABLE sessions ADD COLUMN deleted_at DATETIME;")
+                if db_type == "postgresql":
+                    add_column_query = text("ALTER TABLE sessions ADD COLUMN deleted_at TIMESTAMP WITH TIME ZONE;")
+                else:
+                    add_column_query = text("ALTER TABLE sessions ADD COLUMN deleted_at DATETIME;")
+
                 await session.execute(add_column_query)
                 await session.commit()
                 print("✅ deleted_at column added to sessions table")
@@ -73,17 +117,30 @@ async def drop_score_records_table():
     """Drop the score_records table if it exists."""
     async with AsyncSessionLocal() as session:
         try:
-            # For SQLite, use sqlite_master to check table existence
-            check_query = text("""
-                SELECT name FROM sqlite_master
-                WHERE type='table' AND name='score_records';
-            """)
+            db_type = await _detect_database_type(session)
+
+            if db_type == "postgresql":
+                # PostgreSQL: use information_schema
+                check_query = text("""
+                    SELECT table_name FROM information_schema.tables
+                    WHERE table_schema = 'public' AND table_name = 'score_records';
+                """)
+            else:
+                # SQLite: use sqlite_master
+                check_query = text("""
+                    SELECT name FROM sqlite_master
+                    WHERE type='table' AND name='score_records';
+                """)
+
             result = await session.execute(check_query)
             table_exists = result.fetchone() is not None
 
             if table_exists:
-                # Drop the table (SQLite doesn't support CASCADE)
-                drop_query = text("DROP TABLE IF EXISTS score_records;")
+                if db_type == "postgresql":
+                    drop_query = text("DROP TABLE IF EXISTS score_records CASCADE;")
+                else:
+                    drop_query = text("DROP TABLE IF EXISTS score_records;")
+
                 await session.execute(drop_query)
                 await session.commit()
                 print("✅ score_records table dropped successfully")
