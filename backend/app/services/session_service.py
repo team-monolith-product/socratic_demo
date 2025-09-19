@@ -229,21 +229,19 @@ class SessionService:
         now = self.get_korea_time()
 
         if existing_student:
-            # Check if the returning student is trying to change to a name that's already taken
-            if existing_student.get('name', '').strip().lower() != student_name.strip().lower():
-                # Check if the new name is already taken by another student
-                if session_id in self.session_students:
-                    for existing_student_id, existing_student_data in self.session_students[session_id].items():
-                        # Skip if it's the same student (same fingerprint)
-                        if existing_student_data.get('fingerprint') == student_fingerprint:
-                            continue
-                        # Check if name is already taken by a different student
-                        if existing_student_data.get('name', '').strip().lower() == student_name.strip().lower():
-                            print(f"❌ Returning student trying to use taken name '{student_name}' in session {session_id}")
-                            return {
-                                'error': 'name_taken',
-                                'message': f"'{student_name}' 이름은 이미 사용 중입니다. 다른 이름을 입력해주세요."
-                            }
+            # Always check if the name is already taken by another student (even for returning students)
+            if session_id in self.session_students:
+                for existing_student_id, existing_student_data in self.session_students[session_id].items():
+                    # Skip if it's the same student (same fingerprint)
+                    if existing_student_data.get('fingerprint') == student_fingerprint:
+                        continue
+                    # Check if name is already taken by a different student
+                    if existing_student_data.get('name', '').strip().lower() == student_name.strip().lower():
+                        print(f"❌ Returning student trying to use taken name '{student_name}' in session {session_id}")
+                        return {
+                            'error': 'name_taken',
+                            'message': f"'{student_name}' 이름은 이미 사용 중입니다. 다른 이름을 입력해주세요."
+                        }
 
             # Update existing student's last active time
             existing_student['last_active'] = now.isoformat()
