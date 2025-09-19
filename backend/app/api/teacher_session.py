@@ -252,29 +252,39 @@ async def get_session_info(session_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/session/{session_id}/join", response_model=SessionJoinResponse)
-async def join_session(session_id: str, request: SessionJoinRequest):
+async def join_session(session_id: str, request: SessionJoinRequest, http_request: Request):
     """Student joins a session"""
     try:
         session_service = get_session_service()
         socratic_service = get_socratic_service()
 
-        # Join session
-        join_result = await session_service.join_session(session_id, request.student_name)
+        # Generate student fingerprint from browser
+        student_fingerprint = session_service.generate_browser_fingerprint(dict(http_request.headers))
+
+        # Join session (with fingerprint for re-entry detection)
+        join_result = await session_service.join_session(session_id, request.student_name, student_fingerprint)
         if not join_result:
             raise HTTPException(status_code=404, detail="Session not found or expired")
 
         student_id = join_result['student_id']
         session_config = join_result['session_config']
+        is_returning = join_result.get('is_returning', False)
 
-        # Generate initial message
-        initial_message = await socratic_service.generate_initial_message(session_config.topic)
+        # Generate initial message only for new students
+        if not is_returning:
+            initial_message = await socratic_service.generate_initial_message(session_config.topic)
+        else:
+            initial_message = "다시 오셨군요! 이전 대화를 이어서 계속해보세요."
+
+        # Get current score for returning students
+        current_score = join_result.get('current_score', 0)
 
         return SessionJoinResponse(
             success=True,
             student_id=student_id,
             session_config=session_config,
             initial_message=initial_message,
-            understanding_score=0
+            understanding_score=current_score
         )
 
     except HTTPException:

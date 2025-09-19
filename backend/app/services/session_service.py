@@ -209,23 +209,53 @@ class SessionService:
             'students': students
         }
 
-    async def join_session(self, session_id: str, student_name: str = "익명") -> Optional[Dict[str, Any]]:
-        """Student joins a session"""
+    async def join_session(self, session_id: str, student_name: str = "익명", student_fingerprint: str = None) -> Optional[Dict[str, Any]]:
+        """Student joins a session (supports re-entry via browser fingerprint)"""
         await self._ensure_data_loaded()
         session_data = self.active_sessions.get(session_id)
         if not session_data:
             return None
 
+        # Check if student already exists in this session (by fingerprint)
+        existing_student = None
+        if student_fingerprint and session_id in self.session_students:
+            for student_id, student_data in self.session_students[session_id].items():
+                if student_data.get('fingerprint') == student_fingerprint:
+                    existing_student = student_data
+                    print(f"🔄 Returning student detected: {student_id} with fingerprint {student_fingerprint[:8]}...")
+                    break
 
-        # Generate student ID
-        student_id = str(uuid.uuid4())
         now = self.get_korea_time()
+
+        if existing_student:
+            # Update existing student's last active time
+            existing_student['last_active'] = now.isoformat()
+            existing_student['name'] = student_name  # Update name in case it changed
+
+            # Save updated data
+            try:
+                await self.storage_service.save_session_students(session_id, self.session_students[session_id])
+                print(f"💾 Updated returning student {existing_student['id']} in session {session_id}")
+            except Exception as e:
+                print(f"❌ Failed to save returning student: {e}")
+
+            return {
+                'student_id': existing_student['id'],
+                'session_config': SessionConfig(**session_data['config']),
+                'session_status': session_data['status'],
+                'is_returning': True,
+                'current_score': existing_student['progress']['current_score']
+            }
+
+        # Create new student
+        student_id = str(uuid.uuid4())
 
         # Create student data
         student_data = {
             'id': student_id,
             'name': student_name,
             'session_id': session_id,
+            'fingerprint': student_fingerprint,  # Store fingerprint for re-entry
             'joined_at': now.isoformat(),  # Convert to ISO string with timezone
             'last_active': now.isoformat(),  # Convert to ISO string with timezone
             'progress': {
@@ -249,10 +279,9 @@ class SessionService:
             self.session_students[session_id] = {}
         self.session_students[session_id][student_id] = student_data
 
-        # Update session stats
+        # Update session stats (only for new students)
         session_data['live_stats']['total_joined'] += 1
         session_data['live_stats']['current_students'] = len(self.session_students[session_id])
-
 
         # Log activity
         activity = {
@@ -279,7 +308,9 @@ class SessionService:
         return {
             'student_id': student_id,
             'session_config': SessionConfig(**session_data['config']),
-            'session_status': session_data['status']
+            'session_status': session_data['status'],
+            'is_returning': False,
+            'current_score': 0
         }
 
     async def update_student_progress(
