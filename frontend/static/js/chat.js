@@ -26,6 +26,7 @@ class SocraticChatHandler {
         this.showScore = urlParams.showScore === 'true';
         this.mode = urlParams.mode || 'teacher';
         this.sessionId = urlParams.session_id || '';
+        this.studentId = urlParams.student_id || '';
         this.studentName = urlParams.student_name || '';
         
         if (!this.topic) {
@@ -52,6 +53,7 @@ class SocraticChatHandler {
             showScore: urlParams.get('showScore') || 'true',
             mode: urlParams.get('mode') || 'teacher',
             session_id: urlParams.get('session_id') || '',
+            student_id: urlParams.get('student_id') || '',
             student_name: decodeURIComponent(urlParams.get('student_name') || '')
         };
     }
@@ -355,19 +357,35 @@ class SocraticChatHandler {
         this.disableInput();
         
         try {
-            // AI 응답 요청
-            const response = await fetch(`${this.apiBase}/chat/socratic`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    topic: this.topic,
-                    messages: this.messages,
-                    understanding_level: this.understandingScore,
-                    difficulty: this.difficulty
-                })
-            });
+            let response;
+            // Use session-based chat API if in session mode (QR code access)
+            if (this.sessionId && this.studentId) {
+                // Session-based chat API (tracks messages in database)
+                response = await fetch(`${this.apiBase}/session/${this.sessionId}/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        student_id: this.studentId, // Use actual student ID from join response
+                        message: userMessage
+                    })
+                });
+            } else {
+                // Legacy standalone chat API (no session tracking)
+                response = await fetch(`${this.apiBase}/chat/socratic`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        topic: this.topic,
+                        messages: this.messages,
+                        understanding_level: this.understandingScore,
+                        difficulty: this.difficulty
+                    })
+                });
+            }
             
             if (!response.ok) {
                 throw new Error('AI 응답을 받아올 수 없습니다.');

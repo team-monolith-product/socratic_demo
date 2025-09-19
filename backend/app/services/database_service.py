@@ -361,6 +361,51 @@ class DatabaseService:
                 "data_directory": "N/A (Database)"
             }
 
+    async def is_database_enabled(self) -> bool:
+        """Check if database is enabled."""
+        return True  # DatabaseService is always database-enabled
+
+    async def save_message(self, session_id: str, student_id: str, content: str, message_type: str) -> bool:
+        """Save a single message to database."""
+        try:
+            async with await self._get_session() as session:
+                new_message = Message(
+                    student_id=student_id,
+                    session_id=session_id,
+                    content=content,
+                    message_type=message_type,
+                    timestamp=datetime.now(self.kst)
+                )
+                session.add(new_message)
+                await session.commit()
+                return True
+        except Exception as e:
+            print(f"Error saving message: {e}")
+            return False
+
+    async def get_student_messages(self, session_id: str, student_id: str) -> List[Dict[str, Any]]:
+        """Get all messages for a specific student in a session."""
+        try:
+            async with await self._get_session() as session:
+                stmt = select(Message).where(
+                    and_(Message.session_id == session_id, Message.student_id == student_id)
+                ).order_by(Message.timestamp)
+
+                result = await session.execute(stmt)
+                messages = result.scalars().all()
+
+                return [
+                    {
+                        "content": msg.content,
+                        "message_type": msg.message_type,
+                        "timestamp": msg.timestamp.isoformat() if msg.timestamp else None
+                    }
+                    for msg in messages
+                ]
+        except Exception as e:
+            print(f"Error getting student messages: {e}")
+            return []
+
 
 # Singleton instance
 _database_service = DatabaseService()

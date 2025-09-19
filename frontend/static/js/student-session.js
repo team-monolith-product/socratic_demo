@@ -140,6 +140,9 @@ URL: ${window.location.href}
 
             console.log('Successfully joined session:', joinResponse);
 
+            // Store student_id from response
+            this.studentId = joinResponse.student_id;
+
             // Redirect to chat interface
             this.redirectToChatInterface();
 
@@ -157,6 +160,7 @@ URL: ${window.location.href}
         const config = this.sessionData.config || {};
         const params = new URLSearchParams({
             session_id: this.sessionId,
+            student_id: this.studentId,
             student_name: encodeURIComponent(this.studentName),
             topic: config.topic || '소크라테스 학습',
             difficulty: config.difficulty || 'normal',

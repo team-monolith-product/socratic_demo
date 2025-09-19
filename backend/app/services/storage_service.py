@@ -152,6 +152,23 @@ class StorageService:
             "data_directory": str(self.data_dir.absolute())
         }
 
+    async def is_database_enabled(self) -> bool:
+        """Check if database is enabled."""
+        return False  # File-based storage is not database-enabled
+
+    async def save_message(self, session_id: str, student_id: str, content: str, message_type: str) -> bool:
+        """Save a single message (file-based storage doesn't support individual message tracking)."""
+        # For file-based storage, messages are stored as part of student data
+        # This is a simplified implementation - in production you might want message-level tracking
+        print(f"Message tracking not fully supported in file-based storage mode")
+        return True
+
+    async def get_student_messages(self, session_id: str, student_id: str) -> List[Dict[str, Any]]:
+        """Get all messages for a specific student (file-based storage doesn't support this)."""
+        # File-based storage doesn't track individual messages
+        print(f"Message history not available in file-based storage mode")
+        return []
+
 # Singleton instances
 _storage_service = StorageService()
 

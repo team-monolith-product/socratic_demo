@@ -28,3 +28,16 @@ class InitialMessageRequest(BaseModel):
 class InitialMessageResponse(BaseModel):
     initial_message: str
     understanding_score: int = 0
+
+class SessionChatRequest(BaseModel):
+    student_id: str
+    message: str
+
+class SessionChatResponse(BaseModel):
+    socratic_response: str
+    understanding_score: int
+    is_completed: bool = False
+    dimensions: Optional[Dict[str, int]] = None
+    insights: Optional[Dict[str, str]] = None
+    growth_indicators: Optional[List[str]] = None
+    next_focus: Optional[str] = None

@@ -5,10 +5,12 @@ from app.models.session_models import (
     TeacherSessionsResponse, SessionDetailsResponse, SessionJoinRequest,
     SessionJoinResponse, QRCodeInfo, SessionInfo
 )
+from app.models.request_models import SessionChatRequest, SessionChatResponse
 from app.services.session_service import get_session_service
 from app.services.qr_service import get_qr_service
 from app.services.socratic_service import SocraticService
 from app.services.storage_service import get_storage_service
+from app.services.socratic_assessment_service import get_socratic_assessment_service
 from datetime import datetime
 import io
 
@@ -305,6 +307,119 @@ async def download_qr_code(session_id: str, request: Request):
             headers={"Content-Disposition": f"attachment; filename=session_{session_id}.png"}
         )
 
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/session/{session_id}/chat", response_model=SessionChatResponse)
+async def session_chat(session_id: str, request: SessionChatRequest):
+    """Handle chat message within a session and record to database"""
+    try:
+        session_service = get_session_service()
+        socratic_service = get_socratic_service()
+        assessment_service = get_socratic_assessment_service()
+        storage_service = get_storage_service()
+
+        # Verify session exists and is active
+        session_data = session_service.active_sessions.get(session_id)
+        if not session_data:
+            raise HTTPException(status_code=404, detail="Session not found")
+
+        # Verify student is part of this session
+        student_exists = False
+        if hasattr(session_service, 'session_students'):
+            session_students = session_service.session_students.get(session_id, {})
+            if request.student_id in session_students:
+                student_exists = True
+
+        if not student_exists:
+            raise HTTPException(status_code=403, detail="Student not authorized for this session")
+
+        # Get session configuration
+        config = SessionConfig(**session_data['config'])
+
+        # Get student's chat history from database if available
+        messages = []
+        if storage_service and await storage_service.is_database_enabled():
+            # Get previous messages for this student in this session
+            try:
+                stored_messages = await storage_service.get_student_messages(session_id, request.student_id)
+                messages = [{"role": msg["message_type"], "content": msg["content"]} for msg in stored_messages]
+            except Exception as e:
+                print(f"Warning: Could not load message history: {e}")
+
+        # Add the new user message
+        messages.append({"role": "user", "content": request.message})
+
+        # Store user message in database
+        if storage_service and await storage_service.is_database_enabled():
+            try:
+                await storage_service.save_message(
+                    session_id=session_id,
+                    student_id=request.student_id,
+                    content=request.message,
+                    message_type="user"
+                )
+            except Exception as e:
+                print(f"Warning: Could not save user message: {e}")
+
+        # Generate AI response
+        socratic_response = await socratic_service.generate_socratic_response(
+            config.topic,
+            messages,
+            0  # understanding_level - will be calculated
+        )
+
+        # Store AI response in database
+        if storage_service and await storage_service.is_database_enabled():
+            try:
+                await storage_service.save_message(
+                    session_id=session_id,
+                    student_id=request.student_id,
+                    content=socratic_response,
+                    message_type="assistant"
+                )
+            except Exception as e:
+                print(f"Warning: Could not save AI message: {e}")
+
+        # Evaluate understanding using the new message and AI response
+        evaluation_result = await assessment_service.evaluate_socratic_dimensions(
+            config.topic,
+            request.message,
+            socratic_response,
+            messages,
+            config.difficulty
+        )
+
+        understanding_score = evaluation_result["overall_score"]
+        is_completed = evaluation_result["is_completed"]
+
+        # Update student progress in session service
+        try:
+            await session_service.update_student_progress(
+                session_id,
+                request.student_id,
+                {
+                    'current_score': understanding_score,
+                    'dimensions': evaluation_result["dimensions"],
+                    'conversation_turns': len([m for m in messages if m["role"] == "user"]),
+                    'is_completed': is_completed
+                }
+            )
+        except Exception as e:
+            print(f"Warning: Could not update student progress: {e}")
+
+        return SessionChatResponse(
+            socratic_response=socratic_response,
+            understanding_score=understanding_score,
+            is_completed=is_completed,
+            dimensions=evaluation_result["dimensions"],
+            insights=evaluation_result["insights"],
+            growth_indicators=evaluation_result["growth_indicators"],
+            next_focus=evaluation_result["next_focus"]
+        )
+
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
