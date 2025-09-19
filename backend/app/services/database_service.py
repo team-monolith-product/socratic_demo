@@ -93,10 +93,10 @@ class DatabaseService:
             return False
 
     async def load_sessions(self) -> Dict[str, Any]:
-        """Load all sessions from database."""
+        """Load all active (non-deleted) sessions from database."""
         try:
             async with await self._get_session() as session:
-                stmt = select(Session).options(selectinload(Session.teacher))
+                stmt = select(Session).options(selectinload(Session.teacher)).where(Session.deleted_at.is_(None))
                 result = await session.execute(stmt)
                 db_sessions = result.scalars().all()
 
@@ -233,7 +233,21 @@ class DatabaseService:
             return {}
 
     async def delete_session(self, session_id: str) -> bool:
-        """Delete a session from database."""
+        """Soft delete a session (mark as deleted but keep data)."""
+        try:
+            async with await self._get_session() as session:
+                stmt = update(Session).where(Session.id == session_id).values(
+                    deleted_at=datetime.now(self.kst)
+                )
+                result = await session.execute(stmt)
+                await session.commit()
+                return result.rowcount > 0
+        except Exception as e:
+            print(f"Error soft deleting session {session_id}: {e}")
+            return False
+
+    async def hard_delete_session(self, session_id: str) -> bool:
+        """Hard delete a session from database (permanent removal)."""
         try:
             async with await self._get_session() as session:
                 stmt = delete(Session).where(Session.id == session_id)
@@ -241,7 +255,7 @@ class DatabaseService:
                 await session.commit()
                 return True
         except Exception as e:
-            print(f"Error deleting session {session_id}: {e}")
+            print(f"Error hard deleting session {session_id}: {e}")
             return False
 
     async def _save_student_messages(self, db_session: AsyncSession, student_id: str, session_id: str, messages: List[Dict]):

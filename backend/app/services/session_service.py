@@ -85,6 +85,7 @@ class SessionService:
             'created_at': now.isoformat(),  # Convert to ISO string with timezone
             'expires_at': expires_at.isoformat(),  # Convert to ISO string with timezone
             'last_activity': now.isoformat(),  # Convert to ISO string with timezone
+            'deleted_at': None,  # Not deleted
             'students': {},
             'live_stats': {
                 'current_students': 0,
@@ -377,22 +378,26 @@ class SessionService:
         return await self.delete_session(session_id, teacher_fingerprint)
 
     async def delete_session(self, session_id: str, teacher_fingerprint: str) -> bool:
-        """Delete a session"""
+        """Soft delete a session (hide from UI but keep data)"""
         await self._ensure_data_loaded()
         session_data = self.active_sessions.get(session_id)
         if not session_data or session_data['teacher_fingerprint'] != teacher_fingerprint:
             return False
 
-        # Remove from memory
+        # Mark as deleted in session data
+        now = self.get_korea_time()
+        session_data['deleted_at'] = now.isoformat()
+
+        # Remove from memory (hide from UI)
         self.active_sessions.pop(session_id, None)
         self.session_students.pop(session_id, None)
 
-        # Remove from persistent storage
+        # Soft delete in persistent storage (keep data)
         try:
             await self.storage_service.delete_session(session_id)
-            print(f"💾 Deleted session {session_id} from persistent storage")
+            print(f"💾 Soft deleted session {session_id} from UI (data preserved)")
         except Exception as e:
-            print(f"❌ Failed to delete session {session_id} from storage: {e}")
+            print(f"❌ Failed to soft delete session {session_id}: {e}")
 
         return True
 

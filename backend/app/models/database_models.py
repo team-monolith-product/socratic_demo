@@ -80,6 +80,7 @@ class Session(Base):
         onupdate=func.now()
     )
     ended_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
+    deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
 
     # Relationships
     teacher: Mapped["Teacher"] = relationship("Teacher", back_populates="sessions")
