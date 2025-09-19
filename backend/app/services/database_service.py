@@ -10,7 +10,7 @@ from sqlalchemy import select, update, delete, and_, or_, func
 from sqlalchemy.orm import selectinload
 
 from app.core.database import AsyncSessionLocal
-from app.models.database_models import Teacher, Session, Student, Message, ScoreRecord
+from app.models.database_models import Teacher, Session, Student, Message
 
 
 class DatabaseService:
@@ -435,103 +435,8 @@ class DatabaseService:
             print(f"Error getting student messages: {e}")
             return []
 
-    async def save_score_record(
-        self,
-        session_id: str,
-        student_id: str,
-        message_id: str,
-        overall_score: int,
-        dimensions: Dict[str, int],
-        is_completed: bool,
-        evaluation_data: Dict[str, Any]
-    ) -> bool:
-        """Save a score record for a student's message evaluation."""
-        try:
-            async with await self._get_session() as session:
-                score_record = ScoreRecord(
-                    student_id=student_id,
-                    message_id=message_id,
-                    session_id=session_id,
-                    overall_score=overall_score,
-                    depth_score=dimensions.get('depth', 0),
-                    breadth_score=dimensions.get('breadth', 0),
-                    application_score=dimensions.get('application', 0),
-                    metacognition_score=dimensions.get('metacognition', 0),
-                    engagement_score=dimensions.get('engagement', 0),
-                    is_completed=is_completed,
-                    evaluation_data=evaluation_data,
-                    created_at=datetime.now(self.kst)
-                )
-                session.add(score_record)
-                await session.commit()
-                return True
-        except Exception as e:
-            print(f"Error saving score record: {e}")
-            return False
 
-    async def get_student_score_history(self, session_id: str, student_id: str) -> List[Dict[str, Any]]:
-        """Get scoring history for a specific student in a session."""
-        try:
-            async with await self._get_session() as session:
-                stmt = select(ScoreRecord).where(
-                    and_(ScoreRecord.session_id == session_id, ScoreRecord.student_id == student_id)
-                ).order_by(ScoreRecord.created_at)
 
-                result = await session.execute(stmt)
-                score_records = result.scalars().all()
-
-                return [
-                    {
-                        "id": record.id,
-                        "message_id": record.message_id,
-                        "overall_score": record.overall_score,
-                        "dimensions": {
-                            "depth": record.depth_score,
-                            "breadth": record.breadth_score,
-                            "application": record.application_score,
-                            "metacognition": record.metacognition_score,
-                            "engagement": record.engagement_score
-                        },
-                        "is_completed": record.is_completed,
-                        "evaluation_data": record.evaluation_data,
-                        "created_at": self._format_korea_time(record.created_at) if record.created_at else None
-                    }
-                    for record in score_records
-                ]
-        except Exception as e:
-            print(f"Error getting student score history: {e}")
-            return []
-
-    async def get_message_score_record(self, message_id: str) -> Optional[Dict[str, Any]]:
-        """Get the score record for a specific message."""
-        try:
-            async with await self._get_session() as session:
-                stmt = select(ScoreRecord).where(ScoreRecord.message_id == message_id)
-                result = await session.execute(stmt)
-                record = result.scalar_one_or_none()
-
-                if record:
-                    return {
-                        "id": record.id,
-                        "student_id": record.student_id,
-                        "message_id": record.message_id,
-                        "session_id": record.session_id,
-                        "overall_score": record.overall_score,
-                        "dimensions": {
-                            "depth": record.depth_score,
-                            "breadth": record.breadth_score,
-                            "application": record.application_score,
-                            "metacognition": record.metacognition_score,
-                            "engagement": record.engagement_score
-                        },
-                        "is_completed": record.is_completed,
-                        "evaluation_data": record.evaluation_data,
-                        "created_at": self._format_korea_time(record.created_at) if record.created_at else None
-                    }
-                return None
-        except Exception as e:
-            print(f"Error getting message score record: {e}")
-            return None
 
 
 # Singleton instance

@@ -69,9 +69,37 @@ async def add_deleted_at_column():
             raise
 
 
+async def drop_score_records_table():
+    """Drop the score_records table if it exists."""
+    async with AsyncSessionLocal() as session:
+        try:
+            # For SQLite, use sqlite_master to check table existence
+            check_query = text("""
+                SELECT name FROM sqlite_master
+                WHERE type='table' AND name='score_records';
+            """)
+            result = await session.execute(check_query)
+            table_exists = result.fetchone() is not None
+
+            if table_exists:
+                # Drop the table (SQLite doesn't support CASCADE)
+                drop_query = text("DROP TABLE IF EXISTS score_records;")
+                await session.execute(drop_query)
+                await session.commit()
+                print("✅ score_records table dropped successfully")
+            else:
+                print("ℹ️ score_records table does not exist")
+
+        except Exception as e:
+            await session.rollback()
+            print(f"❌ Error dropping score_records table: {e}")
+            raise
+
+
 async def run_migrations():
     """Run all pending migrations."""
     print("🔄 Running database migrations...")
     await drop_session_activities_table()
+    await drop_score_records_table()
     await add_deleted_at_column()
     print("✅ Migrations completed")

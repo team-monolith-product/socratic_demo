@@ -11,7 +11,7 @@ from app.api.teacher_session import router as teacher_router
 from app.core.config import get_settings
 from app.core.database import create_tables
 # Import models to ensure they are registered with Base
-from app.models.database_models import Teacher, Session, Student, Message, ScoreRecord
+from app.models.database_models import Teacher, Session, Student, Message
 
 load_dotenv()
 

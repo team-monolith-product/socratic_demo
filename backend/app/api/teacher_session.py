@@ -426,25 +426,6 @@ async def session_chat(session_id: str, request: SessionChatRequest):
         understanding_score = evaluation_result["overall_score"]
         is_completed = evaluation_result["is_completed"]
 
-        # Save score record to database
-        if storage_service and await storage_service.is_database_enabled() and message_id:
-            try:
-                await storage_service.save_score_record(
-                    session_id=session_id,
-                    student_id=request.student_id,
-                    message_id=message_id,
-                    overall_score=understanding_score,
-                    dimensions=evaluation_result["dimensions"],
-                    is_completed=is_completed,
-                    evaluation_data={
-                        "insights": evaluation_result["insights"],
-                        "growth_indicators": evaluation_result["growth_indicators"],
-                        "next_focus": evaluation_result["next_focus"]
-                    }
-                )
-                print(f"✅ Score record saved for student {request.student_id}, message {message_id}")
-            except Exception as e:
-                print(f"Warning: Could not save score record: {e}")
 
         # Update student progress in session service
         try:
