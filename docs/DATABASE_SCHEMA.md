@@ -68,17 +68,25 @@ CREATE TABLE messages (
 );
 ```
 
-### 5. session_activities (세션 활동 로그)
+### 5. score_records (점수 기록)
 ```sql
-CREATE TABLE session_activities (
+CREATE TABLE score_records (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    student_id UUID NOT NULL REFERENCES students(id) ON DELETE CASCADE,
+    message_id UUID NOT NULL REFERENCES messages(id) ON DELETE CASCADE,
     session_id VARCHAR(20) NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
-    student_id UUID REFERENCES students(id) ON DELETE SET NULL,
-    activity_type VARCHAR(20) NOT NULL,
-    activity_data JSONB,
-    timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    overall_score INTEGER NOT NULL,
+    depth_score INTEGER NOT NULL,
+    breadth_score INTEGER NOT NULL,
+    application_score INTEGER NOT NULL,
+    metacognition_score INTEGER NOT NULL,
+    engagement_score INTEGER NOT NULL,
+    is_completed BOOLEAN DEFAULT FALSE,
+    evaluation_data JSONB, -- insights, growth_indicators, next_focus 등
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 ```
+
 
 ## 인덱스
 
@@ -93,8 +101,10 @@ CREATE INDEX idx_students_joined_at ON students(joined_at DESC);
 CREATE INDEX idx_messages_student_id ON messages(student_id);
 CREATE INDEX idx_messages_session_id ON messages(session_id);
 CREATE INDEX idx_messages_timestamp ON messages(timestamp DESC);
-CREATE INDEX idx_activities_session_id ON session_activities(session_id);
-CREATE INDEX idx_activities_timestamp ON session_activities(timestamp DESC);
+CREATE INDEX idx_score_records_student_id ON score_records(student_id);
+CREATE INDEX idx_score_records_message_id ON score_records(message_id);
+CREATE INDEX idx_score_records_session_id ON score_records(session_id);
+CREATE INDEX idx_score_records_created_at ON score_records(created_at DESC);
 ```
 
 ## 데이터 관계
@@ -103,7 +113,9 @@ CREATE INDEX idx_activities_timestamp ON session_activities(timestamp DESC);
 teachers (1) ──→ (N) sessions
 sessions (1) ──→ (N) students
 students (1) ──→ (N) messages
-sessions (1) ──→ (N) session_activities
+students (1) ──→ (N) score_records
+messages (1) ──→ (N) score_records
+sessions (1) ──→ (N) score_records
 ```
 
 ## 마이그레이션 전략

@@ -93,11 +93,6 @@ class Session(Base):
         back_populates="session",
         cascade="all, delete-orphan"
     )
-    activities: Mapped[List["SessionActivity"]] = relationship(
-        "SessionActivity",
-        back_populates="session",
-        cascade="all, delete-orphan"
-    )
 
 
 class Student(Base):
@@ -143,9 +138,10 @@ class Student(Base):
         back_populates="student",
         cascade="all, delete-orphan"
     )
-    activities: Mapped[List["SessionActivity"]] = relationship(
-        "SessionActivity",
-        back_populates="student"
+    score_records: Mapped[List["ScoreRecord"]] = relationship(
+        "ScoreRecord",
+        back_populates="student",
+        cascade="all, delete-orphan"
     )
 
 
@@ -182,16 +178,33 @@ class Message(Base):
     # Relationships
     student: Mapped["Student"] = relationship("Student", back_populates="messages")
     session: Mapped["Session"] = relationship("Session", back_populates="messages")
+    score_records: Mapped[List["ScoreRecord"]] = relationship(
+        "ScoreRecord",
+        back_populates="message",
+        cascade="all, delete-orphan"
+    )
 
 
-class SessionActivity(Base):
-    """Session activity model."""
-    __tablename__ = "session_activities"
+class ScoreRecord(Base):
+    """Score record model for tracking evaluation history."""
+    __tablename__ = "score_records"
 
     id: Mapped[str] = mapped_column(
         String(36),
         primary_key=True,
         default=lambda: str(uuid.uuid4())
+    )
+    student_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("students.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True
+    )
+    message_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("messages.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True
     )
     session_id: Mapped[str] = mapped_column(
         String(20),
@@ -199,18 +212,22 @@ class SessionActivity(Base):
         nullable=False,
         index=True
     )
-    student_id: Mapped[Optional[str]] = mapped_column(
-        String(36),
-        ForeignKey("students.id", ondelete="SET NULL")
-    )
-    activity_type: Mapped[str] = mapped_column(String(20), nullable=False)
-    activity_data: Mapped[Optional[dict]] = mapped_column(JSON)
-    timestamp: Mapped[datetime] = mapped_column(
+    overall_score: Mapped[int] = mapped_column(Integer, nullable=False)
+    depth_score: Mapped[int] = mapped_column(Integer, nullable=False)
+    breadth_score: Mapped[int] = mapped_column(Integer, nullable=False)
+    application_score: Mapped[int] = mapped_column(Integer, nullable=False)
+    metacognition_score: Mapped[int] = mapped_column(Integer, nullable=False)
+    engagement_score: Mapped[int] = mapped_column(Integer, nullable=False)
+    is_completed: Mapped[bool] = mapped_column(Boolean, default=False)
+    evaluation_data: Mapped[Optional[dict]] = mapped_column(JSON)  # insights, growth_indicators, next_focus
+    created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
         index=True
     )
 
     # Relationships
-    session: Mapped["Session"] = relationship("Session", back_populates="activities")
-    student: Mapped[Optional["Student"]] = relationship("Student", back_populates="activities")
+    student: Mapped["Student"] = relationship("Student", back_populates="score_records")
+    message: Mapped["Message"] = relationship("Message", back_populates="score_records")
+    session: Mapped["Session"] = relationship("Session")
+
