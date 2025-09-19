@@ -109,10 +109,17 @@ URL: ${window.location.href}
     validateInput() {
         const studentNameInput = document.getElementById('student-name');
         const joinButton = document.getElementById('join-session-btn');
+        const errorDiv = document.getElementById('name-error');
 
         if (studentNameInput && joinButton) {
             const isValid = studentNameInput.value.trim().length >= 2;
             joinButton.disabled = !isValid;
+
+            // Clear error message and reset input style when user types
+            if (errorDiv) {
+                errorDiv.textContent = '';
+                studentNameInput.style.borderColor = '';
+            }
         }
     }
 
@@ -148,7 +155,32 @@ URL: ${window.location.href}
 
         } catch (error) {
             console.error('Failed to join session:', error);
-            alert('세션 참여에 실패했습니다. 다시 시도해주세요.');
+
+            // Handle specific error types
+            if (error.type === 'name_taken') {
+                // Show error message for duplicate name
+                const nameInput = document.getElementById('student-name');
+                const errorDiv = document.getElementById('name-error');
+
+                // Create error message element if it doesn't exist
+                if (!errorDiv) {
+                    const errorMessage = document.createElement('div');
+                    errorMessage.id = 'name-error';
+                    errorMessage.className = 'error-message';
+                    errorMessage.style.color = '#dc3545';
+                    errorMessage.style.fontSize = '14px';
+                    errorMessage.style.marginTop = '5px';
+                    nameInput.parentNode.insertBefore(errorMessage, nameInput.nextSibling);
+                }
+
+                document.getElementById('name-error').textContent = error.message;
+                nameInput.style.borderColor = '#dc3545';
+                nameInput.focus();
+                nameInput.select();
+
+            } else {
+                alert('세션 참여에 실패했습니다. 다시 시도해주세요.');
+            }
 
             joinButton.disabled = false;
             joinButton.textContent = '세션 참여하기';

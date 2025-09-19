@@ -180,11 +180,19 @@ class SessionManager {
                 body: JSON.stringify(studentInfo)
             });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+            const result = await response.json();
+
+            // Check if the response indicates an error (even with 200 status)
+            if (result.error) {
+                const error = new Error(result.message || 'Join session failed');
+                error.type = result.error;
+                throw error;
             }
 
-            const result = await response.json();
+            if (!response.ok) {
+                throw new Error(result.detail || `HTTP error! status: ${response.status}`);
+            }
+
             return result;
         } catch (error) {
             console.error('Error joining session:', error);
