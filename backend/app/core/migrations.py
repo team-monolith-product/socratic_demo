@@ -9,20 +9,17 @@ async def drop_session_activities_table():
     """Drop the session_activities table if it exists."""
     async with AsyncSessionLocal() as session:
         try:
-            # Check if table exists first
+            # For SQLite, use sqlite_master to check table existence
             check_query = text("""
-                SELECT EXISTS (
-                    SELECT FROM information_schema.tables
-                    WHERE table_schema = 'public'
-                    AND table_name = 'session_activities'
-                );
+                SELECT name FROM sqlite_master
+                WHERE type='table' AND name='session_activities';
             """)
             result = await session.execute(check_query)
-            table_exists = result.scalar()
+            table_exists = result.fetchone() is not None
 
             if table_exists:
-                # Drop the table
-                drop_query = text("DROP TABLE IF EXISTS session_activities CASCADE;")
+                # Drop the table (SQLite doesn't support CASCADE)
+                drop_query = text("DROP TABLE IF EXISTS session_activities;")
                 await session.execute(drop_query)
                 await session.commit()
                 print("✅ session_activities table dropped successfully")
@@ -39,21 +36,27 @@ async def add_deleted_at_column():
     """Add deleted_at column to sessions table if it doesn't exist."""
     async with AsyncSessionLocal() as session:
         try:
-            # Check if column exists first
-            check_query = text("""
-                SELECT EXISTS (
-                    SELECT FROM information_schema.columns
-                    WHERE table_schema = 'public'
-                    AND table_name = 'sessions'
-                    AND column_name = 'deleted_at'
-                );
+            # First check if sessions table exists
+            table_check_query = text("""
+                SELECT name FROM sqlite_master
+                WHERE type='table' AND name='sessions';
             """)
+            table_result = await session.execute(table_check_query)
+            table_exists = table_result.fetchone() is not None
+
+            if not table_exists:
+                print("ℹ️ sessions table does not exist yet, skipping column addition")
+                return
+
+            # For SQLite, use PRAGMA to check column existence
+            check_query = text("PRAGMA table_info(sessions);")
             result = await session.execute(check_query)
-            column_exists = result.scalar()
+            columns = result.fetchall()
+            column_exists = any(col[1] == 'deleted_at' for col in columns)
 
             if not column_exists:
-                # Add the column
-                add_column_query = text("ALTER TABLE sessions ADD COLUMN deleted_at TIMESTAMP WITH TIME ZONE;")
+                # Add the column (SQLite uses DATETIME instead of TIMESTAMP WITH TIME ZONE)
+                add_column_query = text("ALTER TABLE sessions ADD COLUMN deleted_at DATETIME;")
                 await session.execute(add_column_query)
                 await session.commit()
                 print("✅ deleted_at column added to sessions table")

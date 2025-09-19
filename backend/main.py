@@ -10,6 +10,8 @@ from app.api.socratic_chat import router as chat_router
 from app.api.teacher_session import router as teacher_router
 from app.core.config import get_settings
 from app.core.database import create_tables
+# Import models to ensure they are registered with Base
+from app.models.database_models import Teacher, Session, Student, Message, ScoreRecord
 
 load_dotenv()
 
@@ -73,13 +75,14 @@ async def startup_event():
         try:
             print("🗄️ Initializing database...")
 
-            # Run migrations first
+            # First create/verify tables
+            await create_tables()
+            print("✅ Database tables created/verified successfully")
+
+            # Then run migrations to add any missing columns
             from app.core.migrations import run_migrations
             await run_migrations()
 
-            # Then create/verify tables
-            await create_tables()
-            print("✅ Database tables created/verified successfully")
         except Exception as e:
             print(f"❌ Database initialization failed: {e}")
             # Don't crash the app, fall back to file storage
