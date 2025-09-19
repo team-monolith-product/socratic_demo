@@ -447,12 +447,10 @@ async def session_chat(session_id: str, request: SessionChatRequest):
             await session_service.update_student_progress(
                 session_id,
                 request.student_id,
-                {
-                    'current_score': understanding_score,
-                    'dimensions': evaluation_result["dimensions"],
-                    'conversation_turns': len([m for m in messages if m["role"] == "user"]),
-                    'is_completed': is_completed
-                }
+                understanding_score,
+                evaluation_result["dimensions"],
+                is_completed,
+                request.message
             )
         except Exception as e:
             print(f"Warning: Could not update student progress: {e}")
