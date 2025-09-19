@@ -72,6 +72,12 @@ async def startup_event():
     if settings.use_database:
         try:
             print("🗄️ Initializing database...")
+
+            # Run migrations first
+            from app.core.migrations import run_migrations
+            await run_migrations()
+
+            # Then create/verify tables
             await create_tables()
             print("✅ Database tables created/verified successfully")
         except Exception as e:
