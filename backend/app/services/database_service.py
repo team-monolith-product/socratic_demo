@@ -332,6 +332,22 @@ class DatabaseService:
         except Exception:
             return None
 
+    def _format_korea_time(self, dt: datetime) -> str:
+        """Format datetime to Korean timezone ISO string."""
+        if not dt:
+            return None
+        try:
+            # If datetime is naive (no timezone), assume it's UTC
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=pytz.UTC)
+
+            # Convert to Korean timezone
+            korea_time = dt.astimezone(self.kst)
+            return korea_time.isoformat()
+        except Exception:
+            # Fallback to original isoformat
+            return dt.isoformat() if dt else None
+
     async def get_storage_stats(self) -> Dict[str, Any]:
         """Get storage statistics."""
         try:
@@ -398,7 +414,7 @@ class DatabaseService:
                     {
                         "content": msg.content,
                         "message_type": msg.message_type,
-                        "timestamp": msg.timestamp.isoformat() if msg.timestamp else None
+                        "timestamp": self._format_korea_time(msg.timestamp) if msg.timestamp else None
                     }
                     for msg in messages
                 ]
