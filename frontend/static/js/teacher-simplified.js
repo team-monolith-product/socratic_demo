@@ -442,17 +442,7 @@ class SimplifiedTeacherDashboard {
                 <td>${student.student_name || `학생 #${String(index + 1).padStart(3, '0')}`}</td>
                 <td>${this.createScoreBar(student.latest_score || 0)}</td>
                 <td>${student.message_count || 0}개</td>
-                <td>${this.formatJoinTime(student.joined_at)}</td>
                 <td>${this.formatLastActivity(student.minutes_since_last_activity)}</td>
-                <td>
-                    <span class="student-status ${student.is_completed ? 'completed' : 'active'}">
-                        ${student.is_completed ? '완료' : '진행중'}
-                    </span>
-                </td>
-                <td>
-                    <button class="table-action-btn primary" onclick="simplifiedDashboard.viewStudentDetail('${student.student_id}')">상세</button>
-                    <button class="table-action-btn" onclick="simplifiedDashboard.downloadStudentReport('${student.student_id}')">보고서</button>
-                </td>
             </tr>
         `).join('');
     }
@@ -647,16 +637,6 @@ class SimplifiedTeacherDashboard {
         `;
     }
 
-    // Student action handlers (placeholder implementations)
-    viewStudentDetail(studentId) {
-        console.log('View student detail:', studentId);
-        this.showToast('학생 상세 보기는 곧 구현될 예정입니다', 'success');
-    }
-
-    downloadStudentReport(studentId) {
-        console.log('Download student report:', studentId);
-        this.showToast('학생 보고서 다운로드는 곧 구현될 예정입니다', 'success');
-    }
 }
 
 // Initialize dashboard when script loads

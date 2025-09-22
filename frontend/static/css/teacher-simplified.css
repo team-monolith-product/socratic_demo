@@ -499,47 +499,6 @@
     background: #f9fafb;
 }
 
-.score-badge {
-    background: #10b981;
-    color: white;
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.student-status {
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: 500;
-}
-
-.student-status.active {
-    background: #dbeafe;
-    color: #1e40af;
-}
-
-.student-status.completed {
-    background: #d1fae5;
-    color: #065f46;
-}
-
-.table-action-btn {
-    padding: 6px 12px;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    background: white;
-    font-size: 12px;
-    cursor: pointer;
-    margin-right: 4px;
-}
-
-.table-action-btn.primary {
-    background: #667eea;
-    color: white;
-    border-color: #667eea;
-}
 
 .table-empty-state {
     padding: 60px 24px;
