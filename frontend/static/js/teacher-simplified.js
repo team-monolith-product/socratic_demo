@@ -28,13 +28,20 @@ class SimplifiedTeacherDashboard {
             // Set up event listeners
             this.setupEventListeners();
 
+            // Debug: Check localStorage
+            const savedSession = this.sessionManager.getSavedSession();
+            console.log('Saved session from localStorage:', savedSession);
+
             // Initialize session based on localStorage and server state
             const initResult = await this.sessionManager.initializeSession();
+            console.log('Initialization result:', initResult);
 
             if (initResult.action === 'showDashboard') {
                 this.currentSessionId = initResult.sessionId;
+                console.log('Will show dashboard with sessionInfo:', initResult.sessionInfo);
                 await this.showDashboard(initResult.sessionInfo);
             } else {
+                console.log('Showing setup screen');
                 this.showSetupScreen();
             }
 
@@ -114,6 +121,17 @@ class SimplifiedTeacherDashboard {
         if (studentSearch) {
             studentSearch.addEventListener('input', (e) => this.filterStudents(e.target.value));
         }
+
+        // Debug: Add clear localStorage handler for development
+        if (window.location.hostname === 'localhost') {
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'F9') {
+                    console.log('Clearing localStorage (F9 pressed)');
+                    this.sessionManager.clearSavedSession();
+                    location.reload();
+                }
+            });
+        }
     }
 
     // View Management
@@ -135,8 +153,17 @@ class SimplifiedTeacherDashboard {
 
         // Update session title with proper check
         const sessionTitleElement = document.getElementById('sessionTitle');
-        if (sessionTitleElement && sessionInfo && sessionInfo.title) {
-            sessionTitleElement.textContent = sessionInfo.title;
+        if (sessionTitleElement && sessionInfo) {
+            // Handle both localStorage format and API response format
+            const title = sessionInfo.title ||
+                         (sessionInfo.config && sessionInfo.config.title) ||
+                         (sessionInfo.session && sessionInfo.session.config && sessionInfo.session.config.title);
+
+            if (title) {
+                sessionTitleElement.textContent = title;
+            } else {
+                console.warn('No title found in sessionInfo:', sessionInfo);
+            }
         }
 
         // Load session details
@@ -413,7 +440,7 @@ class SimplifiedTeacherDashboard {
         tableBody.innerHTML = students.map((student, index) => `
             <tr>
                 <td>${student.student_name || `학생 #${String(index + 1).padStart(3, '0')}`}</td>
-                <td>${this.createScoreGauge(student.latest_score || 0)}</td>
+                <td>${this.createScoreBar(student.latest_score || 0)}</td>
                 <td>${student.message_count || 0}개</td>
                 <td>${this.formatJoinTime(student.joined_at)}</td>
                 <td>${this.formatLastActivity(student.minutes_since_last_activity)}</td>
@@ -601,8 +628,8 @@ class SimplifiedTeacherDashboard {
         return `${hours}시간 ${remainingMinutes}분 전`;
     }
 
-    // Score Gauge Component
-    createScoreGauge(score) {
+    // Score Bar Component
+    createScoreBar(score) {
         const percentage = Math.round(score);
 
         // Determine score category and color
@@ -611,12 +638,11 @@ class SimplifiedTeacherDashboard {
         else if (percentage >= 60) category = 'good';
 
         return `
-            <div class="score-display">
-                <div class="score-gauge ${category}" style="--score: ${percentage}">
-                    <div class="gauge-circle">
-                        <div class="gauge-text">${percentage}%</div>
-                    </div>
+            <div class="score-bar-container">
+                <div class="score-bar">
+                    <div class="score-bar-fill ${category}" style="width: ${percentage}%"></div>
                 </div>
+                <div class="score-text">${percentage}%</div>
             </div>
         `;
     }
