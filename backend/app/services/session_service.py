@@ -208,14 +208,24 @@ class SessionService:
 
         # Get student progress details
         students = []
-        for student_id, student_data in self.session_students.get(session_id, {}).items():
+        session_students = self.session_students.get(session_id, {})
+        print(f"🔍 Session {session_id} has {len(session_students)} students in session_students")
+
+        for student_id, student_data in session_students.items():
+            print(f"🔍 Processing student {student_id}: {student_data.get('name', 'Unknown')}")
             progress = self._calculate_student_progress(student_data)
+            print(f"🔍 Calculated progress for {student_id}: {progress}")
             students.append(progress)
 
-        return {
+        print(f"🔍 Total students calculated: {len(students)}")
+
+        result = {
             'session': session_copy,
             'students': students
         }
+
+        print(f"🔍 Final result for session {session_id}: session has {len(students)} students")
+        return result
 
     async def join_session(self, session_id: str, student_name: str = "익명", student_fingerprint: str = None) -> Optional[Dict[str, Any]]:
         """Student joins a session (supports re-entry via browser fingerprint)"""

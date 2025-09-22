@@ -6,8 +6,11 @@ class TeacherDashboard {
         this.qrGenerator = new QRGenerator();
         this.sessions = [];
         this.refreshInterval = null;
+        this.detailRefreshInterval = null;
         this.currentModalSession = null;
         this.currentDetailSession = null;
+        this.isUpdating = false;
+        this.lastUpdateTime = null;
 
         // Initialize when DOM is loaded
         if (document.readyState === 'loading') {
@@ -22,6 +25,9 @@ class TeacherDashboard {
 
         // Set up event listeners
         this.setupEventListeners();
+
+        // Add manual refresh button
+        this.addManualRefreshButton();
 
         // Load initial data
         await this.loadSessions();
@@ -84,6 +90,72 @@ class TeacherDashboard {
         if (sessionQRBtn) {
             sessionQRBtn.addEventListener('click', () => this.showDetailSessionQR());
         }
+    }
+
+    addManualRefreshButton() {
+        // Add manual refresh button to header
+        const headerActions = document.querySelector('.header-actions');
+        if (headerActions) {
+            const refreshBtn = document.createElement('button');
+            refreshBtn.id = 'manualRefreshBtn';
+            refreshBtn.className = 'secondary-button refresh-btn';
+            refreshBtn.innerHTML = `
+                <span class="button-icon">🔄</span>
+                <span class="button-text">새로고침</span>
+            `;
+            refreshBtn.addEventListener('click', () => this.manualRefresh());
+
+            // Insert before the create session button
+            const createSessionBtn = document.getElementById('createSessionBtn');
+            if (createSessionBtn) {
+                headerActions.insertBefore(refreshBtn, createSessionBtn);
+            } else {
+                headerActions.appendChild(refreshBtn);
+            }
+        }
+    }
+
+    async manualRefresh() {
+        // Trigger manual refresh
+        const refreshBtn = document.getElementById('manualRefreshBtn');
+        if (refreshBtn) {
+            refreshBtn.disabled = true;
+            refreshBtn.innerHTML = `
+                <span class="button-icon">⏳</span>
+                <span class="button-text">새로고침 중...</span>
+            `;
+        }
+
+        try {
+            await this.autoRefreshSessions();
+            this.showToast('✅ 대시보드가 업데이트되었습니다');
+        } catch (error) {
+            console.error('Manual refresh failed:', error);
+            this.showToast('❌ 새로고침에 실패했습니다', 'error');
+        } finally {
+            if (refreshBtn) {
+                refreshBtn.disabled = false;
+                refreshBtn.innerHTML = `
+                    <span class="button-icon">🔄</span>
+                    <span class="button-text">새로고침</span>
+                `;
+            }
+        }
+    }
+
+    showToast(message, type = 'success') {
+        // Create and show toast notification
+        const toast = document.createElement('div');
+        toast.className = `auto-refresh-toast ${type}`;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+
+        // Remove toast after 3 seconds
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 3000);
     }
 
     showCreateSessionModal() {
@@ -532,6 +604,15 @@ class TeacherDashboard {
         const stats = session.live_stats || {};
         const students = sessionDetails.students || [];
 
+        // Debug logging to see the actual data structure
+        console.log('🔍 Session Details Debug:', {
+            sessionDetails,
+            session,
+            stats,
+            students,
+            studentsLength: students.length
+        });
+
         // Store current session for QR button
         this.currentDetailSession = sessionDetails;
 
@@ -540,14 +621,30 @@ class TeacherDashboard {
 
         // Calculate real data from students
         const realStudentCount = students.length;
-        const totalMessages = students.reduce((sum, s) => sum + (s.message_count || s.conversation_turns || 0), 0);
+
+        // Use correct field names based on backend _calculate_student_progress
+        const totalMessages = students.reduce((sum, s) => {
+            const messageCount = s.message_count || 0;  // Use exact field name from backend
+            console.log(`Student ${s.student_name || 'Unknown'} message count:`, messageCount);
+            return sum + messageCount;
+        }, 0);
 
         // Calculate average score from actual student scores
         let realAverageScore = 0;
         if (students.length > 0) {
-            const totalScore = students.reduce((sum, s) => sum + (s.latest_score || s.understanding_score || 0), 0);
+            const totalScore = students.reduce((sum, s) => {
+                const score = s.latest_score || 0;  // Use exact field name from backend
+                console.log(`Student ${s.student_name || 'Unknown'} score:`, score);
+                return sum + score;
+            }, 0);
             realAverageScore = Math.round(totalScore / students.length);
         }
+
+        console.log('📊 Calculated Stats:', {
+            realStudentCount,
+            totalMessages,
+            realAverageScore
+        });
 
         // Update info cards with real data
         document.getElementById('detailStudentCount').textContent = realStudentCount;
@@ -757,12 +854,122 @@ class TeacherDashboard {
 
 
     startAutoRefresh() {
-        // Refresh every 30 seconds if there are any sessions
+        // Setup page visibility change detection for smart refreshing
+        this.setupPageVisibilityHandling();
+
+        // Start main auto-refresh (every 10 seconds)
         this.refreshInterval = setInterval(() => {
-            if (this.sessions.length > 0) {
-                this.loadSessions();
+            this.autoRefreshSessions();
+        }, 10000);
+
+        // Initial refresh status display
+        this.updateLastRefreshTime();
+    }
+
+    setupPageVisibilityHandling() {
+        // Handle page visibility changes to optimize refreshing
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                // Page became visible - refresh immediately
+                this.autoRefreshSessions();
             }
-        }, 30000);
+        });
+
+        // Handle window focus events
+        window.addEventListener('focus', () => {
+            this.autoRefreshSessions();
+        });
+    }
+
+    async autoRefreshSessions() {
+        // Prevent multiple simultaneous updates
+        if (this.isUpdating) {
+            return;
+        }
+
+        try {
+            this.isUpdating = true;
+            this.showRefreshIndicator(true);
+
+            // Always refresh sessions (not just when there are sessions)
+            await this.loadSessions();
+
+            // Also refresh session detail if we're viewing one
+            if (this.currentDetailSession) {
+                await this.refreshCurrentSessionDetail();
+            }
+
+            this.updateLastRefreshTime();
+
+        } catch (error) {
+            console.error('Auto-refresh failed:', error);
+        } finally {
+            this.isUpdating = false;
+            this.showRefreshIndicator(false);
+        }
+    }
+
+    showRefreshIndicator(show) {
+        // Show/hide a subtle refresh indicator
+        let indicator = document.getElementById('refreshIndicator');
+
+        if (show && !indicator) {
+            // Create refresh indicator if it doesn't exist
+            indicator = document.createElement('div');
+            indicator.id = 'refreshIndicator';
+            indicator.className = 'refresh-indicator';
+            indicator.innerHTML = `
+                <div class="refresh-content">
+                    <div class="refresh-spinner"></div>
+                    <span>업데이트 중...</span>
+                </div>
+            `;
+            document.body.appendChild(indicator);
+        }
+
+        if (indicator) {
+            indicator.style.display = show ? 'flex' : 'none';
+        }
+    }
+
+    updateLastRefreshTime() {
+        this.lastUpdateTime = new Date();
+
+        // Update the refresh time display if it exists
+        let timeDisplay = document.getElementById('lastUpdateTime');
+        if (!timeDisplay) {
+            // Create last update time display
+            const header = document.querySelector('.modern-header .header-content');
+            if (header) {
+                timeDisplay = document.createElement('div');
+                timeDisplay.id = 'lastUpdateTime';
+                timeDisplay.className = 'last-update-time';
+                header.appendChild(timeDisplay);
+            }
+        }
+
+        if (timeDisplay) {
+            const timeStr = this.lastUpdateTime.toLocaleTimeString('ko-KR', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            timeDisplay.textContent = `마지막 업데이트: ${timeStr}`;
+        }
+    }
+
+    async refreshCurrentSessionDetail() {
+        if (!this.currentDetailSession || !this.currentDetailSession.session) {
+            return;
+        }
+
+        try {
+            const sessionId = this.currentDetailSession.session.id;
+            const sessionDetails = await this.sessionManager.getSessionDetails(sessionId);
+            this.populateSessionDetail(sessionDetails);
+        } catch (error) {
+            console.error('Failed to refresh session detail:', error);
+        }
     }
 
     // Utility methods
