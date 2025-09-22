@@ -140,6 +140,10 @@ class SessionService:
 
             if session_data['teacher_fingerprint'] == teacher_fingerprint:
                 print(f"🔍 DEBUG - MATCH! Processing session {session_id}")
+
+                # Update live stats before returning
+                await self._update_session_live_stats(session_id)
+
                 # Add calculated fields
                 session_copy = session_data.copy()
                 session_copy['students_count'] = len(session_data['students'])
@@ -177,6 +181,9 @@ class SessionService:
         session_data = self.active_sessions.get(session_id)
         if not session_data or session_data['teacher_fingerprint'] != teacher_fingerprint:
             return None
+
+        # Update live stats before returning
+        await self._update_session_live_stats(session_id)
 
         # Add session duration to session data
         session_copy = session_data.copy()

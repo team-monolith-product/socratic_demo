@@ -407,6 +407,11 @@ class TeacherDashboard {
         const config = session.config;
         const stats = session.live_stats || {};
 
+        // Use actual stats values, fallback to 0 if not available
+        const currentStudents = stats.current_students || stats.total_joined || 0;
+        const averageScore = Math.round(stats.average_score || 0);
+        const completionRate = Math.round(stats.completion_rate || 0);
+
         return `
             <div class="session-card" data-session-id="${session.id}" onclick="dashboard.viewSessionDetail('${session.id}')">
                 <div class="session-card-header">
@@ -424,15 +429,15 @@ class TeacherDashboard {
 
                 <div class="session-card-stats">
                     <div class="stat-item">
-                        <span class="stat-item-value">${stats.current_students || 0}</span>
+                        <span class="stat-item-value">${currentStudents}</span>
                         <span class="stat-item-label">참여 학생</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-item-value">${Math.round(stats.average_score || 0)}%</span>
+                        <span class="stat-item-value">${averageScore}%</span>
                         <span class="stat-item-label">평균 점수</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-item-value">${Math.round(stats.completion_rate || 0)}%</span>
+                        <span class="stat-item-value">${completionRate}%</span>
                         <span class="stat-item-label">완료율</span>
                     </div>
                 </div>
@@ -533,11 +538,22 @@ class TeacherDashboard {
         // Update header
         document.getElementById('sessionDetailTitle').textContent = session.config.title;
 
-        // Update info cards
-        document.getElementById('detailStudentCount').textContent = stats.current_students || 0;
+        // Calculate real data from students
+        const realStudentCount = students.length;
+        const totalMessages = students.reduce((sum, s) => sum + (s.message_count || s.conversation_turns || 0), 0);
+
+        // Calculate average score from actual student scores
+        let realAverageScore = 0;
+        if (students.length > 0) {
+            const totalScore = students.reduce((sum, s) => sum + (s.latest_score || s.understanding_score || 0), 0);
+            realAverageScore = Math.round(totalScore / students.length);
+        }
+
+        // Update info cards with real data
+        document.getElementById('detailStudentCount').textContent = realStudentCount;
         document.getElementById('detailDuration').textContent = this.calculateSessionDuration(session.created_at, session.duration_minutes);
-        document.getElementById('detailAvgScore').textContent = `${Math.round(stats.average_score || 0)}%`;
-        document.getElementById('detailTotalMessages').textContent = students.reduce((sum, s) => sum + (s.conversation_turns || 0), 0);
+        document.getElementById('detailAvgScore').textContent = `${realAverageScore}%`;
+        document.getElementById('detailTotalMessages').textContent = totalMessages;
 
         // Update students table
         this.populateStudentsTable(students);
