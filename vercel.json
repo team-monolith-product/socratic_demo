@@ -3,6 +3,18 @@
   "outputDirectory": "frontend",
   "rewrites": [
     {
+      "source": "/teacher",
+      "destination": "/pages/teacher-simplified.html"
+    },
+    {
+      "source": "/student",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/teacher_hidden",
+      "destination": "/pages/teacher.html"
+    },
+    {
       "source": "/s/:sessionId",
       "destination": "/pages/student-session.html"
     }
