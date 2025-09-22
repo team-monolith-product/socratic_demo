@@ -223,7 +223,7 @@ class DatabaseService:
                                 'timestamp': msg.timestamp.isoformat(),
                                 'type': msg.message_type
                             }
-                            for msg in student.messages
+                            for msg in sorted(student.messages, key=lambda x: x.timestamp, reverse=True)
                         ]
                     }
 
@@ -418,7 +418,7 @@ class DatabaseService:
             async with await self._get_session() as session:
                 stmt = select(Message).where(
                     and_(Message.session_id == session_id, Message.student_id == student_id)
-                ).order_by(Message.timestamp)
+                ).order_by(Message.timestamp.desc())
 
                 result = await session.execute(stmt)
                 messages = result.scalars().all()
@@ -433,6 +433,33 @@ class DatabaseService:
                 ]
         except Exception as e:
             print(f"Error getting student messages: {e}")
+            return []
+
+    async def get_session_messages(self, session_id: str) -> List[Dict[str, Any]]:
+        """Get all messages for a session with student info, ordered by timestamp (newest first)."""
+        try:
+            async with await self._get_session() as session:
+                stmt = select(Message, Student.name).join(
+                    Student, Message.student_id == Student.id
+                ).where(
+                    Message.session_id == session_id
+                ).order_by(Message.timestamp.desc())
+
+                result = await session.execute(stmt)
+                message_student_pairs = result.all()
+
+                return [
+                    {
+                        "content": msg.content,
+                        "message_type": msg.message_type,
+                        "timestamp": self._format_korea_time(msg.timestamp) if msg.timestamp else None,
+                        "student_id": msg.student_id,
+                        "student_name": student_name
+                    }
+                    for msg, student_name in message_student_pairs
+                ]
+        except Exception as e:
+            print(f"Error getting session messages: {e}")
             return []
 
 

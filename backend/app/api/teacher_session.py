@@ -277,6 +277,19 @@ async def join_session(session_id: str, request: SessionJoinRequest, http_reques
         # Generate initial message only for new students
         if not is_returning:
             initial_message = await socratic_service.generate_initial_message(session_config.topic)
+
+            # Save initial AI message to database
+            storage_service = get_storage_service()
+            if storage_service and await storage_service.is_database_enabled():
+                try:
+                    await storage_service.save_message(
+                        session_id=session_id,
+                        student_id=student_id,
+                        content=initial_message,
+                        message_type="assistant"
+                    )
+                except Exception as e:
+                    print(f"Warning: Could not save initial AI message: {e}")
         else:
             initial_message = "다시 오셨군요! 이전 대화를 이어서 계속해보세요."
 
@@ -357,6 +370,8 @@ async def session_chat(session_id: str, request: SessionChatRequest):
             # Get previous messages for this student in this session
             try:
                 stored_messages = await storage_service.get_student_messages(session_id, request.student_id)
+                # Reverse the order since we get them newest-first from DB, but need oldest-first for conversation context
+                stored_messages.reverse()
                 messages = [{"role": msg["message_type"], "content": msg["content"]} for msg in stored_messages]
             except Exception as e:
                 print(f"Warning: Could not load message history: {e}")

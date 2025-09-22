@@ -169,6 +169,12 @@ class StorageService:
         print(f"Message history not available in file-based storage mode")
         return []
 
+    async def get_session_messages(self, session_id: str) -> List[Dict[str, Any]]:
+        """Get all messages for a session (file-based storage doesn't support this)."""
+        # File-based storage doesn't track individual messages
+        print(f"Session message history not available in file-based storage mode")
+        return []
+
 # Singleton instances
 _storage_service = StorageService()
 
