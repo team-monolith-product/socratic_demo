@@ -133,8 +133,11 @@ class SimplifiedTeacherDashboard {
         document.getElementById('sessionSetupView').style.display = 'none';
         document.getElementById('sessionDashboardView').style.display = 'flex';
 
-        // Update session title
-        document.getElementById('sessionTitle').textContent = sessionInfo.title;
+        // Update session title with proper check
+        const sessionTitleElement = document.getElementById('sessionTitle');
+        if (sessionTitleElement && sessionInfo && sessionInfo.title) {
+            sessionTitleElement.textContent = sessionInfo.title;
+        }
 
         // Load session details
         try {
@@ -313,7 +316,9 @@ class SimplifiedTeacherDashboard {
         // If we're showing QR from setup flow, go to dashboard
         if (this.currentSessionId && document.getElementById('sessionSetupView').style.display !== 'none') {
             const savedSession = this.sessionManager.getSavedSession();
-            this.showDashboard(savedSession);
+            if (savedSession) {
+                this.showDashboard(savedSession);
+            }
         }
     }
 
@@ -378,7 +383,10 @@ class SimplifiedTeacherDashboard {
         }
 
         // Update session title
-        document.getElementById('sessionTitle').textContent = session.config.title;
+        const sessionTitleElement = document.getElementById('sessionTitle');
+        if (sessionTitleElement && session.config && session.config.title) {
+            sessionTitleElement.textContent = session.config.title;
+        }
 
         // Update statistics cards
         document.getElementById('studentCount').textContent = realStudentCount;
@@ -405,7 +413,7 @@ class SimplifiedTeacherDashboard {
         tableBody.innerHTML = students.map((student, index) => `
             <tr>
                 <td>${student.student_name || `학생 #${String(index + 1).padStart(3, '0')}`}</td>
-                <td><span class="score-badge">${student.latest_score || 0}점</span></td>
+                <td>${this.createScoreGauge(student.latest_score || 0)}</td>
                 <td>${student.message_count || 0}개</td>
                 <td>${this.formatJoinTime(student.joined_at)}</td>
                 <td>${this.formatLastActivity(student.minutes_since_last_activity)}</td>
@@ -591,6 +599,26 @@ class SimplifiedTeacherDashboard {
         const remainingMinutes = minutes % 60;
         if (remainingMinutes === 0) return `${hours}시간 전`;
         return `${hours}시간 ${remainingMinutes}분 전`;
+    }
+
+    // Score Gauge Component
+    createScoreGauge(score) {
+        const percentage = Math.round(score);
+
+        // Determine score category and color
+        let category = 'poor';
+        if (percentage >= 80) category = 'excellent';
+        else if (percentage >= 60) category = 'good';
+
+        return `
+            <div class="score-display">
+                <div class="score-gauge ${category}" style="--score: ${percentage}">
+                    <div class="gauge-circle">
+                        <div class="gauge-text">${percentage}%</div>
+                    </div>
+                </div>
+            </div>
+        `;
     }
 
     // Student action handlers (placeholder implementations)
