@@ -514,6 +514,123 @@ body {
     transform: translateX(4px);
 }
 
+/* Teacher Section */
+.teacher-section {
+    padding: 60px 0;
+    background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 100%);
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.teacher-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.teacher-header {
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.teacher-title {
+    font-size: 36px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 16px;
+    line-height: 1.2;
+}
+
+.teacher-subtitle {
+    font-size: 18px;
+    color: #666;
+    line-height: 1.6;
+}
+
+.teacher-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 32px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.teacher-card {
+    background: white;
+    border-radius: 16px;
+    padding: 32px;
+    border: 2px solid #f0f0f0;
+    transition: all 0.3s ease;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.teacher-card:hover {
+    border-color: #667eea;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(102, 126, 234, 0.15);
+}
+
+.teacher-icon {
+    font-size: 48px;
+    margin-bottom: 24px;
+    display: block;
+}
+
+.teacher-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.teacher-option-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+.teacher-option-description {
+    font-size: 16px;
+    color: #666;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.teacher-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    margin-top: 8px;
+}
+
+.teacher-button.primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.teacher-button.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.teacher-button.secondary {
+    background: #f8f9fa;
+    color: #374151;
+    border: 2px solid #e5e7eb;
+}
+
+.teacher-button.secondary:hover {
+    background: #e5e7eb;
+    transform: translateY(-2px);
+}
+
 /* Features Section */
 .features-section {
     padding: var(--space-32) 0;

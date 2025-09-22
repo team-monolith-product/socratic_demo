@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>소크라테스 아카데미 - 교사용</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/main.css?v=3">
+    <link rel="stylesheet" href="/static/css/teacher-simplified.css?v=1">
+</head>
+<body class="simplified-body">
+    <div class="simplified-container">
+
+        <!-- Session Setup Screen (Default View) -->
+        <div id="sessionSetupView" class="session-setup-main">
+            <header class="simple-header">
+                <div class="brand">
+                    <div class="brand-icon">🏛️</div>
+                    <div class="brand-text">
+                        <h1>소크라테스 아카데미</h1>
+                        <span class="brand-subtitle">교사용</span>
+                    </div>
+                </div>
+            </header>
+
+            <main class="setup-content">
+                <h1>새로운 학습 세션을 시작해보세요</h1>
+                <p class="setup-description">학생들과 함께 소크라테스식 대화를 통한 깊이 있는 학습을 시작하세요</p>
+
+                <form id="sessionForm" class="session-form">
+                    <div class="form-card">
+                        <!-- Title and Topic Input Section -->
+                        <div class="input-section">
+                            <div class="form-group">
+                                <label for="sessionTitle" class="input-label">세션 제목</label>
+                                <div class="input-wrapper">
+                                    <input
+                                        id="sessionTitle"
+                                        name="title"
+                                        class="form-input"
+                                        placeholder="예: 기후변화 토론"
+                                        maxlength="50"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="sessionTopic" class="input-label">학습 주제</label>
+                                <div class="input-wrapper">
+                                    <textarea
+                                        id="sessionTopic"
+                                        name="topic"
+                                        class="topic-input"
+                                        placeholder="예: 기후변화의 원인과 해결책을 탐구하고 개인과 사회 차원의 대응방안을 토론해보세요"
+                                        rows="3"
+                                        required
+                                    ></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Options Grid -->
+                        <div class="options-grid">
+                            <!-- Difficulty Selection -->
+                            <div class="option-card">
+                                <div class="card-header">
+                                    <h3 class="card-title">학습 난이도</h3>
+                                </div>
+                                <div class="card-content">
+                                    <div class="option-buttons horizontal" data-name="difficulty">
+                                        <input type="radio" id="difficultyEasy" name="difficulty" value="easy">
+                                        <label for="difficultyEasy" class="option-button">
+                                            <div class="button-content">
+                                                <span class="button-icon">🌱</span>
+                                                <div class="button-text">
+                                                    <span class="button-title">쉬움</span>
+                                                    <span class="button-subtitle">기본 개념</span>
+                                                </div>
+                                            </div>
+                                        </label>
+
+                                        <input type="radio" id="difficultyNormal" name="difficulty" value="normal" checked>
+                                        <label for="difficultyNormal" class="option-button">
+                                            <div class="button-content">
+                                                <span class="button-icon">📚</span>
+                                                <div class="button-text">
+                                                    <span class="button-title">보통</span>
+                                                    <span class="button-subtitle">중학생 수준</span>
+                                                </div>
+                                            </div>
+                                        </label>
+
+                                        <input type="radio" id="difficultyHard" name="difficulty" value="hard">
+                                        <label for="difficultyHard" class="option-button">
+                                            <div class="button-content">
+                                                <span class="button-icon">🎓</span>
+                                                <div class="button-text">
+                                                    <span class="button-title">어려움</span>
+                                                    <span class="button-subtitle">깊이 있는 탐구</span>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Score Display Selection -->
+                            <div class="option-card">
+                                <div class="card-header">
+                                    <h3 class="card-title">학습 진행도</h3>
+                                </div>
+                                <div class="card-content">
+                                    <div class="option-buttons toggle" data-name="scoreDisplay">
+                                        <input type="radio" id="showScoreTrue" name="showScore" value="true" checked>
+                                        <label for="showScoreTrue" class="option-button">
+                                            <div class="button-content">
+                                                <span class="button-icon">📊</span>
+                                                <div class="button-text">
+                                                    <span class="button-title">점수 표시</span>
+                                                    <span class="button-subtitle">실시간 피드백</span>
+                                                </div>
+                                            </div>
+                                        </label>
+
+                                        <input type="radio" id="showScoreFalse" name="showScore" value="false">
+                                        <label for="showScoreFalse" class="option-button">
+                                            <div class="button-content">
+                                                <span class="button-icon">🎯</span>
+                                                <div class="button-text">
+                                                    <span class="button-title">점수 숨김</span>
+                                                    <span class="button-subtitle">집중 모드</span>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Start Button -->
+                        <div class="action-section">
+                            <button type="submit" class="start-session-btn">
+                                <span class="button-text">세션 시작하기</span>
+                                <span class="button-arrow">→</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </main>
+        </div>
+
+        <!-- Session Dashboard Screen -->
+        <div id="sessionDashboardView" class="session-dashboard" style="display: none;">
+            <header class="dashboard-header">
+                <div class="session-info">
+                    <h1 id="sessionTitle">세션 제목</h1>
+                    <div class="last-update" id="lastUpdateTime">마지막 업데이트: --</div>
+                </div>
+
+                <div class="header-actions">
+                    <button id="showQRBtn" class="action-btn secondary">
+                        <span class="btn-icon">📱</span>
+                        QR 코드 보기
+                    </button>
+                    <button id="refreshBtn" class="action-btn secondary">
+                        <span class="btn-icon">🔄</span>
+                        새로고침
+                    </button>
+                    <button id="newSessionBtn" class="action-btn primary">
+                        <span class="btn-icon">✨</span>
+                        새 세션 시작
+                    </button>
+                </div>
+            </header>
+
+            <main class="dashboard-content">
+                <!-- Session Statistics Cards -->
+                <div class="session-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="studentCount">0</div>
+                            <div class="stat-label">참여 학생</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⏱️</div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="sessionDuration">0분</div>
+                            <div class="stat-label">진행 시간</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="averageScore">0%</div>
+                            <div class="stat-label">평균 점수</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">💬</div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="totalMessages">0</div>
+                            <div class="stat-label">총 메시지</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Students Table Section -->
+                <div class="students-section">
+                    <div class="students-header">
+                        <h3>참여 학생 목록</h3>
+                        <div class="students-controls">
+                            <input type="text" class="search-input" placeholder="학생 이름 검색..." id="studentSearch">
+                            <button class="export-btn">
+                                <span class="btn-icon">📥</span>
+                                내보내기
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="students-table-container">
+                        <table class="students-table" id="studentsTable">
+                            <thead>
+                                <tr>
+                                    <th>학생 이름</th>
+                                    <th>최근 점수</th>
+                                    <th>메시지 수</th>
+                                    <th>접속 시간</th>
+                                    <th>최근 응답</th>
+                                    <th>상태</th>
+                                    <th>액션</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentsTableBody">
+                                <!-- 학생 데이터가 여기에 동적으로 로드됩니다 -->
+                            </tbody>
+                        </table>
+
+                        <div class="table-empty-state" id="tableEmptyState">
+                            <div class="empty-icon">👥</div>
+                            <div class="empty-title">아직 참여한 학생이 없습니다</div>
+                            <div class="empty-description">QR 코드를 공유하여 학생들의 참여를 기다려보세요</div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- QR Code Modal -->
+        <div id="qrModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>📱 학생들에게 이 QR 코드를 보여주세요!</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="qr-display">
+                        <div class="qr-code-section">
+                            <canvas id="qrCanvas" width="300" height="300"></canvas>
+                        </div>
+
+                        <div class="session-summary-section">
+                            <div class="qr-info">
+                                <div class="session-details">
+                                    <div class="detail-item">
+                                        <strong>🌐 직접 링크:</strong>
+                                        <a id="sessionLink" href="#" target="_blank"></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="sessionSummary"></div>
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button id="copyLinkBtn" class="secondary-button">📋 링크 복사</button>
+                        <button id="downloadQRBtn" class="secondary-button">🖼️ QR 다운로드</button>
+                        <button id="gotoDashboardBtn" class="primary-button">📊 대시보드로 가기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- New Session Confirmation Modal -->
+        <div id="confirmNewSessionModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>⚠️ 새 세션 시작</h3>
+                </div>
+                <div class="modal-body">
+                    <p>새 세션을 시작하면 현재 진행 중인 세션이 종료됩니다.</p>
+                    <p>이번 세션의 기록은 삭제됩니다.</p>
+                    <p><strong>계속하시겠습니까?</strong></p>
+                </div>
+                <div class="modal-actions">
+                    <button class="secondary-button" data-action="cancel">취소</button>
+                    <button class="primary-button" id="confirmNewSession">새 세션 시작</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div id="loading" class="loading-overlay" style="display: none;">
+            <div class="loading-content">
+                <div class="spinner"></div>
+                <p id="loadingMessage">처리 중입니다...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/static/config.js"></script>
+    <script src="/static/js/shared/qr-generator.js?v=2"></script>
+    <script src="/static/js/shared/simplified-session-manager.js?v=1"></script>
+    <script src="/static/js/teacher-simplified.js?v=1"></script>
+</body>
+</html>

@@ -455,6 +455,75 @@ async def session_chat(session_id: str, request: SessionChatRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.get("/teacher/sessions/{session_id}/validate")
+async def validate_session(session_id: str, request: Request):
+    """Validate if session exists and is accessible by teacher"""
+    try:
+        session_service = get_session_service()
+
+        # Generate teacher fingerprint
+        teacher_fingerprint = session_service.generate_browser_fingerprint(dict(request.headers))
+
+        # Check if session exists in active sessions
+        session_data = session_service.active_sessions.get(session_id)
+        if not session_data:
+            return {"valid": False, "session": None}
+
+        # Check if session belongs to this teacher
+        if session_data.get('teacher_fingerprint') != teacher_fingerprint:
+            return {"valid": False, "session": None}
+
+        # Convert datetime objects for JSON serialization
+        session_copy = session_data.copy()
+        for field in ['created_at', 'expires_at', 'last_activity', 'ended_at']:
+            if field in session_copy and hasattr(session_copy[field], 'isoformat'):
+                session_copy[field] = session_copy[field].isoformat()
+
+        return {
+            "valid": True,
+            "session": {
+                "id": session_id,
+                "config": session_copy['config'],
+                "status": session_copy['status'],
+                "created_at": session_copy['created_at'],
+                "expires_at": session_copy['expires_at']
+            }
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/teacher/sessions/{session_id}/archive")
+async def archive_session(session_id: str, request: Request):
+    """Soft archive a session (doesn't delete, but marks as inactive)"""
+    try:
+        session_service = get_session_service()
+
+        # Generate teacher fingerprint
+        teacher_fingerprint = session_service.generate_browser_fingerprint(dict(request.headers))
+
+        # Check if session exists and belongs to teacher
+        session_data = session_service.active_sessions.get(session_id)
+        if not session_data:
+            raise HTTPException(status_code=404, detail="Session not found")
+
+        if session_data.get('teacher_fingerprint') != teacher_fingerprint:
+            raise HTTPException(status_code=403, detail="Not authorized to archive this session")
+
+        # Mark session as archived (keep data but mark as inactive)
+        session_data['status'] = 'archived'
+        session_data['archived_at'] = datetime.now()
+
+        # Optional: Remove from active sessions but keep in a separate archived sessions store
+        # For now, we'll just mark it as archived
+
+        return {"success": True, "message": "Session archived successfully"}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @router.get("/teacher/storage/stats")
 async def get_storage_stats():
     """Get storage statistics"""
