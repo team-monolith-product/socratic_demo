@@ -151,18 +151,16 @@ class SimplifiedTeacherDashboard {
         document.getElementById('sessionSetupView').style.display = 'none';
         document.getElementById('sessionDashboardView').style.display = 'flex';
 
-        // Update session title with proper check
-        const sessionTitleElement = document.getElementById('sessionTitle');
-        if (sessionTitleElement && sessionInfo) {
-            // Handle both localStorage format and API response format
-            const title = sessionInfo.title ||
-                         (sessionInfo.config && sessionInfo.config.title) ||
-                         (sessionInfo.session && sessionInfo.session.config && sessionInfo.session.config.title);
-
-            if (title) {
-                sessionTitleElement.textContent = title;
+        // Update session title directly from localStorage
+        const sessionTitleElement = document.getElementById('sessionTitleDisplay');
+        if (sessionTitleElement) {
+            if (sessionInfo && sessionInfo.title) {
+                // Use title from localStorage directly
+                sessionTitleElement.textContent = sessionInfo.title;
+                console.log('Session title set from localStorage:', sessionInfo.title);
             } else {
                 console.warn('No title found in sessionInfo:', sessionInfo);
+                sessionTitleElement.textContent = '세션 제목 로딩 중...';
             }
         }
 
@@ -175,7 +173,13 @@ class SimplifiedTeacherDashboard {
 
         } catch (error) {
             console.error('Failed to load session details:', error);
-            this.showError('세션 정보를 불러올 수 없습니다: ' + error.message);
+            console.log('Using localStorage data as fallback');
+
+            // Use localStorage data as fallback
+            this.showLocalStorageStats(sessionInfo);
+
+            // Still try to start auto-refresh for future updates
+            this.startAutoRefresh();
         }
     }
 
@@ -377,6 +381,39 @@ class SimplifiedTeacherDashboard {
         }
     }
 
+    // Fallback method to show basic stats from localStorage
+    showLocalStorageStats(sessionInfo) {
+        console.log('Showing localStorage stats:', sessionInfo);
+
+        // Update session title (already done above, but ensure it's set)
+        const sessionTitleElement = document.getElementById('sessionTitleDisplay');
+        if (sessionTitleElement && sessionInfo.title) {
+            sessionTitleElement.textContent = sessionInfo.title;
+        }
+
+        // Calculate session duration from creation time
+        let sessionDuration = '0분';
+        if (sessionInfo.createdAt) {
+            const startTime = new Date(sessionInfo.createdAt);
+            const now = new Date();
+            const diffMs = now - startTime;
+            const diffMinutes = Math.floor(diffMs / (1000 * 60));
+            sessionDuration = this.sessionManager.formatDuration(Math.max(0, diffMinutes));
+        }
+
+        // Set basic stats (no students data available from localStorage)
+        document.getElementById('studentCount').textContent = '0';
+        document.getElementById('sessionDuration').textContent = sessionDuration;
+        document.getElementById('averageScore').textContent = '0%';
+        document.getElementById('totalMessages').textContent = '0';
+
+        // Show empty students table
+        this.updateStudentsTable([]);
+
+        // Update last refresh time
+        this.updateLastRefreshTime();
+    }
+
     // Dashboard Data Management
     async loadSessionDetails() {
         if (!this.currentSessionId) return;
@@ -409,10 +446,15 @@ class SimplifiedTeacherDashboard {
             realAverageScore = Math.round(totalScore / students.length);
         }
 
-        // Update session title
-        const sessionTitleElement = document.getElementById('sessionTitle');
-        if (sessionTitleElement && session.config && session.config.title) {
-            sessionTitleElement.textContent = session.config.title;
+        // Update session title - ensure it gets updated from API data
+        const sessionTitleElement = document.getElementById('sessionTitleDisplay');
+        if (sessionTitleElement) {
+            const title = (session.config && session.config.title) ||
+                         (session.title) ||
+                         '세션';
+
+            sessionTitleElement.textContent = title;
+            console.log('Session title updated to:', title);
         }
 
         // Update statistics cards
