@@ -175,14 +175,23 @@ class SimplifiedSessionManager {
         }
     }
 
-    // Create Session and Show QR Flow
-    async createSessionAndShowQR(sessionConfig) {
+    // Create Session and Show Dashboard Flow
+    async createSessionAndShowDashboard(sessionConfig) {
         try {
             // Create session (this also saves to localStorage)
             const sessionData = await this.createSession(sessionConfig);
 
             return {
-                action: 'showQRModal',
+                action: 'showDashboard',
+                sessionId: sessionData.session.id,
+                sessionInfo: {
+                    sessionId: sessionData.session.id,
+                    title: sessionConfig.title,
+                    topic: sessionConfig.topic,
+                    difficulty: sessionConfig.difficulty,
+                    showScore: sessionConfig.show_score,
+                    createdAt: sessionData.session.created_at
+                },
                 sessionData: sessionData
             };
 

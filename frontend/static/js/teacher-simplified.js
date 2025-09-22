@@ -151,6 +151,9 @@ class SimplifiedTeacherDashboard {
         document.getElementById('sessionSetupView').style.display = 'none';
         document.getElementById('sessionDashboardView').style.display = 'flex';
 
+        // Store session data for future QR modal calls
+        this.currentSessionData = sessionInfo;
+
         // Update session title directly from localStorage
         const sessionTitleElement = document.getElementById('sessionTitleDisplay');
         if (sessionTitleElement) {
@@ -200,12 +203,17 @@ class SimplifiedTeacherDashboard {
 
             console.log('Creating session with config:', sessionConfig);
 
-            // Create session and show QR immediately
-            const result = await this.sessionManager.createSessionAndShowQR(sessionConfig);
+            // Create session and show dashboard first
+            const result = await this.sessionManager.createSessionAndShowDashboard(sessionConfig);
 
-            if (result.action === 'showQRModal') {
-                this.showQRModal(result.sessionData);
-                this.currentSessionId = result.sessionData.session.id;
+            if (result.action === 'showDashboard') {
+                this.currentSessionId = result.sessionId;
+                await this.showDashboard(result.sessionInfo);
+
+                // Show QR modal automatically after dashboard is loaded
+                setTimeout(() => {
+                    this.showQRModal(result.sessionData);
+                }, 1000); // Wait 1 second for dashboard to settle
             }
 
             // Reset form
