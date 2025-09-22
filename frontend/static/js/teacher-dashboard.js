@@ -11,6 +11,8 @@ class TeacherDashboard {
         this.currentDetailSession = null;
         this.isUpdating = false;
         this.lastUpdateTime = null;
+        this.sessionDetailLastUpdateTime = null;
+        this.isDetailRefreshing = false;
 
         // Initialize when DOM is loaded
         if (document.readyState === 'loading') {
@@ -72,6 +74,12 @@ class TeacherDashboard {
         document.querySelectorAll('[data-action="cancel"]').forEach(button => {
             button.addEventListener('click', (e) => this.closeModal(e.target.closest('.modal')));
         });
+
+        // Session detail refresh button
+        const sessionRefreshBtn = document.getElementById('sessionRefreshBtn');
+        if (sessionRefreshBtn) {
+            sessionRefreshBtn.addEventListener('click', () => this.manualRefreshSessionDetail());
+        }
 
         // QR actions
         const copyLinkBtn = document.getElementById('copyLinkBtn');
@@ -589,10 +597,17 @@ class TeacherDashboard {
         document.getElementById('dashboardView').style.display = 'none';
         document.getElementById('sessionDetailView').style.display = 'block';
 
+        // Store current session ID for auto-refresh
+        this.currentDetailSessionId = sessionId;
+
         // Load session details
         try {
             const sessionDetails = await this.sessionManager.getSessionDetails(sessionId);
             this.populateSessionDetail(sessionDetails);
+
+            // Start auto-refresh for session detail
+            this.startSessionDetailAutoRefresh();
+            this.updateSessionDetailLastRefreshTime();
         } catch (error) {
             console.error('Failed to load session details:', error);
             this.showError('세션 상세 정보를 불러올 수 없습니다');
@@ -693,6 +708,10 @@ class TeacherDashboard {
     showDashboard() {
         document.getElementById('sessionDetailView').style.display = 'none';
         document.getElementById('dashboardView').style.display = 'block';
+
+        // Stop session detail auto-refresh
+        this.stopSessionDetailAutoRefresh();
+        this.currentDetailSessionId = null;
     }
 
     async monitorSession(sessionId) {
@@ -958,17 +977,98 @@ class TeacherDashboard {
         }
     }
 
-    async refreshCurrentSessionDetail() {
-        if (!this.currentDetailSession || !this.currentDetailSession.session) {
+    startSessionDetailAutoRefresh() {
+        // Clear any existing interval
+        this.stopSessionDetailAutoRefresh();
+
+        // Start auto-refresh every 10 seconds
+        this.detailRefreshInterval = setInterval(() => {
+            this.autoRefreshSessionDetail();
+        }, 10000);
+    }
+
+    stopSessionDetailAutoRefresh() {
+        if (this.detailRefreshInterval) {
+            clearInterval(this.detailRefreshInterval);
+            this.detailRefreshInterval = null;
+        }
+    }
+
+    async autoRefreshSessionDetail() {
+        if (this.isDetailRefreshing || !this.currentDetailSessionId) {
             return;
         }
 
         try {
-            const sessionId = this.currentDetailSession.session.id;
-            const sessionDetails = await this.sessionManager.getSessionDetails(sessionId);
+            this.isDetailRefreshing = true;
+            this.showSessionDetailRefreshIndicator(true);
+
+            const sessionDetails = await this.sessionManager.getSessionDetails(this.currentDetailSessionId);
             this.populateSessionDetail(sessionDetails);
+            this.updateSessionDetailLastRefreshTime();
         } catch (error) {
-            console.error('Failed to refresh session detail:', error);
+            console.error('Failed to auto-refresh session detail:', error);
+        } finally {
+            this.isDetailRefreshing = false;
+            this.showSessionDetailRefreshIndicator(false);
+        }
+    }
+
+    async manualRefreshSessionDetail() {
+        if (!this.currentDetailSessionId) return;
+
+        const refreshBtn = document.getElementById('sessionRefreshBtn');
+        if (refreshBtn) {
+            refreshBtn.disabled = true;
+            refreshBtn.innerHTML = `
+                <span class="btn-icon">⏳</span>
+                새로고침 중...
+            `;
+        }
+
+        try {
+            const sessionDetails = await this.sessionManager.getSessionDetails(this.currentDetailSessionId);
+            this.populateSessionDetail(sessionDetails);
+            this.updateSessionDetailLastRefreshTime();
+            this.showToast('✅ 세션 상세정보가 업데이트되었습니다');
+        } catch (error) {
+            console.error('Manual refresh failed:', error);
+            this.showToast('❌ 새로고침에 실패했습니다', 'error');
+        } finally {
+            if (refreshBtn) {
+                refreshBtn.disabled = false;
+                refreshBtn.innerHTML = `
+                    <span class="btn-icon">🔄</span>
+                    새로고침
+                `;
+            }
+        }
+    }
+
+    showSessionDetailRefreshIndicator(show) {
+        const infoCards = document.querySelector('.session-info-cards');
+        const tableContainer = document.querySelector('.students-table-container');
+
+        if (show) {
+            infoCards?.classList.add('refreshing');
+            tableContainer?.classList.add('refreshing');
+        } else {
+            infoCards?.classList.remove('refreshing');
+            tableContainer?.classList.remove('refreshing');
+        }
+    }
+
+    updateSessionDetailLastRefreshTime() {
+        this.sessionDetailLastUpdateTime = new Date();
+        const timeDisplay = document.getElementById('sessionLastUpdateTime');
+
+        if (timeDisplay) {
+            const timeStr = this.sessionDetailLastUpdateTime.toLocaleTimeString('ko-KR', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            timeDisplay.textContent = `마지막 업데이트: ${timeStr}`;
         }
     }
 

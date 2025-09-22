@@ -2359,3 +2359,94 @@
         max-width: none;
     }
 }
+
+/* Session Detail Specific Styles */
+.detail-title-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+}
+
+.detail-title-section .last-update-time {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    font-weight: 400;
+    padding: 4px 8px;
+    background: var(--gray-50);
+    border-radius: 6px;
+    border: 1px solid var(--gray-200);
+}
+
+.detail-actions {
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+}
+
+.action-btn.secondary {
+    background: var(--gray-50);
+    color: var(--text-secondary);
+    border: 1px solid var(--gray-200);
+    transition: all 0.2s ease;
+}
+
+.action-btn.secondary:hover {
+    background: var(--gray-100);
+    color: var(--text-primary);
+    border-color: var(--gray-300);
+}
+
+.action-btn.secondary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Refresh states for session detail */
+.session-info-cards.refreshing {
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.students-table-container.refreshing {
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+/* Refresh indicator for session detail */
+.session-detail-refresh-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--bg-primary);
+    border: 1px solid var(--gray-200);
+    border-radius: 12px;
+    padding: 12px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    z-index: 100;
+    display: none;
+}
+
+.session-detail-refresh-indicator.show {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+@media (max-width: 768px) {
+    .detail-title-section .last-update-time {
+        font-size: 11px;
+        padding: 3px 6px;
+    }
+
+    .detail-actions {
+        gap: var(--space-1);
+    }
+
+    .action-btn {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+}
