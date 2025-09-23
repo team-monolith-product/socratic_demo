@@ -153,10 +153,105 @@ async def drop_score_records_table():
             raise
 
 
+async def create_scores_table():
+    """Create the scores table for tracking student response evaluations."""
+    async with AsyncSessionLocal() as session:
+        try:
+            db_type = await _detect_database_type(session)
+
+            # Check if scores table already exists
+            if db_type == "postgresql":
+                check_query = text("""
+                    SELECT table_name FROM information_schema.tables
+                    WHERE table_schema = 'public' AND table_name = 'scores';
+                """)
+            else:
+                check_query = text("""
+                    SELECT name FROM sqlite_master
+                    WHERE type='table' AND name='scores';
+                """)
+
+            result = await session.execute(check_query)
+            table_exists = result.fetchone() is not None
+
+            if not table_exists:
+                if db_type == "postgresql":
+                    create_query = text("""
+                        CREATE TABLE scores (
+                            id VARCHAR(36) PRIMARY KEY,
+                            message_id VARCHAR(36) NOT NULL,
+                            student_id VARCHAR(36) NOT NULL,
+                            session_id VARCHAR(20) NOT NULL,
+                            overall_score INTEGER NOT NULL,
+                            depth_score INTEGER NOT NULL,
+                            breadth_score INTEGER NOT NULL,
+                            application_score INTEGER NOT NULL,
+                            metacognition_score INTEGER NOT NULL,
+                            engagement_score INTEGER NOT NULL,
+                            evaluation_data JSON,
+                            is_completed BOOLEAN DEFAULT FALSE,
+                            created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+                            FOREIGN KEY (message_id) REFERENCES messages(id) ON DELETE CASCADE,
+                            FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+                            FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
+                        );
+
+                        CREATE INDEX idx_scores_message_id ON scores(message_id);
+                        CREATE INDEX idx_scores_student_id ON scores(student_id);
+                        CREATE INDEX idx_scores_session_id ON scores(session_id);
+                        CREATE INDEX idx_scores_created_at ON scores(created_at);
+                    """)
+                else:
+                    # Create table first
+                    create_table_query = text("""
+                        CREATE TABLE scores (
+                            id TEXT PRIMARY KEY,
+                            message_id TEXT NOT NULL,
+                            student_id TEXT NOT NULL,
+                            session_id TEXT NOT NULL,
+                            overall_score INTEGER NOT NULL,
+                            depth_score INTEGER NOT NULL,
+                            breadth_score INTEGER NOT NULL,
+                            application_score INTEGER NOT NULL,
+                            metacognition_score INTEGER NOT NULL,
+                            engagement_score INTEGER NOT NULL,
+                            evaluation_data TEXT,
+                            is_completed INTEGER DEFAULT 0,
+                            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                            FOREIGN KEY (message_id) REFERENCES messages(id) ON DELETE CASCADE,
+                            FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+                            FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
+                        )
+                    """)
+
+                    await session.execute(create_table_query)
+
+                    # Create indexes separately for SQLite
+                    index_queries = [
+                        "CREATE INDEX idx_scores_message_id ON scores(message_id)",
+                        "CREATE INDEX idx_scores_student_id ON scores(student_id)",
+                        "CREATE INDEX idx_scores_session_id ON scores(session_id)",
+                        "CREATE INDEX idx_scores_created_at ON scores(created_at)"
+                    ]
+
+                    for index_query in index_queries:
+                        await session.execute(text(index_query))
+                await session.commit()
+                print("✅ scores table created successfully with indexes")
+            else:
+                print("ℹ️ scores table already exists")
+
+        except Exception as e:
+            await session.rollback()
+            print(f"❌ Error creating scores table: {e}")
+            raise
+
+
 async def run_migrations():
     """Run all pending migrations."""
     print("🔄 Running database migrations...")
     await drop_session_activities_table()
     await drop_score_records_table()
     await add_deleted_at_column()
+    await create_scores_table()
     print("✅ Migrations completed")

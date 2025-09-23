@@ -94,6 +94,11 @@ class Session(Base):
         back_populates="session",
         cascade="all, delete-orphan"
     )
+    scores: Mapped[List["Score"]] = relationship(
+        "Score",
+        back_populates="session",
+        cascade="all, delete-orphan"
+    )
 
 
 class Student(Base):
@@ -139,6 +144,11 @@ class Student(Base):
         back_populates="student",
         cascade="all, delete-orphan"
     )
+    scores: Mapped[List["Score"]] = relationship(
+        "Score",
+        back_populates="student",
+        cascade="all, delete-orphan"
+    )
 
 
 class Message(Base):
@@ -174,6 +184,64 @@ class Message(Base):
     # Relationships
     student: Mapped["Student"] = relationship("Student", back_populates="messages")
     session: Mapped["Session"] = relationship("Session", back_populates="messages")
+    scores: Mapped[List["Score"]] = relationship(
+        "Score",
+        back_populates="message",
+        cascade="all, delete-orphan"
+    )
+
+
+class Score(Base):
+    """Score model for tracking student response evaluations."""
+    __tablename__ = "scores"
+
+    id: Mapped[str] = mapped_column(
+        String(36),
+        primary_key=True,
+        default=lambda: str(uuid.uuid4())
+    )
+    message_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("messages.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True
+    )
+    student_id: Mapped[str] = mapped_column(
+        String(36),
+        ForeignKey("students.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True
+    )
+    session_id: Mapped[str] = mapped_column(
+        String(20),
+        ForeignKey("sessions.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True
+    )
+
+    # Socratic dimension scores (0-100)
+    overall_score: Mapped[int] = mapped_column(Integer, nullable=False)
+    depth_score: Mapped[int] = mapped_column(Integer, nullable=False)
+    breadth_score: Mapped[int] = mapped_column(Integer, nullable=False)
+    application_score: Mapped[int] = mapped_column(Integer, nullable=False)
+    metacognition_score: Mapped[int] = mapped_column(Integer, nullable=False)
+    engagement_score: Mapped[int] = mapped_column(Integer, nullable=False)
+
+    # Evaluation metadata
+    evaluation_data: Mapped[Optional[dict]] = mapped_column(JSON)
+    is_completed: Mapped[bool] = mapped_column(Boolean, default=False)
+
+    # Timestamps
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        index=True
+    )
+
+    # Relationships
+    message: Mapped["Message"] = relationship("Message", back_populates="scores")
+    student: Mapped["Student"] = relationship("Student", back_populates="scores")
+    session: Mapped["Session"] = relationship("Session", back_populates="scores")
 
 
 

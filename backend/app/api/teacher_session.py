@@ -441,6 +441,25 @@ async def session_chat(session_id: str, request: SessionChatRequest):
         understanding_score = evaluation_result["overall_score"]
         is_completed = evaluation_result["is_completed"]
 
+        # Record score in database
+        if storage_service and await storage_service.is_database_enabled() and message_id:
+            try:
+                await storage_service.save_score(
+                    message_id=message_id,
+                    student_id=request.student_id,
+                    session_id=session_id,
+                    overall_score=understanding_score,
+                    dimensions=evaluation_result["dimensions"],
+                    evaluation_data={
+                        "insights": evaluation_result.get("insights", []),
+                        "growth_indicators": evaluation_result.get("growth_indicators", []),
+                        "next_focus": evaluation_result.get("next_focus", [])
+                    },
+                    is_completed=is_completed
+                )
+                print(f"✅ Score recorded for student {request.student_id}: {understanding_score}")
+            except Exception as e:
+                print(f"Warning: Could not save score to database: {e}")
 
         # Update student progress in session service
         try:
@@ -546,5 +565,65 @@ async def get_storage_stats():
         storage_service = get_storage_service()
         stats = await storage_service.get_storage_stats()
         return {"success": True, "stats": stats}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/teacher/sessions/{session_id}/scores")
+async def get_session_scores(session_id: str, request: Request):
+    """Get all score records for a session"""
+    try:
+        session_service = get_session_service()
+        storage_service = session_service.storage_service
+
+        # Validate teacher access
+        teacher_fingerprint = session_service._generate_teacher_fingerprint(request)
+        session_data = await session_service.get_session(session_id)
+
+        if not session_data:
+            raise HTTPException(status_code=404, detail="Session not found")
+
+        if session_data.get('teacher_fingerprint') != teacher_fingerprint:
+            raise HTTPException(status_code=403, detail="Access denied")
+
+        # Get scores from database if available
+        if storage_service and await storage_service.is_database_enabled():
+            scores = await storage_service.get_session_scores(session_id)
+            return {"scores": scores}
+        else:
+            return {"scores": [], "message": "Database not available"}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/teacher/sessions/{session_id}/students/{student_id}/scores")
+async def get_student_scores(session_id: str, student_id: str, request: Request):
+    """Get all score records for a specific student"""
+    try:
+        session_service = get_session_service()
+        storage_service = session_service.storage_service
+
+        # Validate teacher access
+        teacher_fingerprint = session_service._generate_teacher_fingerprint(request)
+        session_data = await session_service.get_session(session_id)
+
+        if not session_data:
+            raise HTTPException(status_code=404, detail="Session not found")
+
+        if session_data.get('teacher_fingerprint') != teacher_fingerprint:
+            raise HTTPException(status_code=403, detail="Access denied")
+
+        # Get scores from database if available
+        if storage_service and await storage_service.is_database_enabled():
+            scores = await storage_service.get_student_scores(session_id, student_id)
+            return {"scores": scores}
+        else:
+            return {"scores": [], "message": "Database not available"}
+
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

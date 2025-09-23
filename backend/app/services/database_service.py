@@ -10,7 +10,7 @@ from sqlalchemy import select, update, delete, and_, or_, func
 from sqlalchemy.orm import selectinload
 
 from app.core.database import AsyncSessionLocal
-from app.models.database_models import Teacher, Session, Student, Message
+from app.models.database_models import Teacher, Session, Student, Message, Score
 
 
 class DatabaseService:
@@ -460,6 +460,73 @@ class DatabaseService:
                 ]
         except Exception as e:
             print(f"Error getting session messages: {e}")
+            return []
+
+    async def save_score(
+        self,
+        message_id: str,
+        student_id: str,
+        session_id: str,
+        overall_score: int,
+        dimensions: Dict[str, int],
+        evaluation_data: Optional[Dict[str, Any]] = None,
+        is_completed: bool = False
+    ) -> bool:
+        """Save a score record for a student response."""
+        try:
+            async with await self._get_session() as session:
+                new_score = Score(
+                    message_id=message_id,
+                    student_id=student_id,
+                    session_id=session_id,
+                    overall_score=overall_score,
+                    depth_score=dimensions.get('depth', 0),
+                    breadth_score=dimensions.get('breadth', 0),
+                    application_score=dimensions.get('application', 0),
+                    metacognition_score=dimensions.get('metacognition', 0),
+                    engagement_score=dimensions.get('engagement', 0),
+                    evaluation_data=evaluation_data,
+                    is_completed=is_completed,
+                    created_at=datetime.now(self.kst)
+                )
+                session.add(new_score)
+                await session.commit()
+                return True
+        except Exception as e:
+            print(f"Error saving score: {e}")
+            return False
+
+    async def get_student_scores(self, session_id: str, student_id: str) -> List[Dict[str, Any]]:
+        """Get all score records for a specific student in a session."""
+        try:
+            async with await self._get_session() as session:
+                stmt = select(Score).where(
+                    and_(Score.session_id == session_id, Score.student_id == student_id)
+                ).order_by(Score.created_at.desc())
+
+                result = await session.execute(stmt)
+                scores = result.scalars().all()
+
+                return [
+                    {
+                        "id": score.id,
+                        "message_id": score.message_id,
+                        "overall_score": score.overall_score,
+                        "dimensions": {
+                            "depth": score.depth_score,
+                            "breadth": score.breadth_score,
+                            "application": score.application_score,
+                            "metacognition": score.metacognition_score,
+                            "engagement": score.engagement_score
+                        },
+                        "evaluation_data": score.evaluation_data,
+                        "is_completed": score.is_completed,
+                        "created_at": self._format_korea_time(score.created_at) if score.created_at else None
+                    }
+                    for score in scores
+                ]
+        except Exception as e:
+            print(f"Error getting student scores: {e}")
             return []
 
 
