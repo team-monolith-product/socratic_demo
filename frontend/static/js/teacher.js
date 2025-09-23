@@ -642,21 +642,6 @@ class SimplifiedTeacherDashboard {
         this.showToast(message, 'error');
     }
 
-    showSuccess(message) {
-        this.showToast(message, 'success');
-    }
-
-    formatJoinTime(timestamp) {
-        if (!timestamp) return '-';
-        const date = new Date(timestamp);
-        return date.toLocaleString('ko-KR', {
-            timeZone: 'Asia/Seoul',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-    }
 
     formatLastActivity(minutes) {
         if (minutes === undefined || minutes === null) return '-';

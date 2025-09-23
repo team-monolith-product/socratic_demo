@@ -265,32 +265,6 @@ class SimplifiedSessionManager {
         }
     }
 
-    formatTimestamp(timestamp) {
-        const date = new Date(timestamp);
-        const now = new Date();
-
-        const diffMs = now - date;
-        const diffMinutes = Math.floor(diffMs / (1000 * 60));
-        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-        if (diffMinutes < 1) {
-            return '방금 전';
-        } else if (diffMinutes < 60) {
-            return `${diffMinutes}분 전`;
-        } else if (diffHours < 24) {
-            return `${diffHours}시간 전`;
-        } else if (diffDays < 7) {
-            return `${diffDays}일 전`;
-        } else {
-            return date.toLocaleDateString('ko-KR', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-                timeZone: 'Asia/Seoul'
-            });
-        }
-    }
 
     getDifficultyText(difficulty) {
         const difficultyMap = {
@@ -301,14 +275,6 @@ class SimplifiedSessionManager {
         return difficultyMap[difficulty] || difficulty;
     }
 
-    getDifficultyIcon(difficulty) {
-        const iconMap = {
-            'easy': '🌱',
-            'normal': '📚',
-            'hard': '🎓'
-        };
-        return iconMap[difficulty] || '📚';
-    }
 
     calculateSessionDuration(startTime, sessionDurationMinutes = null) {
         // If server provided duration_minutes, use that
