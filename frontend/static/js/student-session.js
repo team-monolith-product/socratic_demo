@@ -2,7 +2,7 @@
 
 class StudentSession {
     constructor() {
-        this.sessionManager = new SessionManager();
+        this.apiBaseUrl = window.__API_BASE__ || '/api/v1';
         this.sessionId = null;
         this.sessionData = null;
         this.studentName = null;
@@ -46,7 +46,7 @@ class StudentSession {
             console.error('Failed to initialize student session:', error);
             const technicalInfo = `
 Session ID: ${this.sessionId}
-API URL: ${this.sessionManager.apiBaseUrl}
+API URL: ${this.apiBaseUrl}
 Error: ${error.message}
 Type: ${error.constructor.name}
 Online: ${navigator.onLine}
@@ -59,11 +59,18 @@ URL: ${window.location.href}
     async loadSessionInfo() {
         try {
             console.log('Loading session info for:', this.sessionId);
-            console.log('API Base URL:', this.sessionManager.apiBaseUrl);
+            console.log('API Base URL:', this.apiBaseUrl);
 
-            // Use public session API for students instead of teacher API
-            const sessionInfo = await this.sessionManager.getPublicSessionInfo(this.sessionId);
-            // Public API returns flat structure, wrap to match teacher API structure
+            // Use public session API for students
+            const response = await fetch(`${this.apiBaseUrl}/session/${this.sessionId}`);
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            const sessionInfo = await response.json();
+
+            // Public API returns flat structure, wrap to match expected structure
             this.sessionData = {
                 config: {
                     topic: sessionInfo.session.topic,
@@ -79,7 +86,7 @@ URL: ${window.location.href}
                 message: error.message,
                 stack: error.stack,
                 sessionId: this.sessionId,
-                apiBaseUrl: this.sessionManager.apiBaseUrl
+                apiBaseUrl: this.apiBaseUrl
             });
             throw new Error('세션을 찾을 수 없습니다.');
         }
@@ -141,10 +148,30 @@ URL: ${window.location.href}
 
         try {
             // Join session via API
-            const joinResponse = await this.sessionManager.joinSession(this.sessionId, {
-                student_name: this.studentName
+            const response = await fetch(`${this.apiBaseUrl}/session/${this.sessionId}/join`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    student_name: this.studentName
+                })
             });
 
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                const error = new Error(errorData.detail || `HTTP ${response.status}`);
+
+                // Check for specific error types
+                if (response.status === 400 && errorData.detail?.includes('이미 사용중')) {
+                    error.type = 'name_taken';
+                    error.message = '이미 사용중인 이름입니다. 다른 이름을 입력해주세요.';
+                }
+
+                throw error;
+            }
+
+            const joinResponse = await response.json();
             console.log('Successfully joined session:', joinResponse);
 
             // Store student_id from response
