@@ -1,21 +1,447 @@
-/* Teacher Simplified Dashboard CSS */
-/* Responsive design with mobile-first approach as specified in the documentation */
+/* Teacher Apple Store Style Dashboard CSS */
+/* Apple Store inspired design with clean, modern aesthetics */
 
-/* Base Styles */
-.simplified-body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+/* Base Styles - Apple Store Inspired */
+.apple-body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
     margin: 0;
     padding: 0;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #ffffff;
     min-height: 100vh;
-    color: #333;
+    color: #1d1d1f;
+    font-size: 17px;
+    line-height: 1.47059;
+    -webkit-font-smoothing: antialiased;
 }
 
-.simplified-container {
+.apple-container {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
 }
+
+/* Apple Session Setup */
+.apple-session-setup {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Apple Navigation */
+.apple-nav {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    height: 48px;
+}
+
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-brand .brand-icon {
+    font-size: 24px;
+}
+
+.nav-brand .brand-text {
+    font-size: 19px;
+    font-weight: 600;
+    color: #1d1d1f;
+}
+
+/* Apple Hero Section */
+.apple-hero {
+    padding: 80px 20px 60px;
+    text-align: center;
+    background: linear-gradient(135deg, rgba(0, 125, 255, 0.05) 0%, rgba(120, 119, 198, 0.05) 100%);
+}
+
+.hero-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.hero-title {
+    font-size: 56px;
+    font-weight: 600;
+    line-height: 1.07143;
+    letter-spacing: -0.005em;
+    color: #1d1d1f;
+    margin: 0 0 16px 0;
+}
+
+.hero-subtitle {
+    font-size: 28px;
+    line-height: 1.14286;
+    font-weight: 400;
+    color: #86868b;
+    margin: 0;
+}
+
+/* Apple Content */
+.apple-content {
+    flex: 1;
+    padding: 40px 20px 80px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.apple-cards-container {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Apple Card Styles */
+.apple-card {
+    background: #ffffff;
+    border-radius: 18px;
+    border: 1px solid #d2d2d7;
+    padding: 0;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.04);
+    transition: all 0.3s ease;
+}
+
+.apple-card:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+}
+
+.apple-card .card-header {
+    padding: 32px 32px 0;
+}
+
+.apple-card .card-title {
+    font-size: 28px;
+    font-weight: 600;
+    color: #1d1d1f;
+    margin: 0 0 8px 0;
+    line-height: 1.21429;
+}
+
+.apple-card .card-description {
+    font-size: 19px;
+    color: #86868b;
+    margin: 0 0 24px 0;
+    line-height: 1.42105;
+}
+
+.apple-card .card-content {
+    padding: 0 32px 32px;
+}
+
+/* Apple Form Styles */
+.apple-form {
+    width: 100%;
+}
+
+.apple-form-group {
+    margin-bottom: 24px;
+}
+
+.apple-label {
+    display: block;
+    font-size: 17px;
+    font-weight: 600;
+    color: #1d1d1f;
+    margin-bottom: 8px;
+}
+
+.apple-input, .apple-textarea {
+    width: 100%;
+    padding: 16px 20px;
+    border: 2px solid #d2d2d7;
+    border-radius: 12px;
+    font-size: 17px;
+    font-family: inherit;
+    background: #ffffff;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.apple-input:focus, .apple-textarea:focus {
+    outline: none;
+    border-color: #007aff;
+    box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.2);
+}
+
+.apple-textarea {
+    resize: vertical;
+    min-height: 120px;
+    line-height: 1.47059;
+}
+
+/* Apple Options Grid */
+.apple-options-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 32px;
+}
+
+/* Apple Radio Group */
+.apple-radio-group, .apple-toggle-group {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+.apple-radio-group input[type="radio"],
+.apple-toggle-group input[type="radio"] {
+    display: none;
+}
+
+.apple-radio-card, .apple-toggle-card {
+    display: block;
+    padding: 20px;
+    border: 2px solid #d2d2d7;
+    border-radius: 12px;
+    background: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.apple-radio-card:hover, .apple-toggle-card:hover {
+    border-color: #007aff;
+    background: rgba(0, 122, 255, 0.02);
+}
+
+.apple-radio-group input[type="radio"]:checked + .apple-radio-card,
+.apple-toggle-group input[type="radio"]:checked + .apple-toggle-card {
+    border-color: #007aff;
+    background: rgba(0, 122, 255, 0.05);
+    position: relative;
+}
+
+.apple-radio-group input[type="radio"]:checked + .apple-radio-card::after,
+.apple-toggle-group input[type="radio"]:checked + .apple-toggle-card::after {
+    content: '✓';
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 24px;
+    height: 24px;
+    background: #007aff;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.radio-content, .toggle-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.radio-icon, .toggle-icon {
+    font-size: 32px;
+    flex-shrink: 0;
+}
+
+.radio-info, .toggle-info {
+    flex: 1;
+}
+
+.radio-title, .toggle-title {
+    font-size: 19px;
+    font-weight: 600;
+    color: #1d1d1f;
+    margin: 0 0 4px 0;
+}
+
+.radio-subtitle, .toggle-subtitle {
+    font-size: 15px;
+    color: #86868b;
+    margin: 0;
+}
+
+/* Apple Action Section */
+.apple-action-section {
+    text-align: center;
+    padding-top: 40px;
+}
+
+.apple-primary-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #007aff;
+    color: white;
+    border: none;
+    border-radius: 980px;
+    padding: 16px 32px;
+    font-size: 17px;
+    font-weight: 400;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 200px;
+    justify-content: center;
+    font-family: inherit;
+}
+
+.apple-primary-button:hover {
+    background: #0056cc;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 16px rgba(0, 122, 255, 0.3);
+}
+
+.apple-primary-button:active {
+    transform: translateY(0);
+}
+
+.button-arrow {
+    transition: transform 0.2s ease;
+}
+
+.apple-primary-button:hover .button-arrow {
+    transform: translateX(2px);
+}
+
+/* Apple Responsive Design */
+
+/* Tablet and larger (768px+) */
+@media (min-width: 768px) {
+    .hero-title {
+        font-size: 64px;
+    }
+
+    .hero-subtitle {
+        font-size: 32px;
+    }
+
+    .apple-options-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+    }
+
+    .apple-radio-group, .apple-toggle-group {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .apple-toggle-group {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .nav-container {
+        padding: 0 40px;
+    }
+
+    .apple-content {
+        padding: 60px 40px 100px;
+    }
+}
+
+/* Desktop (1024px+) */
+@media (min-width: 1024px) {
+    .hero-title {
+        font-size: 80px;
+    }
+
+    .hero-subtitle {
+        font-size: 36px;
+    }
+
+    .apple-hero {
+        padding: 120px 20px 80px;
+    }
+
+    .apple-content {
+        padding: 80px 40px 120px;
+    }
+
+    .apple-cards-container {
+        gap: 60px;
+        max-width: 980px;
+    }
+}
+
+/* Mobile specific adjustments */
+@media (max-width: 767px) {
+    .hero-title {
+        font-size: 40px;
+        line-height: 1.1;
+    }
+
+    .hero-subtitle {
+        font-size: 21px;
+    }
+
+    .apple-hero {
+        padding: 40px 20px 30px;
+    }
+
+    .apple-content {
+        padding: 20px 20px 40px;
+    }
+
+    .apple-cards-container {
+        gap: 24px;
+    }
+
+    .apple-card .card-header {
+        padding: 24px 24px 0;
+    }
+
+    .apple-card .card-content {
+        padding: 0 24px 24px;
+    }
+
+    .apple-card .card-title {
+        font-size: 24px;
+    }
+
+    .apple-card .card-description {
+        font-size: 17px;
+    }
+
+    .apple-input, .apple-textarea {
+        padding: 14px 16px;
+        font-size: 16px;
+    }
+
+    .nav-container {
+        height: 44px;
+    }
+
+    .nav-brand .brand-text {
+        font-size: 17px;
+    }
+
+    .apple-radio-card, .apple-toggle-card {
+        padding: 16px;
+    }
+
+    .radio-content, .toggle-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+    }
+
+    .radio-icon, .toggle-icon {
+        font-size: 28px;
+    }
+}
+
+/* Keep existing dashboard styles for compatibility */
 
 /* Session Setup View */
 .session-setup-main {
