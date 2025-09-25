@@ -570,64 +570,6 @@
     }
 }
 
-/* Footer */
-.main-footer {
-    background: #ffffff;
-    border-top: 1px solid #e2e8f0;
-    padding: 24px 0;
-    margin-top: auto;
-}
-
-.footer-container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 40px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.footer-logo {
-    flex-shrink: 0;
-}
-
-.footer-logo-image {
-    width: 120px;
-    height: 72px;
-    filter: grayscale(0.2) brightness(1.1) contrast(0.8);
-    object-fit: contain;
-}
-
-.footer-content {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 8px;
-}
-
-.footer-text {
-    text-align: right;
-}
-
-.footer-company,
-.footer-copyright {
-    font-size: 14px;
-    color: #64748b;
-    margin: 0;
-    line-height: 1.4;
-}
-
-.footer-link {
-    font-size: 14px;
-    color: #3574d9;
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.2s;
-}
-
-.footer-link:hover {
-    color: #2a5bb8;
-}
 
 /* Responsive Design */
 @media (max-width: 1024px) {
