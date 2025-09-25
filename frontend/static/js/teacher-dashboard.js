@@ -141,6 +141,14 @@ class TeacherDashboard {
 
     async loadDashboard(sessionId) {
         try {
+            // Check if this is a new session that needs immediate QR modal
+            const urlParams = new URLSearchParams(window.location.search);
+            const isNewSession = urlParams.get('newSession') === 'true';
+
+            if (isNewSession) {
+                this.showLoading(true, '세션 준비 중입니다...');
+            }
+
             // Validate session exists
             const isValid = await this.sessionManager.validateSession(sessionId);
 
@@ -154,8 +162,14 @@ class TeacherDashboard {
             // Start auto-refresh
             this.startAutoRefresh();
 
-            // Auto-show QR modal for new sessions
-            this.checkAndShowQRModal();
+            // Auto-show QR modal for new sessions with loading screen
+            if (isNewSession) {
+                await this.showQRCodeWithLoading();
+                // Clean up URL parameter
+                const newUrl = new URL(window.location);
+                newUrl.searchParams.delete('newSession');
+                window.history.replaceState({}, document.title, newUrl.pathname + newUrl.search);
+            }
 
         } catch (error) {
             console.error('Failed to load dashboard:', error);
@@ -463,6 +477,52 @@ class TeacherDashboard {
         }
     }
 
+    async showQRCodeWithLoading() {
+        try {
+            // Keep loading screen active and update message
+            this.showLoading(true, 'QR 코드를 생성하고 있습니다...');
+
+            // Get session info
+            const savedSession = this.sessionManager.getSavedSession();
+            if (!savedSession) {
+                throw new Error('세션 정보를 찾을 수 없습니다');
+            }
+
+            // Generate QR code
+            const qrImageData = await this.sessionManager.generateSessionQR(this.currentSessionId);
+
+            // Create session data for modal
+            const base_url = window.location.origin;
+            const session_url = `${base_url}/s/${this.currentSessionId}`;
+
+            const sessionData = {
+                session: {
+                    id: this.currentSessionId,
+                    config: {
+                        title: savedSession.title,
+                        topic: savedSession.topic,
+                        difficulty: savedSession.difficulty,
+                        show_score: savedSession.showScore
+                    },
+                    created_at: savedSession.createdAt
+                },
+                qr_code: {
+                    url: session_url,
+                    image_data: qrImageData
+                }
+            };
+
+            // Hide loading screen and show modal
+            this.showLoading(false);
+            this.showQRModal(sessionData);
+
+        } catch (error) {
+            console.error('Failed to show QR code with loading:', error);
+            this.showLoading(false);
+            this.showError('QR 코드를 표시할 수 없습니다: ' + error.message);
+        }
+    }
+
     showQRModal(sessionData) {
         const modal = document.getElementById('qrModal');
         const qrCode = sessionData.qr_code;
@@ -604,32 +664,6 @@ class TeacherDashboard {
         }, 3000);
     }
 
-    checkAndShowQRModal() {
-        // Check if this is a new session (from setup page)
-        const urlParams = new URLSearchParams(window.location.search);
-        const isNewSession = urlParams.get('newSession') === 'true';
-
-        // Also check if there's a recent session creation timestamp in localStorage
-        const savedSession = this.sessionManager.getSavedSession();
-        const recentlyCreated = savedSession && savedSession.createdAt &&
-            (Date.now() - new Date(savedSession.createdAt).getTime()) < 30000; // Within 30 seconds
-
-        if (isNewSession || recentlyCreated) {
-            console.log('Auto-showing QR modal for new session');
-
-            // Small delay to ensure dashboard is fully loaded
-            setTimeout(() => {
-                this.showQRCode();
-
-                // Clean up URL parameter
-                if (isNewSession) {
-                    const newUrl = new URL(window.location);
-                    newUrl.searchParams.delete('newSession');
-                    window.history.replaceState({}, document.title, newUrl.pathname + newUrl.search);
-                }
-            }, 1000);
-        }
-    }
 
     showError(message) {
         this.showToast(message, 'error');
