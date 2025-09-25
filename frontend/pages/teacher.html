@@ -7,8 +7,21 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://hangeul.pstatic.net/hangeul_static/css/nanum-square-neo.css" rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: 'NanumSquareNeo';
+            src: url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-aLt.woff2') format('woff2'),
+                 url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-bRg.woff2') format('woff2'),
+                 url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-cBd.woff2') format('woff2'),
+                 url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-dEb.woff2') format('woff2'),
+                 url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-eHv.woff2') format('woff2');
+            font-weight: 100 900;
+            font-display: swap;
+        }
+    </style>
     <link rel="stylesheet" href="/static/css/main.css?v=3">
-    <link rel="stylesheet" href="/static/css/teacher.css?v=12">
+    <link rel="stylesheet" href="/static/css/teacher.css?v=26">
 </head>
 <body class="apple-body">
     <div class="apple-container">
@@ -27,6 +40,11 @@
 
             <!-- Main Content -->
             <main class="main-content">
+                <!-- Blue Header Card -->
+                <div class="session-header-card">
+                    <h1 class="session-header-title">새 세션 만들기</h1>
+                    <p class="session-header-subtitle">소크룸 설정하고 학생 참여시키기</p>
+                </div>
 
                 <form id="sessionForm" class="apple-form">
                     <!-- Two Column Layout -->
@@ -72,7 +90,6 @@
                                     <input type="radio" id="difficultyEasy" name="difficulty" value="easy">
                                     <label for="difficultyEasy" class="apple-radio-card">
                                         <div class="radio-content">
-                                            <div class="radio-icon">🌱</div>
                                             <div class="radio-info">
                                                 <h4 class="radio-title">쉬움</h4>
                                                 <p class="radio-subtitle">기본 개념 중심</p>
@@ -83,7 +100,6 @@
                                     <input type="radio" id="difficultyNormal" name="difficulty" value="normal" checked>
                                     <label for="difficultyNormal" class="apple-radio-card">
                                         <div class="radio-content">
-                                            <div class="radio-icon">📚</div>
                                             <div class="radio-info">
                                                 <h4 class="radio-title">보통</h4>
                                                 <p class="radio-subtitle">중학생 수준</p>
@@ -94,7 +110,6 @@
                                     <input type="radio" id="difficultyHard" name="difficulty" value="hard">
                                     <label for="difficultyHard" class="apple-radio-card">
                                         <div class="radio-content">
-                                            <div class="radio-icon">🎓</div>
                                             <div class="radio-info">
                                                 <h4 class="radio-title">어려움</h4>
                                                 <p class="radio-subtitle">깊이 있는 탐구</p>
