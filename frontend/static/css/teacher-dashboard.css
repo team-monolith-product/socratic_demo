@@ -24,7 +24,7 @@
 /* Dashboard Header */
 .dashboard-header {
     background: transparent;
-    padding: 32px 40px;
+    padding: 21px 40px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -111,14 +111,13 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 24px;
-    margin-bottom: 40px;
+    margin-bottom: 24px;
 }
 
 .stat-card {
     background: #ffffff;
     border-radius: 16px;
     padding: 28px;
-    border: 1px solid rgba(53, 116, 217, 0.06);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
@@ -291,7 +290,30 @@
 .empty-description {
     font-size: 14px;
     line-height: 1.5;
-    margin: 0;
+    margin: 0 0 24px 0;
+}
+
+.empty-state-qr-btn {
+    padding: 12px 24px;
+    background: #3574d9;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Pretendard', sans-serif;
+    box-shadow: 0 4px 12px rgba(53, 116, 217, 0.25);
+}
+
+.empty-state-qr-btn:hover {
+    background: #2a5bb8;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(53, 116, 217, 0.35);
 }
 
 /* Score Bar Component */

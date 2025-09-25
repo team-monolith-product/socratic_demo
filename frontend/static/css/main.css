@@ -157,6 +157,8 @@ body {
     display: flex;
     align-items: center;
     height: 100%;
+    margin-left: 6px;
+    margin-top: 2px;
 }
 
 .logo-image {

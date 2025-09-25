@@ -121,6 +121,12 @@ class TeacherDashboard {
             studentSearch.addEventListener('input', (e) => this.filterStudents(e.target.value));
         }
 
+        // Empty state QR button
+        const emptyStateQRBtn = document.getElementById('emptyStateQRBtn');
+        if (emptyStateQRBtn) {
+            emptyStateQRBtn.addEventListener('click', () => this.showQRCode());
+        }
+
         // Debug: Add clear localStorage handler for development
         if (window.location.hostname === 'localhost') {
             document.addEventListener('keydown', (e) => {
