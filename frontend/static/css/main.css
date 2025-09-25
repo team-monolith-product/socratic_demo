@@ -751,71 +751,79 @@ body {
 /* Footer */
 .footer {
     background: #ffffff;
-    border-top: 1px solid var(--color-border);
-    position: relative;
+    border-top: 1px solid #e2e8f0;
+    height: 134px; /* 98px logo height + 36px padding */
+    margin-top: auto;
     width: 100%;
 }
 
 .footer-container {
-    display: flex;
-    align-items: flex-end;
-    min-height: 134px; /* 98px logo height + 36px padding */
     width: 100%;
     padding-left: 64px;
     padding-right: 64px;
+    display: flex;
+    align-items: flex-end;
+    height: 100%;
+    position: relative;
     box-sizing: border-box;
 }
 
 .footer-logo {
+    flex-shrink: 0;
+    display: flex;
+    align-items: flex-end;
+    height: 100%;
+    padding-bottom: 0;
     margin-right: 36px;
     margin-bottom: -1px;
-    flex-shrink: 0;
 }
 
 .footer-logo-img {
     width: 164px;
     height: 98px;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.05)) brightness(1.4) contrast(0.8);
     object-fit: contain;
     display: block;
-    filter: brightness(1.4) contrast(0.8);
 }
 
 .footer-content {
+    flex: 1;
     padding: 25px;
     margin-bottom: 24px;
-    flex: 1;
-    text-align: left;
 }
 
 .footer-text {
     display: flex;
     flex-direction: column;
     gap: 4px;
+    padding-top: 24px;
 }
 
 .footer-company,
 .footer-copyright {
-    font-size: var(--font-size-sm);
-    color: var(--color-text-secondary);
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+    color: #363636;
     line-height: 1.4;
     font-weight: 400;
     text-align: left;
-    margin: 0;
 }
 
 .footer-link {
     display: inline-block;
     margin-top: 12px;
-    font-size: var(--font-size-sm);
-    color: var(--color-primary);
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+    color: #3578d9;
     text-decoration: none;
     border-bottom: 1px solid transparent;
     transition: all 0.2s ease;
+    font-weight: 500;
 }
 
 .footer-link:hover {
-    color: var(--color-primary-dark);
-    border-bottom-color: var(--color-primary);
+    color: #2563eb;
+    border-bottom-color: #3578d9;
 }
 
 /* Loading Overlay */
