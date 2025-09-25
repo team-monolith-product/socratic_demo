@@ -37,6 +37,7 @@
     padding-right: 64px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     height: 56px;
     box-sizing: border-box;
 }
@@ -51,14 +52,40 @@
 .logo-image {
     width: 60px;
     height: 21px;
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.05));
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     object-fit: contain;
 }
 
 .logo-image:hover {
-    filter: drop-shadow(0 2px 4px rgba(53, 116, 217, 0.15));
     transform: scale(1.02);
+}
+
+/* GNB Actions */
+.gnb-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.codle-link-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    background: #3574d9;
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+}
+
+.codle-link-button:hover {
+    background: #2563c7;
+    transform: translateY(-1px);
 }
 
 .gnb-menu {
@@ -412,7 +439,7 @@
 
 .apple-radio-group input[type="radio"]:checked + .apple-radio-card::before,
 .apple-toggle-group input[type="radio"]:checked + .apple-toggle-card::before {
-    transform: scaleX(1);
+    transform: scaleX(0);
 }
 
 .apple-radio-group input[type="radio"]:checked + .apple-radio-card::after,
