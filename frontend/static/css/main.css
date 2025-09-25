@@ -754,6 +754,21 @@ body {
     margin: 0;
 }
 
+.footer-link {
+    display: inline-block;
+    margin-top: 12px;
+    font-size: var(--font-size-sm);
+    color: var(--color-primary);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.footer-link:hover {
+    color: var(--color-primary-dark);
+    border-bottom-color: var(--color-primary);
+}
+
 /* Loading Overlay */
 .loading-overlay {
     position: fixed;

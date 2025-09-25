@@ -992,6 +992,23 @@ textarea:focus,
     text-align: left;
 }
 
+.footer-link {
+    display: inline-block;
+    margin-top: 12px;
+    font-family: 'Pretendard', sans-serif;
+    font-size: 14px;
+    color: #3578d9;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.footer-link:hover {
+    color: #2563eb;
+    border-bottom-color: #3578d9;
+}
+
 /* Mobile footer styles */
 @media (max-width: 767px) {
     .footer-container {
