@@ -148,6 +148,9 @@ class TeacherDashboard {
             // Start auto-refresh
             this.startAutoRefresh();
 
+            // Auto-show QR modal for new sessions
+            this.checkAndShowQRModal();
+
         } catch (error) {
             console.error('Failed to load dashboard:', error);
 
@@ -593,6 +596,33 @@ class TeacherDashboard {
                 toast.parentNode.removeChild(toast);
             }
         }, 3000);
+    }
+
+    checkAndShowQRModal() {
+        // Check if this is a new session (from setup page)
+        const urlParams = new URLSearchParams(window.location.search);
+        const isNewSession = urlParams.get('newSession') === 'true';
+
+        // Also check if there's a recent session creation timestamp in localStorage
+        const savedSession = this.sessionManager.getSavedSession();
+        const recentlyCreated = savedSession && savedSession.createdAt &&
+            (Date.now() - new Date(savedSession.createdAt).getTime()) < 30000; // Within 30 seconds
+
+        if (isNewSession || recentlyCreated) {
+            console.log('Auto-showing QR modal for new session');
+
+            // Small delay to ensure dashboard is fully loaded
+            setTimeout(() => {
+                this.showQRCode();
+
+                // Clean up URL parameter
+                if (isNewSession) {
+                    const newUrl = new URL(window.location);
+                    newUrl.searchParams.delete('newSession');
+                    window.history.replaceState({}, document.title, newUrl.pathname + newUrl.search);
+                }
+            }, 1000);
+        }
     }
 
     showError(message) {

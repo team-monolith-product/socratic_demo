@@ -7,26 +7,25 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://hangeul.pstatic.net/hangeul_static/css/nanum-square-neo.css" rel="stylesheet">
-    <style>
-        @font-face {
-            font-family: 'NanumSquareNeo';
-            src: url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-aLt.woff2') format('woff2'),
-                 url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-bRg.woff2') format('woff2'),
-                 url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-cBd.woff2') format('woff2'),
-                 url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-dEb.woff2') format('woff2'),
-                 url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-eHv.woff2') format('woff2');
-            font-weight: 100 900;
-            font-display: swap;
-        }
-    </style>
     <link rel="stylesheet" href="/static/css/main.css?v=3">
+    <link rel="stylesheet" href="/static/css/teacher.css?v=13">
     <link rel="stylesheet" href="/static/css/teacher-dashboard.css?v=1">
 </head>
-<body class="dashboard-body">
-    <div class="dashboard-container">
-        <!-- Dashboard Header -->
-        <header class="dashboard-header">
+<body class="apple-body">
+    <div class="apple-container">
+        <!-- Global Navigation Bar -->
+        <nav class="gnb">
+            <div class="gnb-container">
+                <div class="gnb-logo">
+                    <img src="/static/codle-logo.svg" alt="Codle" class="logo-image" />
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Header -->
+            <header class="dashboard-header">
             <div class="session-info">
                 <h1 id="sessionTitleDisplay">세션 제목 로딩 중...</h1>
                 <div class="last-update" id="lastUpdateTime">마지막 업데이트: --</div>
@@ -49,7 +48,6 @@
         </header>
 
         <!-- Dashboard Content -->
-        <main class="dashboard-content">
             <!-- Session Statistics Cards -->
             <div class="session-stats">
                 <div class="stat-card">
@@ -171,6 +169,7 @@
                 </div>
             </div>
         </div>
+        </main>
 
         <!-- Loading Overlay -->
         <div id="loading" class="loading-overlay" style="display: none;">

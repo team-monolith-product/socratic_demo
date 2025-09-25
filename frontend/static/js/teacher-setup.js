@@ -204,7 +204,7 @@ class TeacherSetup {
                 console.log('Session created successfully:', result);
 
                 // Navigate to dashboard with the new session
-                this.goToDashboard(result.session.id);
+                this.goToDashboard(result.session.id, true);
             } else {
                 throw new Error('세션 생성 응답이 올바르지 않습니다');
             }
@@ -217,9 +217,15 @@ class TeacherSetup {
         }
     }
 
-    goToDashboard(sessionId) {
+    goToDashboard(sessionId, isNewSession = false) {
         // Navigate to the dashboard page
-        const dashboardUrl = `/pages/teacher-dashboard.html?session=${sessionId}`;
+        let dashboardUrl = `/pages/teacher-dashboard.html?session=${sessionId}`;
+
+        // Add newSession parameter if this is a newly created session
+        if (isNewSession) {
+            dashboardUrl += '&newSession=true';
+        }
+
         console.log('Navigating to dashboard:', dashboardUrl);
         window.location.href = dashboardUrl;
     }
