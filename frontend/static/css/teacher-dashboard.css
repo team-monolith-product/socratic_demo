@@ -1,5 +1,20 @@
 /* Teacher Dashboard Page CSS - Clean and Professional */
 
+/* Common White Box Component - Unified Design System */
+.white-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
+    gap: 10px;
+    background: #FFFFFF;
+    box-shadow: 0px 1.6px 3.6px rgba(0, 0, 0, 0.11), 0px 0.3px 0.9px rgba(0, 0, 0, 0.07);
+    border-radius: 16px;
+    flex: none;
+    flex-grow: 0;
+}
+
 /* Base Styles */
 .dashboard-body {
     font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
@@ -115,14 +130,16 @@
 }
 
 .stat-card {
-    background: #ffffff;
+    background: #FFFFFF;
     border-radius: 16px;
-    padding: 28px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    padding: 20px;
+    box-shadow: 0px 1.6px 3.6px rgba(0, 0, 0, 0.11), 0px 0.3px 0.9px rgba(0, 0, 0, 0.07);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 10px;
+    flex: none;
+    flex-grow: 0;
 }
 
 .stat-card:hover {
@@ -163,11 +180,12 @@
 
 /* Students Section */
 .students-section {
-    background: #ffffff;
+    background: #FFFFFF;
     border-radius: 16px;
-    border: 1px solid rgba(53, 116, 217, 0.06);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    box-shadow: 0px 1.6px 3.6px rgba(0, 0, 0, 0.11), 0px 0.3px 0.9px rgba(0, 0, 0, 0.07);
     overflow: hidden;
+    flex: none;
+    flex-grow: 0;
 }
 
 .students-header {
@@ -374,15 +392,16 @@
 }
 
 .modal-content {
-    background: #ffffff;
-    border-radius: 28px;
+    background: #FFFFFF;
+    border-radius: 16px;
     max-width: 680px;
     width: 100%;
     max-height: 90vh;
     overflow-y: auto;
     position: relative;
-    box-shadow: 0 32px 80px rgba(53, 116, 217, 0.2), 0 8px 32px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(53, 116, 217, 0.06);
+    box-shadow: 0px 1.6px 3.6px rgba(0, 0, 0, 0.11), 0px 0.3px 0.9px rgba(0, 0, 0, 0.07);
+    flex: none;
+    flex-grow: 0;
 }
 
 .modal-header {
