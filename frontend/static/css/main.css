@@ -788,9 +788,7 @@ body {
 
 .footer-content {
     flex: 1;
-    padding: 25px 25px 25px 25px;
-    padding-top: 49px;
-    margin-bottom: 24px;
+    padding: 24px;
 }
 
 .footer-text {
