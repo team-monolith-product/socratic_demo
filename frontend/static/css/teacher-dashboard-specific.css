@@ -1,26 +1,5 @@
-/* Teacher Dashboard Page CSS - Dashboard Specific Styles */
-/* 공통 컴포넌트들은 common.css에서 로드됩니다 */
-
-/* Dashboard Specific Base Styles */
-.dashboard-body {
-    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-    margin: 0;
-    padding: 0;
-    background: #f5f5f5;
-    min-height: 100vh;
-    color: #1a202c;
-    font-size: 16px;
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
-
-.dashboard-container {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    background: #f5f5f5;
-}
+/* Teacher Dashboard Page Specific Styles */
+/* 교사 대시보드 페이지에만 사용되는 스타일들 */
 
 /* Dashboard Header */
 .dashboard-header {
@@ -54,114 +33,11 @@
     flex-wrap: wrap;
 }
 
-.action-btn {
-    padding: 14px 24px;
-    border-radius: 12px;
-    border: none;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    font-family: 'Pretendard', sans-serif;
-    letter-spacing: -0.01em;
-}
-
-.action-btn.primary {
-    background: #3574d9;
-    color: white;
-    box-shadow: 0 6px 20px rgba(53, 116, 217, 0.25);
-}
-
-.action-btn.primary:hover {
-    background: #2a5bb8;
-    transform: translateY(-2px);
-    box-shadow: 0 12px 32px rgba(53, 116, 217, 0.35);
-}
-
-.action-btn.secondary {
-    background: #ffffff;
-    color: #374151;
-    border: 1px solid rgba(53, 116, 217, 0.15);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-.action-btn.secondary:hover {
-    background: #ffffff;
-    border-color: #3574d9;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(53, 116, 217, 0.15);
-}
-
-.btn-icon {
-    font-size: 16px;
-}
-
 /* Dashboard Content */
 .dashboard-content {
     flex: 1;
     padding: 32px 40px;
     background: #f5f5f5;
-}
-
-/* Session Statistics Cards */
-.session-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 24px;
-    margin-bottom: 24px;
-}
-
-.stat-card {
-    background: #FFFFFF;
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0px 1.6px 3.6px rgba(0, 0, 0, 0.11), 0px 0.3px 0.9px rgba(0, 0, 0, 0.07);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex: none;
-    flex-grow: 0;
-}
-
-.stat-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 32px rgba(53, 116, 217, 0.08);
-}
-
-.stat-icon {
-    font-size: 32px;
-    width: 56px;
-    height: 56px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(53, 116, 217, 0.08);
-    border-radius: 12px;
-    flex-shrink: 0;
-}
-
-.stat-content {
-    flex: 1;
-}
-
-.stat-value {
-    font-size: 28px;
-    font-weight: 700;
-    color: #1a202c;
-    line-height: 1;
-    margin-bottom: 4px;
-}
-
-.stat-label {
-    font-size: 14px;
-    color: #64748b;
-    font-weight: 500;
-    margin: 0;
 }
 
 /* Students Section */
@@ -243,6 +119,7 @@
     width: 100%;
     border-collapse: collapse;
     background: #ffffff;
+    table-layout: fixed;
 }
 
 .students-table thead th {
@@ -253,6 +130,102 @@
     border-bottom: 2px solid #f1f5f9;
     font-size: 14px;
     background: #fafbfc;
+    overflow: hidden;
+}
+
+/* Fixed column widths */
+.students-table thead th:nth-child(1) { /* 학생 이름 */
+    width: 30%;
+    min-width: 120px;
+}
+
+.students-table thead th:nth-child(2) { /* 최근 점수 */
+    width: 25%;
+    min-width: 140px;
+}
+
+.students-table thead th:nth-child(3) { /* 메시지 수 */
+    width: 20%;
+    min-width: 100px;
+}
+
+.students-table thead th:nth-child(4) { /* 최근 응답 */
+    width: 25%;
+    min-width: 120px;
+}
+
+/* Sortable Table Headers */
+.students-table thead th.sortable {
+    cursor: pointer;
+    position: relative;
+    user-select: none;
+    transition: background-color 0.15s ease;
+}
+
+.students-table thead th.sortable:hover {
+    background: #f1f5f9;
+    color: #3574d9;
+}
+
+.students-table thead th.sortable:active {
+    background: #e2e8f0;
+}
+
+.students-table thead th.sortable.sort-asc,
+.students-table thead th.sortable.sort-desc {
+    background: #e6f2ff;
+    color: #3574d9;
+}
+
+.sort-icon {
+    display: inline-block;
+    width: 16px;
+    height: 14px;
+    margin-left: 8px;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 14px;
+    opacity: 0.6;
+    transition: opacity 0.1s ease;
+}
+
+.students-table thead th.sortable:hover .sort-icon {
+    opacity: 1;
+}
+
+/* Default state - show up/down arrow */
+.students-table thead th.sortable .sort-icon {
+    color: #9ca3af;
+}
+
+/* Active sort states - hide original content and show arrow */
+.students-table thead th.sortable.sort-asc .sort-icon,
+.students-table thead th.sortable.sort-desc .sort-icon {
+    opacity: 1;
+    color: #3574d9;
+    font-weight: bold;
+    font-size: 0; /* Hide the original ↕️ */
+    position: relative;
+}
+
+.students-table thead th.sortable.sort-asc .sort-icon::after {
+    content: "▲";
+    font-size: 12px;
+    color: #3574d9;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.students-table thead th.sortable.sort-desc .sort-icon::after {
+    content: "▼";
+    font-size: 12px;
+    color: #3574d9;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .students-table tbody td {
@@ -261,6 +234,27 @@
     font-size: 14px;
     color: #1a202c;
     vertical-align: middle;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Match column widths for tbody */
+.students-table tbody td:nth-child(1) { /* 학생 이름 */
+    width: 30%;
+}
+
+.students-table tbody td:nth-child(2) { /* 최근 점수 */
+    width: 25%;
+    white-space: normal; /* Allow score bar to wrap if needed */
+}
+
+.students-table tbody td:nth-child(3) { /* 메시지 수 */
+    width: 20%;
+}
+
+.students-table tbody td:nth-child(4) { /* 최근 응답 */
+    width: 25%;
 }
 
 .students-table tbody tr:hover {
@@ -412,8 +406,6 @@
     text-decoration: underline;
 }
 
-/* Dashboard Button Styles - Using common.css definitions */
-
 /* Dashboard Loading Override */
 .loading-overlay {
     background: #f5f5f5;
@@ -449,10 +441,7 @@
     margin: 0;
 }
 
-/* Toast Notifications - Using common.css definitions */
-
-
-/* Responsive Design */
+/* Responsive Design - Dashboard Specific */
 @media (max-width: 1024px) {
     .dashboard-content {
         padding: 24px 32px;
@@ -522,11 +511,43 @@
 
     .students-table {
         font-size: 13px;
+        table-layout: fixed;
     }
 
     .students-table thead th,
     .students-table tbody td {
         padding: 12px 8px;
+    }
+
+    /* Maintain fixed widths on mobile */
+    .students-table thead th:nth-child(1),
+    .students-table tbody td:nth-child(1) {
+        width: 25%;
+        min-width: 80px;
+    }
+
+    .students-table thead th:nth-child(2),
+    .students-table tbody td:nth-child(2) {
+        width: 30%;
+        min-width: 100px;
+    }
+
+    .students-table thead th:nth-child(3),
+    .students-table tbody td:nth-child(3) {
+        width: 20%;
+        min-width: 70px;
+    }
+
+    .students-table thead th:nth-child(4),
+    .students-table tbody td:nth-child(4) {
+        width: 25%;
+        min-width: 80px;
+    }
+
+    .sort-icon {
+        width: 12px;
+        height: 12px;
+        margin-left: 4px;
     }
 
     .modal-content {
@@ -544,20 +565,5 @@
 
     .modal-header h3 {
         font-size: 24px;
-    }
-
-    .footer-container {
-        padding: 0 32px;
-        flex-direction: column;
-        gap: 16px;
-        text-align: center;
-    }
-
-    .footer-content {
-        align-items: center;
-    }
-
-    .footer-text {
-        text-align: center;
     }
 }

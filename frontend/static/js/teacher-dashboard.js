@@ -10,6 +10,11 @@ class TeacherDashboard {
         this.isRefreshing = false;
         this.lastUpdateTime = null;
         this.lottieAnimation = null;
+        this.studentsData = [];
+        this.currentSort = {
+            column: null,
+            direction: 'none' // 'none', 'asc', 'desc'
+        };
 
         // Set up QR generator dependency
         this.sessionManager.setQRGenerator(this.qrGenerator);
@@ -127,6 +132,9 @@ class TeacherDashboard {
         if (emptyStateQRBtn) {
             emptyStateQRBtn.addEventListener('click', () => this.showQRCode());
         }
+
+        // Table sorting
+        this.setupTableSorting();
 
         // Debug: Add clear localStorage handler for development
         if (window.location.hostname === 'localhost') {
@@ -278,17 +286,30 @@ class TeacherDashboard {
     }
 
     updateStudentsTable(students) {
+        // Store the original data for sorting
+        this.studentsData = [...students];
+        this.renderStudentsTable();
+    }
+
+    renderStudentsTable() {
         const tableBody = document.getElementById('studentsTableBody');
         const emptyState = document.getElementById('tableEmptyState');
 
-        if (students.length === 0) {
+        if (this.studentsData.length === 0) {
             tableBody.innerHTML = '';
             emptyState.style.display = 'block';
             return;
         }
 
         emptyState.style.display = 'none';
-        tableBody.innerHTML = students.map((student, index) => `
+
+        // Sort data if needed
+        let displayData = [...this.studentsData];
+        if (this.currentSort.column && this.currentSort.direction !== 'none') {
+            displayData = this.sortStudents(displayData, this.currentSort.column, this.currentSort.direction);
+        }
+
+        tableBody.innerHTML = displayData.map((student, index) => `
             <tr>
                 <td>${student.student_name || `학생 #${String(index + 1).padStart(3, '0')}`}</td>
                 <td>${this.createScoreBar(student.latest_score || 0)}</td>
@@ -324,6 +345,85 @@ class TeacherDashboard {
         const remainingMinutes = minutes % 60;
         if (remainingMinutes === 0) return `${hours}시간 전`;
         return `${hours}시간 ${remainingMinutes}분 전`;
+    }
+
+    setupTableSorting() {
+        const sortableHeaders = document.querySelectorAll('.students-table thead th.sortable');
+        sortableHeaders.forEach(header => {
+            header.addEventListener('click', () => {
+                const column = header.dataset.column;
+                this.toggleSort(column);
+            });
+        });
+    }
+
+    toggleSort(column) {
+        // Clear other headers
+        document.querySelectorAll('.students-table thead th.sortable').forEach(header => {
+            if (header.dataset.column !== column) {
+                header.classList.remove('sort-asc', 'sort-desc');
+            }
+        });
+
+        const header = document.querySelector(`.students-table thead th.sortable[data-column="${column}"]`);
+
+        // Cycle through sort directions: none -> asc -> desc -> none
+        if (this.currentSort.column !== column || this.currentSort.direction === 'none') {
+            this.currentSort.column = column;
+            this.currentSort.direction = 'asc';
+            header.classList.add('sort-asc');
+            header.classList.remove('sort-desc');
+        } else if (this.currentSort.direction === 'asc') {
+            this.currentSort.direction = 'desc';
+            header.classList.add('sort-desc');
+            header.classList.remove('sort-asc');
+        } else {
+            this.currentSort.column = null;
+            this.currentSort.direction = 'none';
+            header.classList.remove('sort-asc', 'sort-desc');
+        }
+
+        this.renderStudentsTable();
+    }
+
+    sortStudents(students, column, direction) {
+        return students.sort((a, b) => {
+            let aVal, bVal;
+
+            switch (column) {
+                case 'name':
+                    aVal = (a.student_name || '').toLowerCase();
+                    bVal = (b.student_name || '').toLowerCase();
+                    break;
+                case 'score':
+                    aVal = a.latest_score || 0;
+                    bVal = b.latest_score || 0;
+                    break;
+                case 'messages':
+                    aVal = a.message_count || 0;
+                    bVal = b.message_count || 0;
+                    break;
+                case 'activity':
+                    // For activity, lower minutes means more recent (should be sorted ascending when "recent" is desired)
+                    aVal = a.minutes_since_last_activity || 99999;
+                    bVal = b.minutes_since_last_activity || 99999;
+                    break;
+                default:
+                    return 0;
+            }
+
+            if (direction === 'asc') {
+                if (typeof aVal === 'string') {
+                    return aVal.localeCompare(bVal, 'ko');
+                }
+                return aVal - bVal;
+            } else {
+                if (typeof aVal === 'string') {
+                    return bVal.localeCompare(aVal, 'ko');
+                }
+                return bVal - aVal;
+            }
+        });
     }
 
     filterStudents(searchTerm) {

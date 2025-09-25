@@ -8,12 +8,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/main.css?v=4">
-    <link rel="stylesheet" href="/static/css/teacher.css?v=15">
+    <link rel="stylesheet" href="/static/css/shared.css?v=1">
+    <link rel="stylesheet" href="/static/css/teacher-dashboard-specific.css?v=1">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
-    <link rel="stylesheet" href="/static/css/teacher-dashboard.css?v=4">
 </head>
-<body class="apple-body">
-    <div class="apple-container">
+<body class="dashboard-body">
+    <div class="dashboard-container">
         <!-- Global Navigation Bar -->
         <nav class="gnb">
             <div class="gnb-container">
@@ -101,10 +101,22 @@
                     <table class="students-table" id="studentsTable">
                         <thead>
                             <tr>
-                                <th>학생 이름</th>
-                                <th>최근 점수</th>
-                                <th>메시지 수</th>
-                                <th>최근 응답</th>
+                                <th class="sortable" data-column="name" data-type="text">
+                                    학생 이름
+                                    <span class="sort-icon">↕️</span>
+                                </th>
+                                <th class="sortable" data-column="score" data-type="number">
+                                    최근 점수
+                                    <span class="sort-icon">↕️</span>
+                                </th>
+                                <th class="sortable" data-column="messages" data-type="number">
+                                    메시지 수
+                                    <span class="sort-icon">↕️</span>
+                                </th>
+                                <th class="sortable" data-column="activity" data-type="number">
+                                    최근 응답
+                                    <span class="sort-icon">↕️</span>
+                                </th>
                             </tr>
                         </thead>
                         <tbody id="studentsTableBody">

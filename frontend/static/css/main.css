@@ -132,31 +132,13 @@ body {
     flex-direction: column;
 }
 
-/* Global Navigation Bar */
+/* Main Page GNB Overrides */
 .gnb {
-    background: #ffffff;
     border-bottom: 1px solid #e2e8f0;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
 }
 
-.gnb-container {
-    width: 100%;
-    padding-left: 64px;
-    padding-right: 64px;
-    display: flex;
-    align-items: center;
-    height: 56px;
-    box-sizing: border-box;
-}
-
 .gnb-logo {
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    height: 100%;
     margin-left: 6px;
     margin-top: 2px;
 }
@@ -164,13 +146,6 @@ body {
 .logo-image {
     height: 28px;
     width: auto;
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.05));
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.logo-image:hover {
-    filter: drop-shadow(0 2px 4px rgba(53, 116, 217, 0.15));
-    transform: scale(1.02);
 }
 
 /* Navigation */
@@ -750,29 +725,18 @@ body {
     margin: 0;
 }
 
-/* Footer */
-.footer {
-    background: #ffffff;
-    border-top: 1px solid #e2e8f0;
+/* Student Page Footer Overrides - Only for student pages that use main.css only */
+.page-wrapper .footer {
     height: 134px; /* 98px logo height + 36px padding */
-    margin-top: auto;
-    width: 100%;
 }
 
-.footer-container {
-    width: 100%;
-    padding-left: 64px;
-    padding-right: 64px;
-    display: flex;
+.page-wrapper .footer-container {
     align-items: flex-end;
     height: 100%;
     position: relative;
-    box-sizing: border-box;
 }
 
-.footer-logo {
-    flex-shrink: 0;
-    display: flex;
+.page-wrapper .footer-logo {
     align-items: flex-end;
     height: 100%;
     padding-bottom: 0;
@@ -780,69 +744,52 @@ body {
     margin-bottom: -1px;
 }
 
-.footer-logo-img {
+.page-wrapper .footer-logo-img {
     width: 164px;
     height: 98px;
     filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.05)) grayscale(0.2) brightness(1.1) contrast(0.8);
-    object-fit: contain;
     display: block;
 }
 
-.footer-content {
+.page-wrapper .footer-content {
     flex: 1;
     padding: 24px;
 }
 
-.footer-text {
+.page-wrapper .footer-text {
     display: flex;
     flex-direction: column;
     gap: 4px;
 }
 
-.footer-company,
-.footer-copyright {
+.page-wrapper .footer-company,
+.page-wrapper .footer-copyright {
     font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    font-size: 14px;
     color: #363636;
-    line-height: 1.4;
-    font-weight: 400;
     text-align: left;
 }
 
-.footer-link {
+.page-wrapper .footer-link {
     display: inline-block;
     margin-top: 12px;
     font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    font-size: 14px;
     color: #3578d9;
-    text-decoration: none;
     border-bottom: 1px solid transparent;
-    transition: all 0.2s ease;
     font-weight: 500;
 }
 
-.footer-link:hover {
+.page-wrapper .footer-link:hover {
     color: #2563eb;
     border-bottom-color: #3578d9;
 }
 
-/* Loading Overlay */
+/* Main Page Loading Override */
 .loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
     background: rgba(0, 0, 0, 0.8);
     backdrop-filter: var(--blur-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
 }
 
 .loading-content {
-    text-align: center;
     color: var(--color-white);
 }
 
@@ -851,8 +798,6 @@ body {
     height: 48px;
     border: 3px solid rgba(255, 255, 255, 0.3);
     border-top: 3px solid var(--color-white);
-    border-radius: var(--radius-full);
-    animation: spin 1s linear infinite;
     margin: 0 auto var(--space-4);
 }
 
@@ -860,11 +805,6 @@ body {
     font-size: var(--font-size-base);
     font-weight: var(--font-weight-medium);
     margin: 0;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
 }
 
 /* Responsive Design */
