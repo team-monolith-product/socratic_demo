@@ -39,10 +39,11 @@
 /* Global Navigation Bar - Clean White Background */
 .gnb {
     background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
     position: sticky;
     top: 0;
     z-index: 1000;
-    backdrop-filter: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
 }
 
 .gnb-container {
@@ -61,16 +62,19 @@
     display: flex;
     align-items: center;
     height: 100%;
+    margin-left: 6px;
+    margin-top: 2px;
 }
 
 .logo-image {
-    width: 60px;
-    height: 21px;
+    height: 28px;
+    width: auto;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.05));
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    object-fit: contain;
 }
 
 .logo-image:hover {
+    filter: drop-shadow(0 2px 4px rgba(53, 116, 217, 0.15));
     transform: scale(1.02);
 }
 
@@ -626,6 +630,83 @@
     transform: translateX(6px);
 }
 
+/* Footer Components */
+.footer {
+    background: #ffffff;
+    border-top: 1px solid #e2e8f0;
+    height: 134px; /* 98px logo height + 36px padding */
+    margin-top: auto;
+    width: 100%;
+}
+
+.footer-container {
+    width: 100%;
+    padding-left: 64px;
+    padding-right: 64px;
+    display: flex;
+    align-items: flex-end;
+    height: 100%;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.footer-logo {
+    flex-shrink: 0;
+    display: flex;
+    align-items: flex-end;
+    height: 100%;
+    padding-bottom: 0;
+    margin-right: 36px;
+    margin-bottom: -1px;
+}
+
+.footer-logo-img {
+    width: 164px;
+    height: 98px;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.05)) grayscale(0.2) brightness(1.1) contrast(0.8);
+    object-fit: contain;
+    display: block;
+}
+
+.footer-content {
+    flex: 1;
+    padding: 24px;
+}
+
+.footer-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.footer-company,
+.footer-copyright {
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+    color: #363636;
+    line-height: 1.4;
+    font-weight: 400;
+    text-align: left;
+    margin: 0;
+}
+
+.footer-link {
+    display: inline-block;
+    margin-top: 12px;
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+    color: #3578d9;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.footer-link:hover {
+    color: #2563eb;
+    border-bottom-color: #3578d9;
+}
+
 /* Responsive Design */
 
 /* Mobile-first approach */
@@ -705,6 +786,36 @@
     .apple-primary-button {
         min-width: 240px;
         padding: 18px 36px;
+    }
+
+    .footer-container {
+        padding-left: 32px;
+        padding-right: 32px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .footer-logo {
+        height: auto;
+        align-items: flex-start;
+        padding-bottom: 16px;
+        margin-right: 0;
+        margin-bottom: 0;
+    }
+
+    .footer-logo-img {
+        width: 120px;
+        height: 72px;
+    }
+
+    .footer-content {
+        margin-bottom: 20px;
+        width: 100%;
+    }
+
+    .footer-company,
+    .footer-copyright {
+        font-size: 12px;
     }
 }
 
