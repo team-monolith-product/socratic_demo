@@ -186,8 +186,6 @@ class TeacherSetup {
         event.preventDefault();
 
         try {
-            this.showLoading(true, '세션을 생성하고 대시보드를 준비하고 있습니다...');
-
             const formData = new FormData(event.target);
             const sessionConfig = {
                 title: formData.get('title'),
@@ -213,9 +211,7 @@ class TeacherSetup {
         } catch (error) {
             console.error('Failed to create session:', error);
             this.showError('세션 생성에 실패했습니다: ' + error.message);
-            this.showLoading(false);
         }
-        // Note: Don't hide loading here - let dashboard page handle it
     }
 
     goToDashboard(sessionId, isNewSession = false) {

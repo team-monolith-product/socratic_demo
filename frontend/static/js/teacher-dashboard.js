@@ -142,13 +142,12 @@ class TeacherDashboard {
 
     async loadDashboard(sessionId) {
         try {
+            // Always show loading for 1 second minimum
+            this.showLoading(true, '대시보드를 준비하고 있습니다...');
+
             // Check if this is a new session that needs immediate QR modal
             const urlParams = new URLSearchParams(window.location.search);
             const isNewSession = urlParams.get('newSession') === 'true';
-
-            if (isNewSession) {
-                this.showLoading(true, '세션 준비 중입니다...');
-            }
 
             // Validate session exists
             const isValid = await this.sessionManager.validateSession(sessionId);
@@ -163,13 +162,19 @@ class TeacherDashboard {
             // Start auto-refresh
             this.startAutoRefresh();
 
-            // Auto-show QR modal for new sessions with loading screen
+            // Minimum 1 second loading time
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            // Auto-show QR modal for new sessions
             if (isNewSession) {
+                this.showLoading(false);
                 await this.showQRCodeWithLoading();
                 // Clean up URL parameter
                 const newUrl = new URL(window.location);
                 newUrl.searchParams.delete('newSession');
                 window.history.replaceState({}, document.title, newUrl.pathname + newUrl.search);
+            } else {
+                this.showLoading(false);
             }
 
         } catch (error) {
