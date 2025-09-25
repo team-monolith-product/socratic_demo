@@ -32,12 +32,13 @@
 }
 
 .gnb-container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 32px;
+    width: 100%;
+    padding-left: 64px;
+    padding-right: 64px;
     display: flex;
     align-items: center;
     height: 56px;
+    box-sizing: border-box;
 }
 
 .gnb-logo {
@@ -522,7 +523,8 @@
 /* Mobile-first approach */
 @media (max-width: 767px) {
     .gnb-container {
-        padding: 0 20px;
+        padding-left: 32px;
+        padding-right: 32px;
         height: 56px;
     }
 
