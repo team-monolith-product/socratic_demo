@@ -70,7 +70,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 12px 24px;
+    padding: 8px 20px;
     background: #3574d9;
     color: white;
     text-decoration: none;
@@ -410,7 +410,7 @@
 
 .apple-radio-card, .apple-toggle-card {
     display: block;
-    padding: 24px;
+    padding: 32px 24px;
     border: 2px solid rgba(53, 116, 217, 0.1);
     border-radius: 20px;
     background: rgba(255, 255, 255, 0.6);
@@ -461,7 +461,7 @@
 .apple-toggle-group input[type="radio"]:checked + .apple-toggle-card::after {
     content: '✓';
     position: absolute;
-    top: 20px;
+    top: 24px;
     right: 20px;
     width: 32px;
     height: 32px;
