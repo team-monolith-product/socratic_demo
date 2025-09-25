@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>소크라테스 아카데미 - 교사용</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/main.css?v=3">
+    <link rel="stylesheet" href="/static/css/teacher.css?v=13">
+</head>
+<body class="apple-body">
+    <div class="apple-container">
+
+        <!-- Session Setup Screen (Default View) - Apple Store Style -->
+        <div id="sessionSetupView" class="apple-session-setup">
+            <!-- Global Navigation Bar -->
+            <nav class="gnb">
+                <div class="gnb-container">
+                    <div class="gnb-logo">
+                        <img src="/static/codle-logo.svg" alt="Codle" class="logo-image" />
+                    </div>
+                </div>
+            </nav>
+
+
+            <!-- Main Content -->
+            <main class="main-content">
+
+                <form id="sessionForm" class="apple-form">
+                    <!-- Two Column Layout -->
+                    <div class="main-layout-grid">
+                        <!-- Left Column: Session Information -->
+                        <div class="session-info-section">
+                            <h2 class="section-title">세션 정보</h2>
+                            <p class="section-description">기본적인 세션 설정을 입력해주세요</p>
+
+                            <div class="apple-form-group">
+                                <label for="sessionTitle" class="apple-label">세션 제목</label>
+                                <input
+                                    id="sessionTitle"
+                                    name="title"
+                                    class="apple-input"
+                                    placeholder="기후변화 토론"
+                                    maxlength="50"
+                                    required
+                                />
+                            </div>
+
+                            <div class="apple-form-group">
+                                <label for="sessionTopic" class="apple-label">학습 주제</label>
+                                <textarea
+                                    id="sessionTopic"
+                                    name="topic"
+                                    class="apple-textarea"
+                                    placeholder="기후변화의 원인과 해결책을 탐구하고 개인과 사회 차원의 대응방안을 토론해보세요"
+                                    rows="4"
+                                    required
+                                ></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Configuration Options -->
+                        <div class="config-options-section">
+                            <!-- Difficulty Selection -->
+                            <div class="config-section">
+                                <h3 class="section-title">학습 난이도</h3>
+                                <p class="section-description">학생 수준에 맞는 난이도를 선택하세요</p>
+
+                                <div class="apple-radio-group" data-name="difficulty">
+                                    <input type="radio" id="difficultyEasy" name="difficulty" value="easy">
+                                    <label for="difficultyEasy" class="apple-radio-card">
+                                        <div class="radio-content">
+                                            <div class="radio-icon">🌱</div>
+                                            <div class="radio-info">
+                                                <h4 class="radio-title">쉬움</h4>
+                                                <p class="radio-subtitle">기본 개념 중심</p>
+                                            </div>
+                                        </div>
+                                    </label>
+
+                                    <input type="radio" id="difficultyNormal" name="difficulty" value="normal" checked>
+                                    <label for="difficultyNormal" class="apple-radio-card">
+                                        <div class="radio-content">
+                                            <div class="radio-icon">📚</div>
+                                            <div class="radio-info">
+                                                <h4 class="radio-title">보통</h4>
+                                                <p class="radio-subtitle">중학생 수준</p>
+                                            </div>
+                                        </div>
+                                    </label>
+
+                                    <input type="radio" id="difficultyHard" name="difficulty" value="hard">
+                                    <label for="difficultyHard" class="apple-radio-card">
+                                        <div class="radio-content">
+                                            <div class="radio-icon">🎓</div>
+                                            <div class="radio-info">
+                                                <h4 class="radio-title">어려움</h4>
+                                                <p class="radio-subtitle">깊이 있는 탐구</p>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Score Display Selection -->
+                            <div class="config-section">
+                                <h3 class="section-title">학습 진행도</h3>
+                                <p class="section-description">학생들에게 점수를 보여줄지 선택하세요</p>
+
+                                <div class="apple-toggle-group" data-name="scoreDisplay">
+                                    <input type="radio" id="showScoreTrue" name="showScore" value="true" checked>
+                                    <label for="showScoreTrue" class="apple-toggle-card">
+                                        <div class="toggle-content">
+                                            <div class="toggle-icon">📊</div>
+                                            <div class="toggle-info">
+                                                <h4 class="toggle-title">점수 표시</h4>
+                                                <p class="toggle-subtitle">실시간 피드백</p>
+                                            </div>
+                                        </div>
+                                    </label>
+
+                                    <input type="radio" id="showScoreFalse" name="showScore" value="false">
+                                    <label for="showScoreFalse" class="apple-toggle-card">
+                                        <div class="toggle-content">
+                                            <div class="toggle-icon">🎯</div>
+                                            <div class="toggle-info">
+                                                <h4 class="toggle-title">점수 숨김</h4>
+                                                <p class="toggle-subtitle">집중 모드</p>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Button -->
+                    <div class="apple-action-section">
+                        <button type="submit" class="apple-primary-button">
+                            세션 시작하기
+                            <svg class="button-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M6 12l4-4-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                </form>
+
+            </main>
+        </div>
+        <!-- Loading Overlay -->
+        <div id="loading" class="loading-overlay" style="display: none;">
+            <div class="loading-content">
+                <div class="spinner"></div>
+                <p id="loadingMessage">처리 중입니다...</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="main-footer">
+            <div class="footer-container">
+                <div class="footer-logo">
+                    <img src="/static/TM-logo.png" alt="Team Monolith" class="footer-logo-image" />
+                </div>
+                <div class="footer-content">
+                    <div class="footer-text">
+                        <div class="footer-company">(주)팀모노리스 | 서울특별시 중구 퇴계로 15 9층</div>
+                        <div class="footer-copyright">©TEAM MONOLITH Inc.</div>
+                    </div>
+                    <a href="https://codle.io" target="_blank" class="footer-link">코들 바로가기</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/static/config.js"></script>
+    <script src="/static/js/shared/qr-generator.js?v=2"></script>
+    <script src="/static/js/shared/simplified-session-manager.js?v=1"></script>
+    <script src="/static/js/teacher-setup.js?v=1"></script>
+</body>
+</html>

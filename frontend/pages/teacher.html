@@ -3,346 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>소크라테스 아카데미 - 교사용</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://hangeul.pstatic.net/hangeul_static/css/nanum-square-neo.css" rel="stylesheet">
+    <title>소크라테스 아카데미 - 교사용 (리다이렉트)</title>
+    <script>
+        // Redirect to new separated architecture
+        (function() {
+            // Check if user has existing session
+            const savedSession = localStorage.getItem('activeSession');
+
+            if (savedSession) {
+                try {
+                    const sessionData = JSON.parse(savedSession);
+                    // Redirect to dashboard with session ID
+                    window.location.href = `/pages/teacher-dashboard.html?session=${sessionData.sessionId}`;
+                } catch (e) {
+                    // Invalid session data, go to setup
+                    window.location.href = '/pages/teacher-setup.html';
+                }
+            } else {
+                // No existing session, go to setup
+                window.location.href = '/pages/teacher-setup.html';
+            }
+        })();
+    </script>
     <style>
-        @font-face {
-            font-family: 'NanumSquareNeo';
-            src: url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-aLt.woff2') format('woff2'),
-                 url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-bRg.woff2') format('woff2'),
-                 url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-cBd.woff2') format('woff2'),
-                 url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-dEb.woff2') format('woff2'),
-                 url('https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-eHv.woff2') format('woff2');
-            font-weight: 100 900;
-            font-display: swap;
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1a202c;
+        }
+
+        .loading-container {
+            text-align: center;
+            background: white;
+            padding: 48px;
+            border-radius: 24px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+        }
+
+        .spinner {
+            width: 56px;
+            height: 56px;
+            border: 6px solid #f1f5f9;
+            border-top: 6px solid #3574d9;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 24px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a202c;
+            margin: 0 0 8px 0;
+        }
+
+        p {
+            font-size: 16px;
+            color: #64748b;
+            margin: 0;
         }
     </style>
-    <link rel="stylesheet" href="/static/css/main.css?v=3">
-    <link rel="stylesheet" href="/static/css/teacher.css?v=26">
 </head>
-<body class="apple-body">
-    <div class="apple-container">
-
-        <!-- Session Setup Screen (Default View) - Apple Store Style -->
-        <div id="sessionSetupView" class="apple-session-setup">
-            <!-- Global Navigation Bar -->
-            <nav class="gnb">
-                <div class="gnb-container">
-                    <div class="gnb-logo">
-                        <img src="/static/codle-logo.svg" alt="Codle" class="logo-image" />
-                    </div>
-                </div>
-            </nav>
-
-
-            <!-- Main Content -->
-            <main class="main-content">
-                <!-- Blue Header Card -->
-                <div class="session-header-card">
-                    <h1 class="session-header-title">새 세션 만들기</h1>
-                    <p class="session-header-subtitle">소크룸 설정하고 학생 참여시키기</p>
-                </div>
-
-                <form id="sessionForm" class="apple-form">
-                    <!-- Two Column Layout -->
-                    <div class="main-layout-grid">
-                        <!-- Left Column: Session Information -->
-                        <div class="session-info-section">
-                            <h2 class="section-title">세션 정보</h2>
-                            <p class="section-description">기본적인 세션 설정을 입력해주세요</p>
-
-                            <div class="apple-form-group">
-                                <label for="sessionTitle" class="apple-label">세션 제목</label>
-                                <input
-                                    id="sessionTitle"
-                                    name="title"
-                                    class="apple-input"
-                                    placeholder="기후변화 토론"
-                                    maxlength="50"
-                                    required
-                                />
-                            </div>
-
-                            <div class="apple-form-group">
-                                <label for="sessionTopic" class="apple-label">학습 주제</label>
-                                <textarea
-                                    id="sessionTopic"
-                                    name="topic"
-                                    class="apple-textarea"
-                                    placeholder="기후변화의 원인과 해결책을 탐구하고 개인과 사회 차원의 대응방안을 토론해보세요"
-                                    rows="4"
-                                    required
-                                ></textarea>
-                            </div>
-                        </div>
-
-                        <!-- Right Column: Configuration Options -->
-                        <div class="config-options-section">
-                            <!-- Difficulty Selection -->
-                            <div class="config-section">
-                                <h3 class="section-title">학습 난이도</h3>
-                                <p class="section-description">학생 수준에 맞는 난이도를 선택하세요</p>
-
-                                <div class="apple-radio-group" data-name="difficulty">
-                                    <input type="radio" id="difficultyEasy" name="difficulty" value="easy">
-                                    <label for="difficultyEasy" class="apple-radio-card">
-                                        <div class="radio-content">
-                                            <div class="radio-info">
-                                                <h4 class="radio-title">쉬움</h4>
-                                                <p class="radio-subtitle">기본 개념 중심</p>
-                                            </div>
-                                        </div>
-                                    </label>
-
-                                    <input type="radio" id="difficultyNormal" name="difficulty" value="normal" checked>
-                                    <label for="difficultyNormal" class="apple-radio-card">
-                                        <div class="radio-content">
-                                            <div class="radio-info">
-                                                <h4 class="radio-title">보통</h4>
-                                                <p class="radio-subtitle">중학생 수준</p>
-                                            </div>
-                                        </div>
-                                    </label>
-
-                                    <input type="radio" id="difficultyHard" name="difficulty" value="hard">
-                                    <label for="difficultyHard" class="apple-radio-card">
-                                        <div class="radio-content">
-                                            <div class="radio-info">
-                                                <h4 class="radio-title">어려움</h4>
-                                                <p class="radio-subtitle">깊이 있는 탐구</p>
-                                            </div>
-                                        </div>
-                                    </label>
-                                </div>
-                            </div>
-
-                            <!-- Score Display Selection -->
-                            <div class="config-section">
-                                <h3 class="section-title">학습 진행도</h3>
-                                <p class="section-description">학생들에게 점수를 보여줄지 선택하세요</p>
-
-                                <div class="apple-toggle-group" data-name="scoreDisplay">
-                                    <input type="radio" id="showScoreTrue" name="showScore" value="true" checked>
-                                    <label for="showScoreTrue" class="apple-toggle-card">
-                                        <div class="toggle-content">
-                                            <div class="toggle-icon">📊</div>
-                                            <div class="toggle-info">
-                                                <h4 class="toggle-title">점수 표시</h4>
-                                                <p class="toggle-subtitle">실시간 피드백</p>
-                                            </div>
-                                        </div>
-                                    </label>
-
-                                    <input type="radio" id="showScoreFalse" name="showScore" value="false">
-                                    <label for="showScoreFalse" class="apple-toggle-card">
-                                        <div class="toggle-content">
-                                            <div class="toggle-icon">🎯</div>
-                                            <div class="toggle-info">
-                                                <h4 class="toggle-title">점수 숨김</h4>
-                                                <p class="toggle-subtitle">집중 모드</p>
-                                            </div>
-                                        </div>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Action Button -->
-                    <div class="apple-action-section">
-                        <button type="submit" class="apple-primary-button">
-                            세션 시작하기
-                            <svg class="button-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                <path d="M6 12l4-4-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </button>
-                    </div>
-                </form>
-
-            </main>
-        </div>
-        </div>
-
-        <!-- Session Dashboard Screen -->
-        <div id="sessionDashboardView" class="session-dashboard" style="display: none;">
-            <header class="dashboard-header">
-                <div class="session-info">
-                    <h1 id="sessionTitleDisplay">세션 제목 로딩 중...</h1>
-                    <div class="last-update" id="lastUpdateTime">마지막 업데이트: --</div>
-                </div>
-
-                <div class="header-actions">
-                    <button id="showQRBtn" class="action-btn secondary">
-                        <span class="btn-icon">📱</span>
-                        QR 코드 보기
-                    </button>
-                    <button id="refreshBtn" class="action-btn secondary">
-                        <span class="btn-icon">🔄</span>
-                        새로고침
-                    </button>
-                    <button id="newSessionBtn" class="action-btn primary">
-                        <span class="btn-icon">✨</span>
-                        새 세션 시작
-                    </button>
-                </div>
-            </header>
-
-            <main class="dashboard-content">
-                <!-- Session Statistics Cards -->
-                <div class="session-stats">
-                    <div class="stat-card">
-                        <div class="stat-icon">👥</div>
-                        <div class="stat-content">
-                            <div class="stat-value" id="studentCount">0</div>
-                            <div class="stat-label">참여 학생</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">⏱️</div>
-                        <div class="stat-content">
-                            <div class="stat-value" id="sessionDuration">0분</div>
-                            <div class="stat-label">진행 시간</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">📊</div>
-                        <div class="stat-content">
-                            <div class="stat-value" id="averageScore">0%</div>
-                            <div class="stat-label">평균 점수</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">💬</div>
-                        <div class="stat-content">
-                            <div class="stat-value" id="totalMessages">0</div>
-                            <div class="stat-label">총 메시지</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Students Table Section -->
-                <div class="students-section">
-                    <div class="students-header">
-                        <h3>참여 학생 목록</h3>
-                        <div class="students-controls">
-                            <input type="text" class="search-input" placeholder="학생 이름 검색..." id="studentSearch">
-                            <button class="export-btn">
-                                <span class="btn-icon">📥</span>
-                                내보내기
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="students-table-container">
-                        <table class="students-table" id="studentsTable">
-                            <thead>
-                                <tr>
-                                    <th>학생 이름</th>
-                                    <th>최근 점수</th>
-                                    <th>메시지 수</th>
-                                    <th>최근 응답</th>
-                                </tr>
-                            </thead>
-                            <tbody id="studentsTableBody">
-                                <!-- 학생 데이터가 여기에 동적으로 로드됩니다 -->
-                            </tbody>
-                        </table>
-
-                        <div class="table-empty-state" id="tableEmptyState">
-                            <div class="empty-icon">👥</div>
-                            <div class="empty-title">아직 참여한 학생이 없습니다</div>
-                            <div class="empty-description">QR 코드를 공유하여 학생들의 참여를 기다려보세요</div>
-                        </div>
-                    </div>
-                </div>
-            </main>
-        </div>
-
-        <!-- QR Code Modal -->
-        <div id="qrModal" class="modal" style="display: none;">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>📱 학생들에게 이 QR 코드를 보여주세요!</h3>
-                    <button class="modal-close">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="qr-display">
-                        <div class="qr-code-section">
-                            <canvas id="qrCanvas" width="300" height="300"></canvas>
-                        </div>
-
-                        <div class="session-summary-section">
-                            <div class="qr-info">
-                                <div class="session-details">
-                                    <div class="detail-item">
-                                        <strong>🌐 직접 링크:</strong>
-                                        <a id="sessionLink" href="#" target="_blank"></a>
-                                    </div>
-                                </div>
-                            </div>
-                            <div id="sessionSummary"></div>
-                        </div>
-                    </div>
-
-                    <div class="modal-actions">
-                        <button id="copyLinkBtn" class="secondary-button">📋 링크 복사</button>
-                        <button id="downloadQRBtn" class="secondary-button">🖼️ QR 다운로드</button>
-                        <button id="gotoDashboardBtn" class="primary-button">📊 대시보드로 가기</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- New Session Confirmation Modal -->
-        <div id="confirmNewSessionModal" class="modal" style="display: none;">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>⚠️ 새 세션 시작</h3>
-                </div>
-                <div class="modal-body">
-                    <p>새 세션을 시작하면 현재 진행 중인 세션이 종료됩니다.</p>
-                    <p>이번 세션의 기록은 삭제됩니다.</p>
-                    <p><strong>계속하시겠습니까?</strong></p>
-                </div>
-                <div class="modal-actions">
-                    <button class="secondary-button" data-action="cancel">취소</button>
-                    <button class="primary-button" id="confirmNewSession">새 세션 시작</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Loading Overlay -->
-        <div id="loading" class="loading-overlay" style="display: none;">
-            <div class="loading-content">
-                <div class="spinner"></div>
-                <p id="loadingMessage">처리 중입니다...</p>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <footer class="main-footer">
-            <div class="footer-container">
-                <div class="footer-logo">
-                    <img src="/static/TM-logo.png" alt="Team Monolith" class="footer-logo-image" />
-                </div>
-                <div class="footer-content">
-                    <div class="footer-text">
-                        <div class="footer-company">(주)팀모노리스 | 서울특별시 중구 퇴계로 15 9층</div>
-                        <div class="footer-copyright">©TEAM MONOLITH Inc.</div>
-                    </div>
-                    <a href="https://codle.io" target="_blank" class="footer-link">코들 바로가기</a>
-                </div>
-            </div>
-        </footer>
+<body>
+    <div class="loading-container">
+        <div class="spinner"></div>
+        <h1>교사용 대시보드 로딩 중...</h1>
+        <p>잠시만 기다려주세요</p>
     </div>
-
-    <!-- Scripts -->
-    <script src="/static/config.js"></script>
-    <script src="/static/js/shared/qr-generator.js?v=2"></script>
-    <script src="/static/js/shared/simplified-session-manager.js?v=1"></script>
-    <script src="/static/js/teacher.js?v=1"></script>
 </body>
 </html>
