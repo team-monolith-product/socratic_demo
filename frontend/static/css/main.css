@@ -749,8 +749,18 @@ body {
 }
 
 .footer-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.footer-company,
+.footer-copyright {
     font-size: var(--font-size-sm);
     color: var(--color-text-secondary);
+    line-height: 1.4;
+    font-weight: 400;
+    text-align: left;
     margin: 0;
 }
 
