@@ -738,7 +738,7 @@ body {
     height: 98px;
     object-fit: contain;
     display: block;
-    filter: brightness(1.2) contrast(0.9);
+    filter: brightness(1.4) contrast(0.8);
 }
 
 .footer-content {
