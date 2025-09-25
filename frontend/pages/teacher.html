@@ -26,18 +26,24 @@
         })();
     </script>
     <style>
-        body {
+        html, body {
             font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: #f5f5f5;
-            min-height: 100vh;
-            overflow: hidden;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: transparent !important;
+            width: 100% !important;
+            height: 100% !important;
+            min-height: 100vh !important;
+            overflow: hidden !important;
         }
 
         .loading-container {
-            text-align: center;
-            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100vw;
             height: 100vh;
             display: flex;
             flex-direction: column;
@@ -45,6 +51,7 @@
             justify-content: center;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
+            z-index: 9999;
         }
 
         .spinner {
