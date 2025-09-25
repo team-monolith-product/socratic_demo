@@ -264,6 +264,45 @@
 }
 
 
+/* Loading Overlay with Lottie */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(245, 245, 245, 0.95);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loading-content {
+    text-align: center;
+    background: white;
+    padding: 48px 32px;
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    max-width: 320px;
+}
+
+#lottie-container {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 24px;
+}
+
+#loadingMessage {
+    font-family: 'Pretendard', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    color: #64748b;
+    margin: 0;
+    line-height: 1.5;
+}
+
 /* Two Column Layout */
 .main-layout-grid {
     display: grid;

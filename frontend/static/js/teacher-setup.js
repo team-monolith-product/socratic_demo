@@ -5,6 +5,7 @@ class TeacherSetup {
     constructor() {
         this.sessionManager = new SimplifiedSessionManager();
         this.qrGenerator = new QRGenerator();
+        this.lottieAnimation = null;
 
         // Set up QR generator dependency
         this.sessionManager.setQRGenerator(this.qrGenerator);
@@ -233,11 +234,27 @@ class TeacherSetup {
     showLoading(show, message = '처리 중입니다...') {
         const loading = document.getElementById('loading');
         const loadingMessage = document.getElementById('loadingMessage');
+        const lottieContainer = document.getElementById('lottie-container');
 
         if (loading) {
             loading.style.display = show ? 'flex' : 'none';
             if (loadingMessage && message) {
                 loadingMessage.textContent = message;
+            }
+
+            if (show && lottieContainer && !this.lottieAnimation) {
+                // Load Lottie animation
+                this.lottieAnimation = lottie.loadAnimation({
+                    container: lottieContainer,
+                    renderer: 'svg',
+                    loop: true,
+                    autoplay: true,
+                    path: '/static/002 lottie.json'
+                });
+            } else if (!show && this.lottieAnimation) {
+                // Clean up animation when hiding
+                this.lottieAnimation.destroy();
+                this.lottieAnimation = null;
             }
         }
     }
