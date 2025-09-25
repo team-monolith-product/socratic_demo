@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/main.css?v=3">
-    <link rel="stylesheet" href="/static/css/teacher.css?v=1">
+    <link rel="stylesheet" href="/static/css/teacher.css?v=12">
 </head>
 <body class="apple-body">
     <div class="apple-container">
@@ -24,146 +24,129 @@
                 </div>
             </nav>
 
-            <!-- Hero Section -->
-            <section class="main-hero">
-                <div class="hero-container">
-                    <h1 class="hero-title">새로운 학습 세션</h1>
-                    <p class="hero-subtitle">학생들과 함께 소크라테스식 대화를 통한<br>깊이 있는 학습을 시작하세요</p>
-                </div>
-            </section>
 
             <!-- Main Content -->
             <main class="main-content">
 
-                <!-- Session Configuration Cards -->
-                <div class="apple-cards-container">
+                <form id="sessionForm" class="apple-form">
+                    <!-- Two Column Layout -->
+                    <div class="main-layout-grid">
+                        <!-- Left Column: Session Information -->
+                        <div class="session-info-section">
+                            <h2 class="section-title">세션 정보</h2>
+                            <p class="section-description">기본적인 세션 설정을 입력해주세요</p>
 
-                    <!-- Basic Information Card -->
-                    <form id="sessionForm" class="apple-form">
-                        <div class="apple-card main-config-card">
-                            <div class="card-header">
-                                <h2 class="card-title">세션 정보</h2>
-                                <p class="card-description">기본적인 세션 설정을 입력해주세요</p>
+                            <div class="apple-form-group">
+                                <label for="sessionTitle" class="apple-label">세션 제목</label>
+                                <input
+                                    id="sessionTitle"
+                                    name="title"
+                                    class="apple-input"
+                                    placeholder="기후변화 토론"
+                                    maxlength="50"
+                                    required
+                                />
                             </div>
-                            <div class="card-content">
-                                <div class="apple-form-group">
-                                    <label for="sessionTitle" class="apple-label">세션 제목</label>
-                                    <input
-                                        id="sessionTitle"
-                                        name="title"
-                                        class="apple-input"
-                                        placeholder="기후변화 토론"
-                                        maxlength="50"
-                                        required
-                                    />
-                                </div>
 
-                                <div class="apple-form-group">
-                                    <label for="sessionTopic" class="apple-label">학습 주제</label>
-                                    <textarea
-                                        id="sessionTopic"
-                                        name="topic"
-                                        class="apple-textarea"
-                                        placeholder="기후변화의 원인과 해결책을 탐구하고 개인과 사회 차원의 대응방안을 토론해보세요"
-                                        rows="4"
-                                        required
-                                    ></textarea>
-                                </div>
+                            <div class="apple-form-group">
+                                <label for="sessionTopic" class="apple-label">학습 주제</label>
+                                <textarea
+                                    id="sessionTopic"
+                                    name="topic"
+                                    class="apple-textarea"
+                                    placeholder="기후변화의 원인과 해결책을 탐구하고 개인과 사회 차원의 대응방안을 토론해보세요"
+                                    rows="4"
+                                    required
+                                ></textarea>
                             </div>
                         </div>
 
-                        <!-- Configuration Options Cards -->
-                        <div class="apple-options-grid">
-                            <!-- Difficulty Selection Card -->
-                            <div class="apple-card option-card">
-                                <div class="card-header">
-                                    <h3 class="card-title">학습 난이도</h3>
-                                    <p class="card-description">학생 수준에 맞는 난이도를 선택하세요</p>
-                                </div>
-                                <div class="card-content">
-                                    <div class="apple-radio-group" data-name="difficulty">
-                                        <input type="radio" id="difficultyEasy" name="difficulty" value="easy">
-                                        <label for="difficultyEasy" class="apple-radio-card">
-                                            <div class="radio-content">
-                                                <div class="radio-icon">🌱</div>
-                                                <div class="radio-info">
-                                                    <h4 class="radio-title">쉬움</h4>
-                                                    <p class="radio-subtitle">기본 개념 중심</p>
-                                                </div>
-                                            </div>
-                                        </label>
+                        <!-- Right Column: Configuration Options -->
+                        <div class="config-options-section">
+                            <!-- Difficulty Selection -->
+                            <div class="config-section">
+                                <h3 class="section-title">학습 난이도</h3>
+                                <p class="section-description">학생 수준에 맞는 난이도를 선택하세요</p>
 
-                                        <input type="radio" id="difficultyNormal" name="difficulty" value="normal" checked>
-                                        <label for="difficultyNormal" class="apple-radio-card">
-                                            <div class="radio-content">
-                                                <div class="radio-icon">📚</div>
-                                                <div class="radio-info">
-                                                    <h4 class="radio-title">보통</h4>
-                                                    <p class="radio-subtitle">중학생 수준</p>
-                                                </div>
+                                <div class="apple-radio-group" data-name="difficulty">
+                                    <input type="radio" id="difficultyEasy" name="difficulty" value="easy">
+                                    <label for="difficultyEasy" class="apple-radio-card">
+                                        <div class="radio-content">
+                                            <div class="radio-icon">🌱</div>
+                                            <div class="radio-info">
+                                                <h4 class="radio-title">쉬움</h4>
+                                                <p class="radio-subtitle">기본 개념 중심</p>
                                             </div>
-                                        </label>
+                                        </div>
+                                    </label>
 
-                                        <input type="radio" id="difficultyHard" name="difficulty" value="hard">
-                                        <label for="difficultyHard" class="apple-radio-card">
-                                            <div class="radio-content">
-                                                <div class="radio-icon">🎓</div>
-                                                <div class="radio-info">
-                                                    <h4 class="radio-title">어려움</h4>
-                                                    <p class="radio-subtitle">깊이 있는 탐구</p>
-                                                </div>
+                                    <input type="radio" id="difficultyNormal" name="difficulty" value="normal" checked>
+                                    <label for="difficultyNormal" class="apple-radio-card">
+                                        <div class="radio-content">
+                                            <div class="radio-icon">📚</div>
+                                            <div class="radio-info">
+                                                <h4 class="radio-title">보통</h4>
+                                                <p class="radio-subtitle">중학생 수준</p>
                                             </div>
-                                        </label>
-                                    </div>
+                                        </div>
+                                    </label>
+
+                                    <input type="radio" id="difficultyHard" name="difficulty" value="hard">
+                                    <label for="difficultyHard" class="apple-radio-card">
+                                        <div class="radio-content">
+                                            <div class="radio-icon">🎓</div>
+                                            <div class="radio-info">
+                                                <h4 class="radio-title">어려움</h4>
+                                                <p class="radio-subtitle">깊이 있는 탐구</p>
+                                            </div>
+                                        </div>
+                                    </label>
                                 </div>
                             </div>
 
-                            <!-- Score Display Selection Card -->
-                            <div class="apple-card option-card">
-                                <div class="card-header">
-                                    <h3 class="card-title">학습 진행도</h3>
-                                    <p class="card-description">학생들에게 점수를 보여줄지 선택하세요</p>
-                                </div>
-                                <div class="card-content">
-                                    <div class="apple-toggle-group" data-name="scoreDisplay">
-                                        <input type="radio" id="showScoreTrue" name="showScore" value="true" checked>
-                                        <label for="showScoreTrue" class="apple-toggle-card">
-                                            <div class="toggle-content">
-                                                <div class="toggle-icon">📊</div>
-                                                <div class="toggle-info">
-                                                    <h4 class="toggle-title">점수 표시</h4>
-                                                    <p class="toggle-subtitle">실시간 피드백</p>
-                                                </div>
-                                            </div>
-                                        </label>
+                            <!-- Score Display Selection -->
+                            <div class="config-section">
+                                <h3 class="section-title">학습 진행도</h3>
+                                <p class="section-description">학생들에게 점수를 보여줄지 선택하세요</p>
 
-                                        <input type="radio" id="showScoreFalse" name="showScore" value="false">
-                                        <label for="showScoreFalse" class="apple-toggle-card">
-                                            <div class="toggle-content">
-                                                <div class="toggle-icon">🎯</div>
-                                                <div class="toggle-info">
-                                                    <h4 class="toggle-title">점수 숨김</h4>
-                                                    <p class="toggle-subtitle">집중 모드</p>
-                                                </div>
+                                <div class="apple-toggle-group" data-name="scoreDisplay">
+                                    <input type="radio" id="showScoreTrue" name="showScore" value="true" checked>
+                                    <label for="showScoreTrue" class="apple-toggle-card">
+                                        <div class="toggle-content">
+                                            <div class="toggle-icon">📊</div>
+                                            <div class="toggle-info">
+                                                <h4 class="toggle-title">점수 표시</h4>
+                                                <p class="toggle-subtitle">실시간 피드백</p>
                                             </div>
-                                        </label>
-                                    </div>
+                                        </div>
+                                    </label>
+
+                                    <input type="radio" id="showScoreFalse" name="showScore" value="false">
+                                    <label for="showScoreFalse" class="apple-toggle-card">
+                                        <div class="toggle-content">
+                                            <div class="toggle-icon">🎯</div>
+                                            <div class="toggle-info">
+                                                <h4 class="toggle-title">점수 숨김</h4>
+                                                <p class="toggle-subtitle">집중 모드</p>
+                                            </div>
+                                        </div>
+                                    </label>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Action Button -->
-                        <div class="apple-action-section">
-                            <button type="submit" class="apple-primary-button">
-                                세션 시작하기
-                                <svg class="button-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                    <path d="M6 12l4-4-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                            </button>
-                        </div>
-                    </form>
+                    <!-- Action Button -->
+                    <div class="apple-action-section">
+                        <button type="submit" class="apple-primary-button">
+                            세션 시작하기
+                            <svg class="button-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M6 12l4-4-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                </form>
 
-                </div>
             </main>
         </div>
         </div>
