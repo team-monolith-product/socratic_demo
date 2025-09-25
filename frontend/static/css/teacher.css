@@ -154,7 +154,7 @@
 
 /* Content - Full Width Layout */
 .main-content {
-    padding: 24px 128px 16px !important;
+    padding: 36px 128px 16px !important;
     width: 100% !important;
     box-sizing: border-box !important;
     background: transparent !important;
@@ -247,7 +247,7 @@
 .config-options-section {
     display: flex;
     flex-direction: column;
-    gap: 32px;
+    gap: 24px;
 }
 
 .config-section {
@@ -368,7 +368,7 @@
 
 .apple-radio-card, .apple-toggle-card {
     display: block;
-    padding: 28px;
+    padding: 24px;
     border: 2px solid rgba(53, 116, 217, 0.1);
     border-radius: 20px;
     background: rgba(255, 255, 255, 0.6);
@@ -419,8 +419,8 @@
 .apple-toggle-group input[type="radio"]:checked + .apple-toggle-card::after {
     content: '✓';
     position: absolute;
-    top: 24px;
-    right: 24px;
+    top: 20px;
+    right: 20px;
     width: 32px;
     height: 32px;
     background: #3574d9;
@@ -437,7 +437,7 @@
 .radio-content, .toggle-content {
     display: flex;
     align-items: center;
-    gap: 24px;
+    gap: 20px;
 }
 
 .toggle-icon {
@@ -556,7 +556,7 @@
 
 
     .main-content {
-        padding: 32px 20px 32px;
+        padding: 48px 20px 48px;
     }
 
     .apple-cards-container {
@@ -585,7 +585,7 @@
     }
 
     .apple-radio-card, .apple-toggle-card {
-        padding: 24px;
+        padding: 20px;
     }
 
     .apple-radio-group {
@@ -617,7 +617,7 @@
 /* Large screens (1200px+) */
 @media (min-width: 1200px) {
     .main-content {
-        padding: 24px 128px 16px !important;
+        padding: 36px 128px 16px !important;
     }
 
     .gnb-container {
@@ -629,7 +629,7 @@
 /* Medium screens (768px - 1199px) */
 @media (min-width: 768px) and (max-width: 1199px) {
     .main-content {
-        padding: 24px 64px 16px !important;
+        padding: 36px 64px 16px !important;
     }
 
     .gnb-container {
@@ -673,7 +673,7 @@
 /* Medium small screens (721px - 767px) */
 @media (min-width: 721px) and (max-width: 767px) {
     .main-content {
-        padding: 24px 48px 16px !important;
+        padding: 36px 48px 16px !important;
     }
 
     .gnb-container {
@@ -685,7 +685,7 @@
 /* Small screens (720px and below) */
 @media (max-width: 720px) {
     .main-content {
-        padding: 24px 32px 16px !important;
+        padding: 36px 32px 16px !important;
     }
 
     .gnb-container {

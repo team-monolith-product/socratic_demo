@@ -40,5 +40,37 @@
       ]
     },
     "events": []
+  },
+  "58791958B09904641": {
+    "id": "58791958B09904641",
+    "teacher_fingerprint": "406b6fbf4a223c27",
+    "config": {
+      "title": "테스트 세션",
+      "topic": "수학",
+      "description": null,
+      "difficulty": "normal",
+      "show_score": true
+    },
+    "status": "active",
+    "created_at": "2025-09-25T18:19:18.802973+09:00",
+    "expires_at": "2025-09-25T20:19:18.802973+09:00",
+    "last_activity": "2025-09-25T18:19:18.802973+09:00",
+    "deleted_at": null,
+    "students": {},
+    "live_stats": {
+      "current_students": 0,
+      "total_joined": 0,
+      "average_score": 0.0,
+      "completion_rate": 0.0,
+      "dimension_averages": {
+        "depth": 0.0,
+        "breadth": 0.0,
+        "application": 0.0,
+        "metacognition": 0.0,
+        "engagement": 0.0
+      },
+      "recent_activities": []
+    },
+    "events": []
   }
 }
