@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/shared.css?v=1">
+    <link rel="stylesheet" href="/static/css/button-system.css?v=1">
     <link rel="stylesheet" href="/static/css/chat.css?v=2">
 </head>
 <body>
@@ -30,7 +31,10 @@
         <header class="chat-header">
             <div class="topic-info">
                 <h1>🏛️ <span id="topicTitle">학습 주제</span></h1>
-                <button id="backBtn" class="back-btn">← 주제 변경</button>
+                <button id="backBtn" class="btn btn-ghost btn-sm">
+                    <span class="btn-icon btn-icon-left">←</span>
+                    주제 변경
+                </button>
             </div>
         </header>
         
@@ -53,8 +57,9 @@
                                 rows="3"
                                 disabled
                             ></textarea>
-                            <button type="submit" id="sendBtn" disabled>
-                                📤 전송
+                            <button type="submit" id="sendBtn" class="btn btn-primary btn-md" disabled>
+                                <span class="btn-icon btn-icon-left">📤</span>
+                                전송
                             </button>
                         </div>
                     </form>
@@ -70,8 +75,8 @@
                         rows="2"
                         disabled
                     ></textarea>
-                    <button type="submit" id="sendBtnMobile" disabled>
-                        📤
+                    <button type="submit" id="sendBtnMobile" class="btn btn-primary btn-md" disabled>
+                        <span class="btn-icon">📤</span>
                     </button>
                 </form>
             </div>

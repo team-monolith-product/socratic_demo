@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/main.css?v=4">
     <link rel="stylesheet" href="/static/css/shared.css?v=1">
+    <link rel="stylesheet" href="/static/css/button-system.css?v=1">
     <link rel="stylesheet" href="/static/css/chat.css?v=3">
 </head>
 <body class="apple-body">
@@ -42,7 +43,7 @@
                 <div class="error-icon">⚠️</div>
                 <h2>세션 참여 오류</h2>
                 <p id="error-message">세션을 찾을 수 없습니다.</p>
-                <button onclick="location.reload()" class="retry-button">다시 시도</button>
+                <button onclick="location.reload()" class="btn btn-primary btn-md">다시 시도</button>
             </div>
         </div>
 
@@ -66,7 +67,7 @@
 
                 <div class="student-form">
                     <input type="text" id="student-name" placeholder="학생 이름을 입력하세요" maxlength="50">
-                    <button id="join-session-btn" class="join-button">세션 참여하기</button>
+                    <button id="join-session-btn" class="btn btn-success btn-lg btn-full">세션 참여하기</button>
                 </div>
             </div>
         </div>
