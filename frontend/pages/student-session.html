@@ -6,12 +6,24 @@
     <title>학생 세션 - 소크라테스 아카데미</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/main.css?v=2">
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/main.css?v=4">
+    <link rel="stylesheet" href="/static/css/shared.css?v=1">
     <link rel="stylesheet" href="/static/css/chat.css?v=3">
 </head>
-<body class="modern-body">
-    <div class="modern-container">
+<body class="apple-body">
+    <div class="apple-container">
+        <!-- Global Navigation Bar -->
+        <nav class="gnb">
+            <div class="gnb-container">
+                <div class="gnb-logo">
+                    <img src="/static/codle-logo.svg" alt="Codle" class="logo-image" />
+                </div>
+                <div class="gnb-actions">
+                    <a href="https://codle.io" target="_blank" class="codle-link-button">코들 바로가기</a>
+                </div>
+            </div>
+        </nav>
         <!-- Loading Screen -->
         <div id="loading-screen" class="loading-screen">
             <div class="loading-content">
@@ -61,6 +73,22 @@
         <div id="chat-interface" class="hidden">
             <!-- This will be loaded from the existing chat interface -->
         </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-container">
+                <div class="footer-logo">
+                    <img src="/static/TM-logo.png" alt="소크라테스 아카데미 로고" class="footer-logo-img">
+                </div>
+                <div class="footer-content">
+                    <div class="footer-text">
+                        <div class="footer-company">(주)팀모노리스 | 서울특별시 중구 퇴계로 15 9층</div>
+                        <div class="footer-copyright">©TEAM MONOLITH Inc.</div>
+                    </div>
+                    <a href="https://codle.io" target="_blank" class="footer-link">코들 바로가기</a>
+                </div>
+            </div>
+        </footer>
     </div>
 
     <!-- Scripts -->
