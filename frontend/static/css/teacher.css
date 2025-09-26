@@ -331,6 +331,7 @@
     gap: 24px;
     margin-bottom: 16px;
     align-items: stretch;
+    min-height: 400px; /* 강제 최소 높이 설정 */
 }
 
 .session-info-section {
@@ -343,6 +344,7 @@
     flex-direction: column;
     align-items: stretch;
     gap: 20px;
+    height: 100%; /* 그리드 셀 전체 높이 사용 */
 }
 
 /* 오른쪽 컬럼 전체 래퍼 */
@@ -350,7 +352,7 @@
     display: flex;
     flex-direction: column;
     gap: 24px;
-    height: 100%;
+    height: 100%; /* 그리드 셀 전체 높이 사용 */
 }
 
 /* 설정 카드들만 묶는 컨테이너 - 왼쪽 카드와 높이 맞춤 */
@@ -358,8 +360,8 @@
     display: flex;
     flex-direction: column;
     gap: 24px;
-    flex: 1;
-    justify-content: stretch;
+    flex: 1; /* 남은 공간을 모두 사용 */
+    min-height: 0; /* flex 아이템이 줄어들 수 있도록 */
 }
 
 .config-section {
@@ -373,6 +375,8 @@
     align-items: stretch;
     gap: 16px;
     flex: 1;
+    min-height: 0; /* flex 아이템이 줄어들 수 있도록 */
+    justify-content: center; /* 내용을 세로 중앙 정렬 */
 }
 
 /* 학습 난이도 카드와 진행도 카드만 높이 맞추기 - 버튼 제외 */
