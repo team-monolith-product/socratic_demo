@@ -345,11 +345,21 @@
     gap: 20px;
 }
 
-.config-options-section {
+/* 오른쪽 컬럼 전체 래퍼 */
+.right-column-wrapper {
     display: flex;
     flex-direction: column;
     gap: 24px;
     height: 100%;
+}
+
+/* 설정 카드들만 묶는 컨테이너 - 왼쪽 카드와 높이 맞춤 */
+.config-options-section {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    flex: 1;
+    justify-content: stretch;
 }
 
 .config-section {
@@ -365,14 +375,23 @@
     flex: 1;
 }
 
-/* 학습 난이도 섹션 - 더 많은 공간 차지 */
+/* 학습 난이도 카드와 진행도 카드만 높이 맞추기 - 버튼 제외 */
 .config-section:first-child {
-    flex: 2;
+    flex: 1.8; /* 학습 난이도 (3개 옵션) */
 }
 
-/* 학습 진행도 섹션 - 상대적으로 적은 공간 */
 .config-section:nth-child(2) {
-    flex: 1.5;
+    flex: 1.2; /* 학습 진행도 (2개 옵션) */
+}
+
+/* 버튼 섹션은 자동 높이로 별도 처리 */
+.apple-action-section-right {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 24px;
+    padding: 0;
+    flex-shrink: 0; /* 버튼은 고정 크기 */
 }
 
 .session-info-section:hover,

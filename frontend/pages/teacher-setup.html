@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="/static/css/main.css?v=4">
     <link rel="stylesheet" href="/static/css/shared.css?v=1">
     <link rel="stylesheet" href="/static/css/button-system.css?v=1">
-    <link rel="stylesheet" href="/static/css/teacher.css?v=17">
+    <link rel="stylesheet" href="/static/css/teacher.css?v=18">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
 </head>
 <body class="apple-body">
@@ -74,77 +74,80 @@
                         </div>
 
                         <!-- Right Column: Configuration Options -->
-                        <div class="config-options-section">
-                            <!-- Difficulty Selection -->
-                            <div class="config-section">
-                                <h3 class="section-title">학습 난이도</h3>
+                        <div class="right-column-wrapper">
+                            <!-- Config Cards Container - 높이를 왼쪽과 맞춤 -->
+                            <div class="config-options-section">
+                                <!-- Difficulty Selection -->
+                                <div class="config-section">
+                                    <h3 class="section-title">학습 난이도</h3>
 
-                                <div class="apple-radio-group" data-name="difficulty">
-                                    <input type="radio" id="difficultyEasy" name="difficulty" value="easy">
-                                    <label for="difficultyEasy" class="apple-radio-card">
-                                        <div class="radio-content">
-                                            <div class="radio-icon">🌱</div>
-                                            <div class="radio-info">
-                                                <h4 class="radio-title">쉬움</h4>
-                                                <p class="radio-subtitle">핵심 개념 파악</p>
+                                    <div class="apple-radio-group" data-name="difficulty">
+                                        <input type="radio" id="difficultyEasy" name="difficulty" value="easy">
+                                        <label for="difficultyEasy" class="apple-radio-card">
+                                            <div class="radio-content">
+                                                <div class="radio-icon">🌱</div>
+                                                <div class="radio-info">
+                                                    <h4 class="radio-title">쉬움</h4>
+                                                    <p class="radio-subtitle">핵심 개념 파악</p>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </label>
+                                        </label>
 
-                                    <input type="radio" id="difficultyNormal" name="difficulty" value="normal" checked>
-                                    <label for="difficultyNormal" class="apple-radio-card">
-                                        <div class="radio-content">
-                                            <div class="radio-icon">📚</div>
-                                            <div class="radio-info">
-                                                <h4 class="radio-title">보통</h4>
-                                                <p class="radio-subtitle">실생활 연결</p>
+                                        <input type="radio" id="difficultyNormal" name="difficulty" value="normal" checked>
+                                        <label for="difficultyNormal" class="apple-radio-card">
+                                            <div class="radio-content">
+                                                <div class="radio-icon">📚</div>
+                                                <div class="radio-info">
+                                                    <h4 class="radio-title">보통</h4>
+                                                    <p class="radio-subtitle">실생활 연결</p>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </label>
+                                        </label>
 
-                                    <input type="radio" id="difficultyHard" name="difficulty" value="hard">
-                                    <label for="difficultyHard" class="apple-radio-card">
-                                        <div class="radio-content">
-                                            <div class="radio-icon">🎓</div>
-                                            <div class="radio-info">
-                                                <h4 class="radio-title">어려움</h4>
-                                                <p class="radio-subtitle">깊이 있는 탐구</p>
+                                        <input type="radio" id="difficultyHard" name="difficulty" value="hard">
+                                            <label for="difficultyHard" class="apple-radio-card">
+                                                <div class="radio-content">
+                                                    <div class="radio-icon">🎓</div>
+                                                    <div class="radio-info">
+                                                        <h4 class="radio-title">어려움</h4>
+                                                        <p class="radio-subtitle">깊이 있는 탐구</p>
+                                                    </div>
+                                                </div>
+                                            </label>
+                                    </div>
+                                </div>
+
+                                <!-- Score Display Selection -->
+                                <div class="config-section">
+                                    <h3 class="section-title">학습 진행도</h3>
+
+                                    <div class="apple-toggle-group" data-name="scoreDisplay">
+                                        <input type="radio" id="showScoreTrue" name="showScore" value="true" checked>
+                                        <label for="showScoreTrue" class="apple-toggle-card">
+                                            <div class="toggle-content">
+                                                <div class="toggle-icon">📊</div>
+                                                <div class="toggle-info">
+                                                    <h4 class="toggle-title">점수 표시</h4>
+                                                    <p class="toggle-subtitle">실시간 피드백</p>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </label>
+                                        </label>
+
+                                        <input type="radio" id="showScoreFalse" name="showScore" value="false">
+                                            <label for="showScoreFalse" class="apple-toggle-card">
+                                                <div class="toggle-content">
+                                                    <div class="toggle-icon">🎯</div>
+                                                    <div class="toggle-info">
+                                                        <h4 class="toggle-title">점수 숨김</h4>
+                                                        <p class="toggle-subtitle">집중 모드</p>
+                                                    </div>
+                                                </div>
+                                            </label>
+                                    </div>
                                 </div>
                             </div>
 
-                            <!-- Score Display Selection -->
-                            <div class="config-section">
-                                <h3 class="section-title">학습 진행도</h3>
-
-                                <div class="apple-toggle-group" data-name="scoreDisplay">
-                                    <input type="radio" id="showScoreTrue" name="showScore" value="true" checked>
-                                    <label for="showScoreTrue" class="apple-toggle-card">
-                                        <div class="toggle-content">
-                                            <div class="toggle-icon">📊</div>
-                                            <div class="toggle-info">
-                                                <h4 class="toggle-title">점수 표시</h4>
-                                                <p class="toggle-subtitle">실시간 피드백</p>
-                                            </div>
-                                        </div>
-                                    </label>
-
-                                    <input type="radio" id="showScoreFalse" name="showScore" value="false">
-                                    <label for="showScoreFalse" class="apple-toggle-card">
-                                        <div class="toggle-content">
-                                            <div class="toggle-icon">🎯</div>
-                                            <div class="toggle-info">
-                                                <h4 class="toggle-title">점수 숨김</h4>
-                                                <p class="toggle-subtitle">집중 모드</p>
-                                            </div>
-                                        </div>
-                                    </label>
-                                </div>
-                            </div>
-
-                            <!-- Action Button in Right Column -->
+                            <!-- Action Button - 별도 영역 -->
                             <div class="apple-action-section-right">
                                 <button type="submit" class="btn btn-primary btn-xl">
                                     세션 시작하기
