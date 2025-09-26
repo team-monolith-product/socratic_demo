@@ -100,6 +100,8 @@
     font-size: 16px;
     gap: 10px;
     font-weight: 600;
+    position: relative;
+    z-index: 101; /* 다른 요소들보다 위에 표시 */
 }
 
 /* Button Variants */

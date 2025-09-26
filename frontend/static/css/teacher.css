@@ -387,6 +387,8 @@
     margin-top: 24px;
     padding: 0;
     flex-shrink: 0; /* 버튼은 고정 크기 */
+    position: relative;
+    z-index: 100; /* 푸터보다 위에 표시 */
 }
 
 .session-info-section:hover,
@@ -835,30 +837,6 @@
         padding: 18px 36px;
     }
 
-    .footer-container {
-        padding-left: 32px;
-        padding-right: 32px;
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .footer-logo {
-        height: auto;
-        align-items: flex-start;
-        padding-bottom: 16px;
-        margin-right: 0;
-        margin-bottom: 0;
-    }
-
-    .footer-logo-img {
-        width: 120px;
-        height: 72px;
-    }
-
-    .footer-content {
-        margin-bottom: 20px;
-        width: 100%;
-    }
 
     .footer-company,
     .footer-copyright {
@@ -866,10 +844,54 @@
     }
 }
 
+/* Desktop screens (768px+) - 메인 영역에 충분한 하단 여백 */
+@media (min-width: 768px) {
+    .main-content {
+        padding-bottom: 160px !important; /* 푸터 높이(134px) + 추가 여백(26px) = 160px */
+    }
+
+    /* 데스크탑에서는 원래 구조 유지 */
+    .right-column-wrapper {
+        display: flex !important;
+        flex-direction: column;
+        gap: 24px;
+        height: 100%;
+        min-height: 100%;
+    }
+
+    .config-options-section {
+        display: flex !important;
+        flex-direction: column;
+        gap: 24px;
+        flex: 1;
+        height: 100%;
+        min-height: 100%;
+        justify-content: space-between;
+    }
+
+    /* 데스크탑에서 order 제거 */
+    .session-info-section,
+    .config-section:nth-child(1),
+    .config-section:nth-child(2),
+    .apple-action-section-right {
+        order: unset !important;
+    }
+
+    /* 데스크탑에서 버튼 스타일 복원 */
+    .apple-action-section-right {
+        justify-content: flex-end !important;
+        margin-top: 24px !important;
+        margin-bottom: 0 !important;
+        width: auto !important;
+        position: relative !important;
+        z-index: 100 !important; /* 푸터보다 위에 표시 */
+    }
+}
+
 /* Large screens (1200px+) */
 @media (min-width: 1200px) {
     .main-content {
-        padding: 36px 128px 16px !important;
+        padding: 36px 128px 160px !important; /* 하단 패딩을 160px로 통일 */
     }
 
     .gnb-container {
@@ -881,7 +903,7 @@
 /* Medium screens (768px - 1199px) */
 @media (min-width: 768px) and (max-width: 1199px) {
     .main-content {
-        padding: 36px 64px 16px !important;
+        padding: 36px 64px 160px !important; /* 하단 패딩을 160px로 통일 */
     }
 
     .gnb-container {
@@ -892,6 +914,11 @@
 
 /* Small screens (767px and below) - Stack vertically */
 @media (max-width: 767px) {
+    /* 모바일 메인 영역에 충분한 하단 여백 */
+    .main-content {
+        padding-bottom: 100px !important; /* 모바일에서 더 큰 하단 여백 */
+    }
+
     /* Stack cards vertically */
     .main-layout-grid {
         display: flex;
@@ -899,15 +926,39 @@
         gap: 24px;
     }
 
-    /* Session info section */
+    /* Session info section - 첫 번째 */
     .session-info-section {
         order: 1;
     }
 
-    /* Config options section */
+    /* Right column wrapper - 모바일에서만 개별 요소로 분리 */
+    .right-column-wrapper {
+        display: contents; /* 래퍼를 무시하고 직접 자식들을 배치 */
+    }
+
+    /* Config options section을 개별 요소로 분리 */
     .config-options-section {
+        display: contents; /* 이 래퍼도 무시 */
+    }
+
+    /* 학습 난이도 - 두 번째 */
+    .config-section:nth-child(1) {
         order: 2;
-        gap: 24px;
+    }
+
+    /* 학습 진행도 - 세 번째 */
+    .config-section:nth-child(2) {
+        order: 3;
+    }
+
+    /* 세션 시작 버튼 - 네 번째 */
+    .apple-action-section-right {
+        order: 4;
+        justify-content: center; /* 모바일에서는 버튼을 중앙 정렬 */
+        margin-top: 24px;
+        margin-bottom: 0; /* 메인 영역 패딩으로 간격 확보 */
+        width: 100%; /* 전체 너비 차지 */
+        box-sizing: border-box;
     }
 
     /* Adjust radio and toggle groups for mobile */
@@ -1554,33 +1605,46 @@ textarea:focus,
 
 /* Mobile footer styles */
 @media (max-width: 767px) {
+    .footer {
+        height: auto; /* 고정 높이 제거 */
+        padding: 24px 0; /* 상하 패딩 추가 */
+    }
+
     .footer-container {
         padding-left: 32px;
         padding-right: 32px;
         flex-direction: column;
         align-items: flex-start;
+        height: auto; /* 고정 높이 제거 */
+        gap: 16px; /* 요소 간 간격 추가 */
     }
 
     .footer-logo {
         height: auto;
         align-items: flex-start;
-        padding-bottom: 16px;
+        padding-bottom: 0; /* 패딩 제거 */
         margin-right: 0;
+        margin-bottom: 0;
     }
 
-    .footer-logo-image {
+    .footer-logo-img {
         width: 120px;
         height: 72px;
     }
 
     .footer-content {
-        margin-bottom: 20px;
+        margin-bottom: 0; /* 마진 제거 */
+        padding: 0; /* 패딩 제거 */
         width: 100%;
     }
 
     .footer-company,
     .footer-copyright {
         font-size: 12px;
+    }
+
+    .footer-link {
+        margin-top: 8px; /* 링크 위 간격 줄임 */
     }
 }
 
