@@ -365,6 +365,16 @@
     flex: 1;
 }
 
+/* 학습 난이도 섹션 - 더 많은 공간 차지 */
+.config-section:first-child {
+    flex: 2;
+}
+
+/* 학습 진행도 섹션 - 상대적으로 적은 공간 */
+.config-section:nth-child(2) {
+    flex: 1.5;
+}
+
 .session-info-section:hover,
 .config-section:hover {
     box-shadow:
