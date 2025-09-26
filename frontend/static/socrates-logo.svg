@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="800" height="800">
+  <defs>
+    <style>
+      .socrates-blue { fill: #2c4b8d; }
+      .socrates-white { fill: #ffffff; }
+    </style>
+  </defs>
+
+  <!-- Main head shape -->
+  <path class="socrates-blue" d="M400 100c-165.69 0-300 134.31-300 300 0 50 12.27 97.11 33.96 138.46L200 700h400l66.04-161.54C687.73 497.11 700 450 700 400c0-165.69-134.31-300-300-300z"/>
+
+  <!-- Beard -->
+  <path class="socrates-blue" d="M280 520c0 50 40 90 90 90h60c50 0 90-40 90-90v-20c0-30-20-50-50-50h-140c-30 0-50 20-50 50v20z"/>
+
+  <!-- Face -->
+  <ellipse class="socrates-white" cx="400" cy="350" rx="120" ry="140"/>
+
+  <!-- Laurel leaves on head -->
+  <path class="socrates-white" d="M320 220c-10-15-5-35 10-45s35-5 45 10c5 7.5 5 17.5 0 25l-15 20c-10 15-30 15-40-10z"/>
+  <path class="socrates-white" d="M350 200c-8-12-4-28 8-36s28-4 36 8c4 6 4 14 0 20l-12 16c-8 12-24 12-32-8z"/>
+  <path class="socrates-white" d="M380 190c-6-9-3-21 6-27s21-3 27 6c3 4.5 3 10.5 0 15l-9 12c-6 9-18 9-24-6z"/>
+
+  <!-- Eye -->
+  <ellipse class="socrates-blue" cx="430" cy="330" rx="15" ry="8"/>
+
+  <!-- Nose -->
+  <path class="socrates-blue" d="M410 360c5 0 10 2 10 8s-5 8-10 8-10-2-10-8 5-8 10-8z"/>
+
+  <!-- Mustache -->
+  <path class="socrates-white" d="M380 390c20-5 40-5 60 0-10 8-25 8-30 8s-20 0-30-8z"/>
+
+  <!-- Speech bubble tail -->
+  <path class="socrates-blue" d="M550 600l50 50-20 30-30-80z"/>
+</svg>
