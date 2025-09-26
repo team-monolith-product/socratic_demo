@@ -363,7 +363,6 @@
     align-items: stretch;
     gap: 16px;
     flex: 1;
-    min-height: 140px;
 }
 
 .session-info-section:hover,
