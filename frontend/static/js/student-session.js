@@ -244,6 +244,14 @@ URL: ${window.location.href}
 
         // Populate session data
         this.populateSessionInfo();
+
+        // Auto-focus on name input field (especially for mobile keyboard)
+        setTimeout(() => {
+            const studentNameInput = document.getElementById('student-name');
+            if (studentNameInput) {
+                studentNameInput.focus();
+            }
+        }, 100); // Small delay to ensure DOM is ready
     }
 
     populateSessionInfo() {

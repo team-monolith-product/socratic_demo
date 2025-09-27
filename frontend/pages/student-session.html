@@ -23,9 +23,6 @@
                     <div class="logo-divider"></div>
                     <img src="/static/socrates-logo.svg" alt="소크라테스 아카데미" class="socrates-logo" />
                 </div>
-                <div class="gnb-actions">
-                    <a href="https://codle.io" target="_blank" class="codle-link-button">코들 바로가기</a>
-                </div>
             </div>
         </nav>
         <!-- Loading Screen -->
@@ -92,7 +89,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            min-height: calc(100vh - 56px); /* GNB 높이 제외 */
             padding: 2rem;
         }
 
@@ -165,7 +162,7 @@
             padding: 1rem;
             border: 2px solid #e9ecef;
             border-radius: 8px;
-            font-size: 1rem;
+            font-size: 1.25rem;
             margin-bottom: 1rem;
         }
 
