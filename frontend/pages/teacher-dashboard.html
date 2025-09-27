@@ -168,18 +168,36 @@
 
         <!-- New Session Confirmation Modal -->
         <div id="confirmNewSessionModal" class="modal" style="display: none;">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>⚠️ 새 세션 시작</h3>
+            <div class="alert-dialogue">
+                <div class="content-frame">
+                    <div class="alert-header">
+                        <div class="alert-title">
+                            <div class="alert-icon">
+                                <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                                    <path d="M16 2C8.27 2 2 8.27 2 16s6.27 14 14 14 14-6.27 14-14S23.73 2 16 2zm0 22c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2v-6zm0 8h2v2h-2v-2z" fill="#B53720"/>
+                                </svg>
+                            </div>
+                            <h3 class="alert-title-text">새 세션 시작</h3>
+                        </div>
+                        <button class="alert-close" data-action="cancel">
+                            <div class="close-icon">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                    <path d="M15 5L5 15M5 5l10 10" stroke="#363636" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="alert-text">
+                        <div class="spacer"></div>
+                        <div class="alert-description">
+                            새 세션을 시작하면 현재 진행 중인 세션이 종료됩니다.<br>
+                            이번 세션의 기록은 삭제됩니다.
+                        </div>
+                    </div>
                 </div>
-                <div class="modal-body">
-                    <p>새 세션을 시작하면 현재 진행 중인 세션이 종료됩니다.</p>
-                    <p>이번 세션의 기록은 삭제됩니다.</p>
-                    <p><strong>계속하시겠습니까?</strong></p>
-                </div>
-                <div class="modal-actions">
-                    <button class="secondary-button" data-action="cancel">취소</button>
-                    <button class="primary-button" id="confirmNewSession">새 세션 시작</button>
+                <div class="alert-actions">
+                    <button class="alert-button alert-button-cancel" data-action="cancel">취소</button>
+                    <button class="alert-button alert-button-confirm" id="confirmNewSession">새 세션 시작</button>
                 </div>
             </div>
         </div>

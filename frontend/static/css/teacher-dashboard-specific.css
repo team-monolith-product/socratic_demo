@@ -311,6 +311,251 @@
     margin-top: 32px;
 }
 
+/* AlertDialogue Styles */
+.alert-dialogue {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    padding: 24px;
+    gap: 16px;
+    width: 480px;
+    height: 212px;
+    background: #FFFFFF;
+    box-shadow: 0px 1.6px 3.6px rgba(0, 0, 0, 0.11), 0px 0.3px 0.9px rgba(0, 0, 0, 0.07);
+    border-radius: 16px;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+}
+
+/* Content frame */
+.content-frame {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0px;
+    gap: 8px;
+    width: 432px;
+    height: 100px;
+    flex: none;
+    order: 0;
+    align-self: stretch;
+    flex-grow: 0;
+}
+
+/* Header */
+.alert-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0px;
+    gap: 10px;
+    width: 432px;
+    height: 36px;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+}
+
+/* Title */
+.alert-title {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 0px;
+    gap: 16px;
+    margin: 0 auto;
+    width: 244px;
+    height: 36px;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+}
+
+/* Alert icon */
+.alert-icon {
+    width: 32px;
+    height: 32px;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+}
+
+/* Title text */
+.alert-title-text {
+    width: 196px;
+    height: 28px;
+    font-family: 'Pretendard';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 28px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    letter-spacing: 0.25px;
+    color: #363636;
+    margin: 0;
+    flex: none;
+    order: 1;
+    flex-grow: 0;
+}
+
+/* Exit button */
+.alert-close {
+    margin: 0 auto;
+    width: 36px;
+    height: 36px;
+    flex: none;
+    order: 1;
+    flex-grow: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0px;
+    gap: 8px;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+}
+
+/* Close icon */
+.close-icon {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 8px;
+    gap: 10px;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    flex: none;
+    order: 0;
+    align-self: stretch;
+    flex-grow: 1;
+}
+
+.close-icon svg {
+    width: 20px;
+    height: 20px;
+    flex: none;
+    order: 0;
+    align-self: stretch;
+    flex-grow: 1;
+}
+
+/* Text */
+.alert-text {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 0px;
+    gap: 16px;
+    width: 432px;
+    height: 56px;
+    flex: none;
+    order: 1;
+    flex-grow: 0;
+}
+
+/* Spacer */
+.spacer {
+    width: 32px;
+    height: 56px;
+    flex: none;
+    order: 0;
+    align-self: stretch;
+    flex-grow: 0;
+}
+
+/* Description */
+.alert-description {
+    width: 384px;
+    height: 56px;
+    font-family: 'Pretendard';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 28px;
+    color: #363636;
+    flex: none;
+    order: 1;
+    flex-grow: 1;
+}
+
+/* Actions */
+.alert-actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: flex-end;
+    padding: 0px;
+    gap: 16px;
+    width: 432px;
+    height: 48px;
+    flex: none;
+    order: 1;
+    align-self: stretch;
+    flex-grow: 0;
+}
+
+/* Button base styles */
+.alert-button {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 14px 16px;
+    gap: 8px;
+    min-width: 82px;
+    height: 48px;
+    border-radius: 10px;
+    flex: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'Pretendard';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 20px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #FFFFFF;
+    transition: all 0.2s ease;
+}
+
+/* Cancel button */
+.alert-button-cancel {
+    width: 82px;
+    background: #B53720;
+    flex-grow: 0;
+    order: 0;
+}
+
+.alert-button-cancel:hover {
+    background: #9a2f1a;
+}
+
+/* Confirm button */
+.alert-button-confirm {
+    width: 95px;
+    background: #3574D9;
+    flex-grow: 0;
+    order: 1;
+}
+
+.alert-button-confirm:hover {
+    background: #2a5bb8;
+}
+
 /* QR Modal Specific */
 .qr-display {
     display: grid;
@@ -521,5 +766,82 @@
 
     .modal-header h3 {
         font-size: 24px;
+    }
+
+    /* AlertDialogue responsive */
+    .alert-dialogue {
+        width: calc(100vw - 40px);
+        max-width: 480px;
+        height: auto;
+        min-height: 212px;
+        padding: 20px;
+    }
+
+    .content-frame {
+        width: 100%;
+        height: auto;
+    }
+
+    .alert-header {
+        width: 100%;
+        position: relative;
+    }
+
+    .alert-title {
+        width: calc(100% - 72px);
+        justify-content: flex-start;
+        margin: 0;
+    }
+
+    .alert-title-text {
+        width: auto;
+        font-size: 18px;
+        line-height: 24px;
+    }
+
+    .alert-close {
+        position: absolute;
+        right: 0;
+        top: 0;
+    }
+
+    .alert-text {
+        width: 100%;
+        height: auto;
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .spacer {
+        display: none;
+    }
+
+    .alert-description {
+        width: 100%;
+        height: auto;
+        font-size: 16px;
+        line-height: 24px;
+    }
+
+    .alert-actions {
+        width: 100%;
+        height: auto;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .alert-button {
+        width: 100%;
+        order: unset;
+    }
+
+    .alert-button-cancel {
+        width: 100%;
+        order: 2;
+    }
+
+    .alert-button-confirm {
+        width: 100%;
+        order: 1;
     }
 }
