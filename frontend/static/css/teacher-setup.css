@@ -1,25 +1,40 @@
-/* Teacher Setup Page CSS - Setup Specific Styles */
-/* 공통 컴포넌트들은 common.css에서 로드됩니다 */
+/* Teacher Setup Page CSS - Complete Setup Styles */
+/* 모든 Setup 페이지 관련 스타일 통합 */
 
-/* Main Content - Setup Specific */
-.main-content {
+/* Session Setup Layout */
+.apple-session-setup {
     flex: 1;
-    padding: 40px 128px;
-    max-width: 1400px;
-    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    background: #f5f5f5 !important;
+}
+
+/* Main Content */
+.main-content {
+    padding: 36px 128px 16px !important;
+    max-width: none;
     width: 100%;
     box-sizing: border-box;
 }
 
-/* Header Card */
+/* Blue Header Card */
 .session-header-card {
     background: #3574d9;
     border-radius: 24px;
-    padding: 40px;
-    margin-bottom: 40px;
-    text-align: center;
+    padding: 32px 32px 32px 32px;
+    margin-bottom: 24px;
+    text-align: left;
+    height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow:
+        0 8px 32px rgba(53, 116, 217, 0.25),
+        0 2px 8px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     position: relative;
     overflow: hidden;
+    box-sizing: border-box;
 }
 
 .session-header-card::before {
@@ -39,156 +54,156 @@
 }
 
 .session-header-title {
-    font-size: 32px;
-    font-weight: 700;
+    font-family: 'Pretendard', 'NanumSquareNeo', 'Nanum Square Neo', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
     color: #ffffff;
-    margin: 0 0 8px 0;
+    margin: 0 0 6px 0;
     letter-spacing: -0.02em;
+    position: relative;
+    z-index: 1;
+    padding-left: 0;
+    text-rendering: optimizeLegibility;
+    font-variation-settings: 'wght' 800;
+    line-height: 1.2;
 }
 
 .session-header-subtitle {
-    font-size: 18px;
-    color: rgba(255, 255, 255, 0.9);
+    font-family: 'Pretendard', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: #a8c5ff;
     margin: 0;
-    font-weight: 400;
+    letter-spacing: -0.01em;
+    position: relative;
+    z-index: 1;
+    padding-left: 0;
+    line-height: 1.4;
 }
 
-/* Setup Specific Form Styles */
-.apple-form {
-    background: #ffffff;
-    border-radius: 24px;
-    padding: 48px;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
-    border: 1px solid rgba(53, 116, 217, 0.08);
-}
-
+/* Two Column Layout */
 .main-layout-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 48px;
-    margin-bottom: 40px;
+    gap: 24px;
+    margin-bottom: 16px;
+    align-items: stretch;
+}
+
+.session-info-section {
+    background: #FFFFFF;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0px 1.6px 3.6px rgba(0, 0, 0, 0.11), 0px 0.3px 0.9px rgba(0, 0, 0, 0.07);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 20px;
+}
+
+/* 오른쪽 컬럼 전체 래퍼 */
+.right-column-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    height: 100%;
+    min-height: 100%;
+}
+
+/* 설정 카드들만 묶는 컨테이너 */
+.config-options-section {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    flex: 1;
+    height: 100%;
+    min-height: 100%;
+    justify-content: space-between;
+}
+
+.config-section {
+    background: #FFFFFF;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0px 1.6px 3.6px rgba(0, 0, 0, 0.11), 0px 0.3px 0.9px rgba(0, 0, 0, 0.07);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    flex: 1;
+}
+
+.session-info-section:hover,
+.config-section:hover {
+    box-shadow:
+        0 20px 40px rgba(53, 116, 217, 0.08),
+        0 4px 16px rgba(0, 0, 0, 0.04);
+    transform: translateY(-4px);
+    border-color: rgba(53, 116, 217, 0.12);
 }
 
 .section-title {
+    font-family: 'Pretendard', 'NanumSquareNeo', 'Nanum Square Neo', sans-serif;
     font-size: 24px;
-    font-weight: 700;
+    font-weight: 800;
     color: #1a202c;
-    margin: 0 0 8px 0;
+    margin: 0;
+    line-height: 1.3;
     letter-spacing: -0.02em;
+    text-rendering: optimizeLegibility;
+    font-variation-settings: 'wght' 800;
 }
 
 .section-description {
     font-size: 16px;
     color: #64748b;
-    margin: 0 0 32px 0;
+    margin: 0;
     line-height: 1.5;
 }
 
-/* Setup Specific Input Overrides */
-.apple-input,
-.apple-textarea {
-    padding: 16px 20px;
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
-    background: #ffffff;
+/* Form Styles - Enhanced */
+.apple-form {
+    width: 100%;
 }
 
-.apple-input:focus,
-.apple-textarea:focus {
-    border-color: #3574d9;
-    box-shadow: 0 0 0 4px rgba(53, 116, 217, 0.1);
-    background: #fafbfc;
+.apple-form-group {
+    margin-bottom: 20px;
 }
 
-.apple-textarea {
-    min-height: 120px;
+.apple-form-group:last-child {
+    margin-bottom: 8px;
 }
 
-/* Config Section */
-.config-section {
-    margin-bottom: 40px;
-}
-
-.config-section:last-child {
-    margin-bottom: 0;
-}
-
-/* Radio Group */
-.apple-radio-group {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 16px;
-}
-
-.apple-radio-group input[type="radio"] {
-    display: none;
-}
-
-.apple-radio-card {
-    padding: 24px;
-    border: 2px solid #e2e8f0;
-    border-radius: 16px;
-    background: #ffffff;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-}
-
-.apple-radio-card:hover {
-    border-color: #3574d9;
-    background: rgba(53, 116, 217, 0.02);
-}
-
-.apple-radio-card input[type="radio"]:checked + .apple-radio-card,
-.apple-radio-group input[type="radio"]:checked + .apple-radio-card {
-    border-color: #3574d9;
-    background: rgba(53, 116, 217, 0.05);
-}
-
-.apple-radio-card input[type="radio"]:checked + .apple-radio-card::after,
-.apple-radio-group input[type="radio"]:checked + .apple-radio-card::after {
-    content: '✓';
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    font-size: 18px;
-    color: #3574d9;
-    font-weight: 700;
-}
-
-.radio-content {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.radio-title {
-    font-size: 18px;
+.apple-label {
+    display: block;
+    font-size: 15px;
     font-weight: 600;
-    color: #1a202c;
-    margin: 0 0 4px 0;
+    color: #374151;
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
 }
 
-.radio-subtitle {
-    font-size: 14px;
-    color: #64748b;
-    margin: 0;
+/* Teacher Setup Page specific: Radio group for difficulty should be horizontal (3 columns) */
+.config-section .apple-radio-group {
+    grid-template-columns: repeat(3, 1fr);
+    flex: 1;
 }
 
-/* Toggle Group */
-.apple-toggle-group {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
+.config-section .apple-toggle-group {
+    flex: 1;
 }
 
+.apple-radio-group input[type="radio"],
 .apple-toggle-group input[type="radio"] {
     display: none;
 }
 
-.apple-toggle-card {
-    padding: 24px;
-    border: 2px solid #e2e8f0;
+.apple-radio-card, .apple-toggle-card {
+    display: block;
+    padding: 20px;
+    border: 2px solid #f1f5f9;
     border-radius: 16px;
     background: #ffffff;
     cursor: pointer;
@@ -197,194 +212,220 @@
     text-align: center;
 }
 
-.apple-toggle-card:hover {
+.apple-radio-card:hover, .apple-toggle-card:hover {
     border-color: #3574d9;
     background: rgba(53, 116, 217, 0.02);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(53, 116, 217, 0.15);
 }
 
+.apple-radio-group input[type="radio"]:checked + .apple-radio-card,
 .apple-toggle-group input[type="radio"]:checked + .apple-toggle-card {
     border-color: #3574d9;
     background: rgba(53, 116, 217, 0.05);
+    box-shadow: 0 8px 25px rgba(53, 116, 217, 0.2);
 }
 
+.apple-radio-group input[type="radio"]:checked + .apple-radio-card::after,
 .apple-toggle-group input[type="radio"]:checked + .apple-toggle-card::after {
     content: '✓';
     position: absolute;
     top: 12px;
     right: 12px;
-    font-size: 16px;
-    color: #3574d9;
+    width: 24px;
+    height: 24px;
+    background: #3574d9;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
     font-weight: 700;
+    animation: checkmarkBounce 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
-.toggle-content {
+@keyframes checkmarkBounce {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.radio-content, .toggle-content {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
 }
 
-.toggle-icon {
-    font-size: 32px;
-    margin-bottom: 8px;
+.radio-icon, .toggle-icon {
+    font-size: 28px;
+    margin-bottom: 4px;
 }
 
-.toggle-title {
+.radio-title, .toggle-title {
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 700;
     color: #1a202c;
-    margin: 0 0 4px 0;
+    margin: 0;
+    line-height: 1.2;
 }
 
-.toggle-subtitle {
-    font-size: 14px;
+.radio-subtitle, .toggle-subtitle {
+    font-size: 13px;
     color: #64748b;
     margin: 0;
+    line-height: 1.3;
 }
 
 /* Action Section */
-.apple-action-section {
-    text-align: center;
-    padding-top: 24px;
-    border-top: 1px solid #f1f5f9;
-}
-
-.apple-primary-button {
-    background: linear-gradient(135deg, #3574d9 0%, #2a5bb8 100%);
-    color: white;
-    border: none;
-    padding: 18px 48px;
-    border-radius: 16px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    font-family: 'Pretendard', sans-serif;
-    letter-spacing: -0.01em;
-    display: inline-flex;
+.apple-action-section-right {
+    display: flex;
+    justify-content: flex-end;
     align-items: center;
-    gap: 12px;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 8px 32px rgba(53, 116, 217, 0.3);
-    min-width: 200px;
+    gap: 16px;
+    margin-top: 24px;
 }
 
-.apple-primary-button::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: all 0.6s;
-}
-
-.apple-primary-button:hover::before {
-    left: 100%;
-}
-
-.apple-primary-button:hover {
-    background: #2a5bb8;
-    transform: translateY(-4px);
-    box-shadow: 0 16px 48px rgba(53, 116, 217, 0.4);
-}
-
-.apple-primary-button:active {
-    transform: translateY(-2px);
-}
-
-.button-arrow {
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.apple-primary-button:hover .button-arrow {
-    transform: translateX(6px);
-}
-
-/* Setup Specific Loading Override */
+/* Loading overlay specific to Setup */
 .loading-overlay {
-    background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(12px);
+    background: rgba(245, 245, 245, 0.95);
+    backdrop-filter: blur(8px);
 }
 
-.loading-content {
-    color: #1a202c;
+/* Animations */
+.apple-session-setup {
+    animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.loading-content p {
-    font-size: 16px;
-    font-weight: 500;
-    color: #64748b;
-    margin: 0;
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(32px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
-
-/* Footer - Setup specific styles removed (using common.css) */
 
 /* Responsive Design */
-@media (max-width: 1200px) {
-    .main-content {
-        padding: 32px 64px;
+@media (min-width: 1024px) {
+    .config-options-section {
+        display: flex !important;
+        flex-direction: column;
+        gap: 24px;
+        flex: 1;
+        height: 100%;
+        min-height: 100%;
+        justify-content: space-between;
     }
 
-    .footer-container {
-        padding: 0 64px;
+    .session-info-section,
+    .config-section:nth-child(1),
+    .config-section:nth-child(2),
+    .apple-action-section-right {
+        order: unset !important;
+    }
+
+    .apple-action-section-right {
+        justify-content: flex-end !important;
+        margin-top: 24px !important;
+        margin-bottom: 0 !important;
+        width: auto !important;
+    }
+}
+
+@media (max-width: 1023px) {
+    .main-content {
+        padding: 24px 64px 16px !important;
     }
 }
 
 @media (max-width: 768px) {
     .main-content {
-        padding: 24px 32px;
+        padding: 20px 32px 16px !important;
     }
 
+    /* Stack cards vertically */
     .main-layout-grid {
-        grid-template-columns: 1fr;
-        gap: 32px;
-    }
-
-    .apple-toggle-group {
-        grid-template-columns: 1fr;
-    }
-
-    .gnb-container {
-        padding: 0 32px;
-    }
-
-    .footer-container {
-        padding: 0 32px;
+        display: flex;
         flex-direction: column;
-        gap: 16px;
-        text-align: center;
+        gap: 24px;
     }
 
-    .footer-content {
-        align-items: center;
+    /* Session info section - 첫 번째 */
+    .session-info-section {
+        order: 1;
     }
 
-    .footer-text {
-        text-align: center;
+    /* Right column wrapper - 모바일에서만 개별 요소로 분리 */
+    .right-column-wrapper {
+        display: contents; /* 래퍼를 무시하고 직접 자식들을 배치 */
+    }
+
+    /* Config options section을 개별 요소로 분리 */
+    .config-options-section {
+        display: contents; /* 이 래퍼도 무시 */
+    }
+
+    /* 학습 난이도 - 두 번째 */
+    .config-section:nth-child(1) {
+        order: 2;
+    }
+
+    /* 학습 진행도 - 세 번째 */
+    .config-section:nth-child(2) {
+        order: 3;
+    }
+
+    /* 세션 시작 버튼 - 네 번째 */
+    .apple-action-section-right {
+        order: 4;
+        justify-content: center; /* 모바일에서는 버튼을 중앙 정렬 */
+        margin-top: 24px;
+        margin-bottom: 0; /* 메인 영역 패딩으로 간격 확보 */
+        width: 100%; /* 전체 너비 차지 */
+    }
+
+    /* Radio/Toggle groups responsive */
+    .config-section .apple-radio-group {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .config-section .apple-toggle-group {
+        grid-template-columns: 1fr;
+        gap: 12px;
     }
 }
 
 @media (max-width: 480px) {
     .main-content {
-        padding: 20px;
+        padding: 16px 20px 16px !important;
     }
 
-    .apple-form {
-        padding: 32px 24px;
-    }
-
+    /* Header card responsive */
     .session-header-card {
-        padding: 32px 24px;
+        padding: 24px;
+        height: auto;
+        min-height: 100px;
     }
 
     .session-header-title {
-        font-size: 28px;
+        font-size: 24px;
+        margin: 0 0 4px 0;
     }
 
     .session-header-subtitle {
-        font-size: 16px;
+        font-size: 14px;
+    }
+
+    .config-section {
+        padding: 16px;
+    }
+
+    .session-info-section {
+        padding: 16px;
     }
 }
