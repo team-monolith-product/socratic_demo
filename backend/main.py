@@ -8,6 +8,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.api.socratic_chat import router as chat_router
 from app.api.teacher_session import router as teacher_router
+from app.api.pdf_analysis import router as pdf_router
 from app.core.config import get_settings
 from app.core.database import create_tables
 # Import models to ensure they are registered with Base
@@ -66,6 +67,7 @@ if pages_dir.exists():
 
 app.include_router(chat_router, prefix="/api/v1")
 app.include_router(teacher_router, prefix="/api/v1")
+app.include_router(pdf_router, prefix="/api/v1")
 
 
 @app.on_event("startup")

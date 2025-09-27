@@ -168,5 +168,69 @@
       "recent_activities": []
     },
     "events": []
+  },
+  "58873604A5E534C55": {
+    "id": "58873604A5E534C55",
+    "teacher_fingerprint": "a354d353754afa99",
+    "config": {
+      "title": "1-1",
+      "topic": "이 PDF는 인공지능(AI) 디지털 교과서 관련 긴급 대책회의의 일정 및 주요 내용을 공지하는 내용입니다. AI 디지털교과서 지위 격하 개정법률안이 통과되었기 때문에, 이에 대응하는 방안을 협의하기 위해 회의를 개최하려고 합니다. 회의 내용은 주로 AIDT 관련 대책위원회의 구성과 현안사항에 대한 협의, 그리고 동의서 제출에 관한 사항으로 구성되어 있습니다.",
+      "description": null,
+      "difficulty": "normal",
+      "show_score": true
+    },
+    "status": "active",
+    "created_at": "2025-09-26T17:00:04.486707+09:00",
+    "expires_at": "2025-09-26T19:00:04.486707+09:00",
+    "last_activity": "2025-09-26T17:00:04.486707+09:00",
+    "deleted_at": null,
+    "students": {},
+    "live_stats": {
+      "current_students": 0,
+      "total_joined": 0,
+      "average_score": 0.0,
+      "completion_rate": 0.0,
+      "dimension_averages": {
+        "depth": 0.0,
+        "breadth": 0.0,
+        "application": 0.0,
+        "metacognition": 0.0,
+        "engagement": 0.0
+      },
+      "recent_activities": []
+    },
+    "events": []
+  },
+  "588750868EEC337AF": {
+    "id": "588750868EEC337AF",
+    "teacher_fingerprint": "a354d353754afa99",
+    "config": {
+      "title": "1-1",
+      "topic": "이 학습 주제는 '디지털 디자인의 가치와 사용자 경험'에 초점을 두고 있습니다. 학생들은 PDF 자료를 바탕으로 김 종 표의 경력과 그가 제작한 다양한 디지털 제품들을 살펴보며, 그러한 제품들이 사용자 경험과 브랜드 가치에 어떤 영향을 미치는지 논의하게 됩니다. 이 과정에서 학생들은 디지털 디자인의 중요성과 그것이 사용자 경험과 브랜드 가치에 미치는 영향에 대해 깊이 있게 이해하게 됩니다. 또한, 학생들은 디지털 디자인의 다양한 측면, 즉, 디자인 기획, 디자인 토큰 시스템, 프로토타이핑, UI 리뉴얼 등을 통해 제품의 사용자 경험을 어떻게 개선할 수 있는지에 대해 토론하게 됩니다. 학생들은 또한 상품 구매 UX-Flow 개선, 접근성 고려 디자인, UI 가독성 확보 등을 통해 사용자 경험의 중요성을 이해하게 됩니다.",
+      "description": null,
+      "difficulty": "normal",
+      "show_score": true
+    },
+    "status": "active",
+    "created_at": "2025-09-26T17:24:46.861651+09:00",
+    "expires_at": "2025-09-26T19:24:46.861651+09:00",
+    "last_activity": "2025-09-26T17:24:46.861651+09:00",
+    "deleted_at": null,
+    "students": {},
+    "live_stats": {
+      "current_students": 0,
+      "total_joined": 0,
+      "average_score": 0.0,
+      "completion_rate": 0.0,
+      "dimension_averages": {
+        "depth": 0.0,
+        "breadth": 0.0,
+        "application": 0.0,
+        "metacognition": 0.0,
+        "engagement": 0.0
+      },
+      "recent_activities": []
+    },
+    "events": []
   }
 }

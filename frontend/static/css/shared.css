@@ -324,40 +324,7 @@
     letter-spacing: -0.01em;
 }
 
-.apple-input, .apple-textarea {
-    width: 100%;
-    padding: 20px 24px;
-    border: 2px solid #f1f5f9;
-    border-radius: 16px;
-    font-size: 16px;
-    font-family: 'Pretendard', sans-serif;
-    background: #fafbfc;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-sizing: border-box;
-    color: #1a202c;
-    font-weight: 400;
-}
-
-.apple-input:focus, .apple-textarea:focus {
-    outline: none;
-    border-color: #3574d9;
-    background: #ffffff;
-    box-shadow:
-        0 0 0 4px rgba(53, 116, 217, 0.08),
-        0 4px 12px rgba(53, 116, 217, 0.04);
-    transform: translateY(-2px);
-}
-
-.apple-input::placeholder, .apple-textarea::placeholder {
-    color: #94a3b8;
-    font-weight: 400;
-}
-
-.apple-textarea {
-    resize: vertical;
-    min-height: 140px;
-    line-height: 1.6;
-}
+/* Legacy apple-input/textarea styles moved to input-components.css */
 
 /* Section Title & Description Components */
 .section-title {

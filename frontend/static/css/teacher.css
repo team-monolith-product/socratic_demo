@@ -427,7 +427,11 @@
 }
 
 .apple-form-group {
-    margin-bottom: 32px;
+    margin-bottom: 20px;
+}
+
+.apple-form-group:last-child {
+    margin-bottom: 8px;
 }
 
 .apple-label {

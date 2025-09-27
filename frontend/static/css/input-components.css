@@ -1,0 +1,255 @@
+/* Input Components - Figma Design System */
+/* 피그마 디자인을 기반으로 한 공통 입력 컴포넌트 */
+
+/* Input Field Group */
+.input-field-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0px;
+    gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Input Field Base */
+.input-field {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 8px 16px;
+    gap: 16px;
+
+    width: 100%;
+    height: 36px;
+
+    background: #F6F6F6;
+    border: 2px solid #DEDEDE;
+    border-radius: 8px;
+
+    font-family: 'Pretendard', sans-serif;
+    font-style: normal;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+    color: #1F2937;
+
+    transition: all 0.2s ease;
+
+    /* Inside auto layout */
+    flex: none;
+    order: 1;
+    align-self: stretch;
+    flex-grow: 0;
+}
+
+/* Input Field Focus State - 입력중 상태 */
+.input-field:focus {
+    outline: none;
+    background: #FFFFFF;
+    border: 2px solid #0E76E0;
+    box-shadow: 0 0 0 3px rgba(14, 118, 224, 0.1);
+}
+
+/* Input Field Placeholder */
+.input-field::placeholder {
+    font-family: 'Pretendard', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+    color: #9C9C9C;
+}
+
+/* Input Field Disabled State */
+.input-field:disabled {
+    background: #F9FAFB;
+    border-color: #E5E7EB;
+    color: #9CA3AF;
+    cursor: not-allowed;
+}
+
+/* Input Field Error State */
+.input-field.error {
+    border-color: #EF4444;
+    background: #FEF2F2;
+}
+
+.input-field.error:focus {
+    border-color: #EF4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+/* Textarea Variant */
+.input-field.textarea {
+    height: auto;
+    min-height: 100px;
+    padding: 8px 16px;
+    align-items: flex-start;
+    resize: vertical;
+    line-height: 20px;
+}
+
+/* Size Variants */
+.input-field.small {
+    height: 32px;
+    padding: 6px 12px;
+    font-size: 13px;
+}
+
+.input-field.medium {
+    height: 40px;
+    padding: 10px 16px;
+    font-size: 14px;
+}
+
+.input-field.large {
+    height: 48px;
+    padding: 14px 20px;
+    font-size: 16px;
+}
+
+/* Search Input Variant */
+.input-field.search {
+    background: #F9FAFB;
+    border-color: #E5E7EB;
+}
+
+.input-field.search:focus {
+    background: #FFFFFF;
+    border-color: #0E76E0;
+}
+
+/* Input Label */
+.input-label {
+    font-family: 'Pretendard', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 6px;
+    display: block;
+}
+
+.input-label.required::after {
+    content: " *";
+    color: #EF4444;
+}
+
+/* Input Helper Text */
+.input-helper {
+    font-family: 'Pretendard', sans-serif;
+    font-size: 12px;
+    color: #6B7280;
+    margin-top: 4px;
+    line-height: 1.4;
+}
+
+.input-helper.error {
+    color: #EF4444;
+}
+
+.input-helper.success {
+    color: #10B981;
+}
+
+/* Input with Icon */
+.input-with-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-with-icon .input-field {
+    padding-left: 40px;
+}
+
+.input-icon {
+    position: absolute;
+    left: 12px;
+    font-size: 16px;
+    color: #9CA3AF;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .input-field-group {
+        gap: 6px;
+    }
+
+    .input-field {
+        padding: 10px 14px;
+        font-size: 16px; /* iOS에서 zoom 방지 */
+    }
+
+    .input-field.small {
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+}
+
+/* Legacy Compatibility - 기존 apple-input/textarea 클래스 호환성 */
+.apple-input {
+    @extend .input-field;
+}
+
+.apple-textarea {
+    @extend .input-field;
+    @extend .textarea;
+}
+
+/* Legacy Compatibility - 기존 apple-input/textarea 클래스와 동일한 스타일 적용 */
+.apple-input,
+.apple-textarea {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 8px 16px;
+    gap: 16px;
+
+    width: 100%;
+    height: 36px;
+
+    background: #F6F6F6;
+    border: 2px solid #DEDEDE;
+    border-radius: 8px;
+
+    font-family: 'Pretendard', sans-serif;
+    font-style: normal;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+    color: #1F2937;
+
+    transition: all 0.2s ease;
+}
+
+.apple-textarea {
+    height: auto;
+    min-height: 100px;
+    padding: 8px 16px;
+    align-items: flex-start;
+    resize: vertical;
+    line-height: 20px;
+}
+
+.apple-input:focus,
+.apple-textarea:focus {
+    outline: none;
+    background: #FFFFFF;
+    border: 2px solid #0E76E0;
+    box-shadow: 0 0 0 3px rgba(14, 118, 224, 0.1);
+}
+
+.apple-input::placeholder,
+.apple-textarea::placeholder {
+    font-family: 'Pretendard', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+    color: #9C9C9C;
+}

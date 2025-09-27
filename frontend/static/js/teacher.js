@@ -244,12 +244,21 @@ class SimplifiedTeacherDashboard {
         // Update session summary
         const config = sessionData.session.config;
         const sessionSummary = document.getElementById('sessionSummary');
+
+        // 주요 키워드 추출 (main_keyword가 있으면 사용, 없으면 첫 번째 key_concept 사용)
+        let displayKeyword = '학습주제';
+        if (config.main_keyword) {
+            displayKeyword = config.main_keyword;
+        } else if (config.key_concepts && config.key_concepts.length > 0) {
+            displayKeyword = config.key_concepts[0];
+        }
+
         sessionSummary.innerHTML = `
             <div class="detail-item">
                 <strong>📋 제목:</strong> ${config.title}
             </div>
             <div class="detail-item">
-                <strong>📚 주제:</strong> ${config.topic}
+                <strong>🔍 키워드:</strong> <span class="main-keyword-highlight">${displayKeyword}</span>
             </div>
             <div class="detail-item">
                 <strong>🎓 난이도:</strong> ${this.sessionManager.getDifficultyText(config.difficulty)}

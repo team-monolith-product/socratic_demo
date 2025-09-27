@@ -19,6 +19,12 @@ class Settings:
         self.use_database: bool = os.getenv("USE_DATABASE", "false").lower() == "true"
         self.frontend_url: str = os.getenv("FRONTEND_URL", "https://socratic-nine.vercel.app")
 
+        # PDF 처리 설정
+        self.max_pdf_size_mb: int = int(os.getenv("MAX_PDF_SIZE_MB", "10"))
+        self.max_pdf_pages: int = int(os.getenv("MAX_PDF_PAGES", "50"))
+        self.max_text_length: int = int(os.getenv("MAX_TEXT_LENGTH", "50000"))
+        self.allowed_pdf_types: List[str] = [".pdf"]
+
     @property
     def allow_origins(self) -> List[str]:
         """Return CORS origins as a list (comma separated env)."""

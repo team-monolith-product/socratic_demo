@@ -1,0 +1,337 @@
+/* PDF 업로드 UI 스타일 */
+
+/* PDF 업로드 메인 영역 */
+.pdf-upload-main {
+    margin-bottom: 20px;
+}
+
+/* 모든 PDF 상태에 공통 높이 적용 */
+.pdf-upload-zone,
+.pdf-processing-status,
+.pdf-result-card {
+    min-height: 200px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pdf-upload-zone {
+    border: 2px dashed #007AFF;
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    background: linear-gradient(135deg, #f8fbff 0%, #f0f9ff 100%);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.pdf-upload-zone:hover {
+    border-color: #0056b3;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e6f3ff 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 122, 255, 0.1);
+}
+
+.pdf-upload-zone.dragover {
+    border-color: #34C759;
+    background: linear-gradient(135deg, #f0fff4 0%, #e6ffed 100%);
+    transform: scale(1.02);
+}
+
+.upload-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+}
+
+.upload-icon {
+    font-size: 48px;
+    opacity: 0.8;
+    transition: transform 0.3s ease;
+}
+
+.pdf-upload-zone:hover .upload-icon {
+    transform: scale(1.1);
+}
+
+.upload-text h4 {
+    margin: 0 0 8px 0;
+    color: #1d1d1f;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.upload-text p {
+    margin: 0;
+    color: #86868b;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+/* PDF 처리 상태 표시 */
+.pdf-processing-status {
+    padding: 24px;
+    background: #f5f5f7;
+    border-radius: 12px;
+    text-align: center;
+    flex-direction: column;
+}
+
+.processing-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.processing-animation {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+}
+
+.lottie-animation {
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 폴백 스피너 (Lottie 로드 실패시) */
+.spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid #e5e5e7;
+    border-top: 4px solid #007AFF;
+    border-radius: 50%;
+    animation: spin 1.2s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.processing-text {
+    margin-top: 4px;
+}
+
+.current-step {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1d1d1f;
+    text-align: center;
+}
+
+/* PDF 분석 결과 카드 */
+.pdf-result-card {
+    background: #ffffff;
+    border: 1px solid #d2d2d7;
+    border-radius: 12px;
+    padding: 24px;
+    margin-top: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    flex-direction: column;
+}
+
+.result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    gap: 16px;
+}
+
+.result-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.success-icon {
+    font-size: 20px;
+    animation: successBounce 0.6s ease-out;
+}
+
+@keyframes successBounce {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.result-title h4 {
+    margin: 0;
+    color: #1d1d1f;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+
+.content-metadata {
+    padding: 16px 0 0 0;
+    border-top: 1px solid #f2f2f7;
+}
+
+.metadata-item {
+    margin-bottom: 12px;
+}
+
+.metadata-item strong {
+    display: inline-block;
+    margin-bottom: 8px;
+    color: #1d1d1f;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.concept-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.concept-tag {
+    background: #e3f2fd;
+    color: #1565c0;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* 구분선 */
+.topic-divider {
+    display: flex;
+    align-items: center;
+    margin: 32px 0 24px 0;
+    gap: 16px;
+}
+
+.divider-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #d2d2d7, transparent);
+}
+
+.divider-text {
+    color: #86868b;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 0 8px;
+}
+
+/* 직접 입력 보조 영역 */
+.manual-input-auxiliary {
+    margin-bottom: 8px;
+}
+
+.manual-input-header {
+    margin-bottom: 12px;
+}
+
+.auxiliary-label {
+    display: block;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1d1d1f;
+    margin-bottom: 4px;
+}
+
+.input-hint {
+    font-size: 13px;
+    color: #86868b;
+    font-style: italic;
+}
+
+.manual-content {
+    transition: all 0.3s ease;
+}
+
+.manual-content:focus {
+    border-color: #007AFF !important;
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+
+/* 버튼 스타일 확장 */
+.btn-ghost {
+    background: transparent;
+    color: #86868b;
+    border: 1px solid #d2d2d7;
+}
+
+.btn-ghost:hover {
+    background: #f5f5f7;
+    color: #1d1d1f;
+    border-color: #a1a1a6;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .pdf-upload-zone {
+        padding: 32px 20px;
+    }
+
+    .upload-text h4 {
+        font-size: 16px;
+    }
+
+    .upload-text p {
+        font-size: 13px;
+    }
+
+    .topic-divider {
+        margin: 24px 0 20px 0;
+    }
+
+
+    .concept-tags {
+        gap: 6px;
+    }
+
+    .concept-tag {
+        font-size: 11px;
+        padding: 3px 10px;
+    }
+}
+
+/* 접근성 개선 */
+@media (prefers-reduced-motion: reduce) {
+    .pdf-upload-zone,
+    .upload-icon,
+    .spinner {
+        transition: none;
+        animation: none;
+    }
+}
+
+/* 다크모드 대응 */
+@media (prefers-color-scheme: dark) {
+    .pdf-upload-zone {
+        background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+        border-color: #4a90e2;
+    }
+
+    .pdf-result-card {
+        background: #2a2a2a;
+        border-color: #4a4a4a;
+    }
+
+}

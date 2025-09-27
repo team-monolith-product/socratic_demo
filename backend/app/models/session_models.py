@@ -8,6 +8,13 @@ class SessionConfig(BaseModel):
     description: Optional[str] = None
     difficulty: str = "normal"  # easy, normal, hard
     show_score: bool = True
+    # 통합 학습 주제를 위한 새로운 필드
+    source_type: str = "manual"  # "manual", "pdf", "hybrid"
+    pdf_content: Optional[str] = None  # PDF 분석 3문단 요약
+    manual_content: Optional[str] = None  # 사용자 직접 입력
+    combined_topic: Optional[str] = None  # 최종 통합된 학습 주제
+    key_concepts: Optional[List[str]] = None
+    learning_objectives: Optional[List[str]] = None
 
 class SessionCreateRequest(BaseModel):
     config: SessionConfig

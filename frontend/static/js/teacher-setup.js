@@ -187,14 +187,14 @@ class TeacherSetup {
 
         try {
             const formData = new FormData(event.target);
-            const sessionConfig = {
-                title: formData.get('title'),
-                topic: formData.get('topic'),
-                difficulty: formData.get('difficulty'),
-                show_score: formData.get('showScore') === 'true'
-            };
+
+            // PDF 기능과 통합된 세션 설정 구성
+            const sessionConfig = await this.buildSessionConfig(formData);
 
             console.log('Creating session with config:', sessionConfig);
+
+            // 로딩 표시
+            this.showLoading(true, '세션을 생성하는 중...');
 
             // Create session
             const result = await this.sessionManager.createSession(sessionConfig);
@@ -211,7 +211,59 @@ class TeacherSetup {
         } catch (error) {
             console.error('Failed to create session:', error);
             this.showError('세션 생성에 실패했습니다: ' + error.message);
+        } finally {
+            this.showLoading(false);
         }
+    }
+
+    async buildSessionConfig(formData) {
+        // 기본 세션 설정
+        const sessionConfig = {
+            title: formData.get('title'),
+            topic: formData.get('topic') || '', // PDF 시스템에서 설정됨
+            difficulty: formData.get('difficulty'),
+            show_score: formData.get('showScore') === 'true',
+            // PDF 관련 정보 추가
+            source_type: 'manual',
+            pdf_content: null,
+            manual_content: null,
+            combined_topic: null,
+            key_concepts: null,
+            learning_objectives: null
+        };
+
+        // PDF 기능이 활성화되어 있는 경우 상태 확인
+        if (window.pdfTopicManager) {
+            const pdfState = window.pdfTopicManager.state;
+
+            if (pdfState.pdfContent || pdfState.manualContent) {
+                // PDF 콘텐츠가 있는 경우
+                if (pdfState.pdfContent && pdfState.manualContent) {
+                    sessionConfig.source_type = 'hybrid';
+                    sessionConfig.pdf_content = pdfState.pdfContent;
+                    sessionConfig.manual_content = pdfState.manualContent;
+                } else if (pdfState.pdfContent) {
+                    sessionConfig.source_type = 'pdf';
+                    sessionConfig.pdf_content = pdfState.pdfContent;
+                } else {
+                    sessionConfig.source_type = 'manual';
+                    sessionConfig.manual_content = pdfState.manualContent;
+                }
+
+                // 최종 주제가 있으면 사용
+                if (pdfState.finalTopic) {
+                    sessionConfig.topic = pdfState.finalTopic;
+                    sessionConfig.combined_topic = pdfState.finalTopic;
+                }
+            }
+        }
+
+        // topic이 비어있으면 에러
+        if (!sessionConfig.topic || sessionConfig.topic.trim() === '') {
+            throw new Error('학습 주제를 입력하거나 PDF를 업로드해주세요.');
+        }
+
+        return sessionConfig;
     }
 
     goToDashboard(sessionId, isNewSession = false) {

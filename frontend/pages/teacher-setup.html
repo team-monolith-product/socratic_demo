@@ -10,7 +10,9 @@
     <link rel="stylesheet" href="/static/css/main.css?v=4">
     <link rel="stylesheet" href="/static/css/shared.css?v=1">
     <link rel="stylesheet" href="/static/css/button-system.css?v=1">
+    <link rel="stylesheet" href="/static/css/input-components.css?v=1">
     <link rel="stylesheet" href="/static/css/teacher.css?v=32">
+    <link rel="stylesheet" href="/static/css/pdf-upload.css?v=2">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
 </head>
 <body class="apple-body">
@@ -49,26 +51,95 @@
                             <h2 class="section-title">세션 정보</h2>
 
                             <div class="apple-form-group">
-                                <label for="sessionTitle" class="apple-label">세션 제목</label>
-                                <input
-                                    id="sessionTitle"
-                                    name="title"
-                                    class="apple-input"
-                                    placeholder="코들중학교 1학년 3반"
-                                    maxlength="50"
-                                    required
-                                />
+                                <div class="input-field-group">
+                                    <label for="sessionTitle" class="input-label required">세션 제목</label>
+                                    <input
+                                        id="sessionTitle"
+                                        name="title"
+                                        class="input-field"
+                                        placeholder="코들중학교 1학년 3반"
+                                        maxlength="50"
+                                        required
+                                    />
+                                </div>
                             </div>
 
+                            <!-- 학습 주제 설정 (PDF 메인) -->
                             <div class="apple-form-group">
-                                <label for="sessionTopic" class="apple-label">학습 주제</label>
+                                <label class="apple-label">학습 주제 설정</label>
+
+                                <!-- PDF 업로드 영역 (메인) -->
+                                <div class="pdf-upload-main">
+                                    <div class="pdf-upload-zone" id="pdfUploadZone">
+                                        <div class="upload-content">
+                                            <div class="upload-icon">📄</div>
+                                            <div class="upload-text">
+                                                <h4>PDF 파일을 업로드하고 AI로 학습 주제 생성하기</h4>
+                                                <p>최대 10MB, 50페이지까지 지원</p>
+                                            </div>
+                                        </div>
+                                        <input type="file" id="pdfFile" accept=".pdf" hidden>
+                                    </div>
+
+                                    <!-- PDF 분석 진행 상태 -->
+                                    <div class="pdf-processing-status" id="pdfProcessingStatus" style="display: none;">
+                                        <div class="processing-indicator">
+                                            <div class="processing-animation">
+                                                <div class="lottie-animation" id="pdfLottieContainer"></div>
+                                            </div>
+                                            <div class="processing-text">
+                                                <div class="current-step" id="currentStep">파일 분석중...</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- PDF 분석 결과 -->
+                                    <div class="pdf-result-card" id="pdfResultCard" style="display: none;">
+                                        <div class="result-header">
+                                            <div class="result-title">
+                                                <div class="success-icon">✅</div>
+                                                <h4>PDF 분석 완료</h4>
+                                            </div>
+                                            <button type="button" class="btn btn-outline btn-sm" id="replaceFileBtn">
+                                                <span class="btn-icon">📁</span>
+                                                파일 교체
+                                            </button>
+                                        </div>
+
+                                        <div class="content-metadata">
+                                            <div class="metadata-item">
+                                                <strong>주요 개념</strong>
+                                                <div class="concept-tags" id="pdfConceptTags"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 구분선 -->
+                                <div class="topic-divider">
+                                    <div class="divider-line"></div>
+                                    <div class="divider-text">또는</div>
+                                    <div class="divider-line"></div>
+                                </div>
+
+                                <!-- 직접 입력 영역 -->
+                                <div class="manual-input-auxiliary">
+                                    <div class="input-field-group">
+                                        <textarea id="manualTopicInput" name="manual_topic" class="input-field textarea manual-content"
+                                                 placeholder="학습 주제 또는 추가로 강조하고 싶은 관점을 입력하세요"
+                                                 rows="3"></textarea>
+                                    </div>
+                                </div>
+
+
+                                <!-- 기존 직접 입력 필드 (폴백용) -->
                                 <textarea
                                     id="sessionTopic"
                                     name="topic"
                                     class="apple-textarea"
                                     placeholder="기후변화의 원인과 해결책을 탐구하고 개인과 사회 차원의 대응방안을 토론해보세요"
                                     rows="4"
-                                    required
+                                    style="display: none;"
                                 ></textarea>
                             </div>
                         </div>
@@ -189,6 +260,7 @@
     <script src="/static/config.js"></script>
     <script src="/static/js/shared/qr-generator.js?v=2"></script>
     <script src="/static/js/shared/simplified-session-manager.js?v=1"></script>
+    <script src="/static/js/pdf-upload.js?v=2"></script>
     <script src="/static/js/teacher-setup.js?v=1"></script>
 </body>
 </html>
