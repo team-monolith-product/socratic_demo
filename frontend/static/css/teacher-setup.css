@@ -225,13 +225,11 @@
 }
 
 .apple-radio-card:hover, .apple-toggle-card:hover {
-    border-color: #3574d9;
-    background: rgba(53, 116, 217, 0.02);
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(53, 116, 217, 0.15);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
-.apple-radio-group input[type="radio"]:checked + .apple-radio-card,
+/* Override default checked state for non-difficulty cards */
 .apple-toggle-group input[type="radio"]:checked + .apple-toggle-card {
     border-color: #3574d9;
     background: rgba(53, 116, 217, 0.05);
@@ -288,6 +286,64 @@
     color: #64748b;
     margin: 0;
     line-height: 1.3;
+}
+
+/* Difficulty Level Card Styles */
+/* Easy difficulty card */
+input[value="easy"] + .apple-radio-card {
+    background: #F4FAE8;
+    border: 1px solid #6A9415;
+}
+
+input[value="easy"] + .apple-radio-card:hover {
+    border: 2px solid #6A9415 !important;
+}
+
+input[value="easy"]:checked + .apple-radio-card {
+    background: #E8F5D8 !important;
+    border: 2px solid #527A0E !important;
+    box-shadow: 0 8px 25px rgba(82, 122, 14, 0.3) !important;
+}
+
+/* Normal difficulty card */
+input[value="normal"] + .apple-radio-card {
+    background: #FFFAE6;
+    border: 1px solid #B58F04;
+}
+
+input[value="normal"] + .apple-radio-card:hover {
+    border: 2px solid #B58F04 !important;
+}
+
+input[value="normal"]:checked + .apple-radio-card {
+    background: #FFF6CC !important;
+    border: 2px solid #9A7503 !important;
+    box-shadow: 0 8px 25px rgba(154, 117, 3, 0.3) !important;
+}
+
+/* Hard difficulty card */
+input[value="hard"] + .apple-radio-card {
+    background: #FFEDEA;
+    border: 1px solid #B53720;
+}
+
+input[value="hard"] + .apple-radio-card:hover {
+    border: 2px solid #B53720 !important;
+}
+
+input[value="hard"]:checked + .apple-radio-card {
+    background: #FFE0DB !important;
+    border: 2px solid #9A2D18 !important;
+    box-shadow: 0 8px 25px rgba(154, 45, 24, 0.3) !important;
+}
+
+/* Remove blue top line animation for all cards */
+.apple-radio-card::before, .apple-toggle-card::before {
+    display: none !important;
+}
+
+.apple-radio-card:hover::before, .apple-toggle-card:hover::before {
+    display: none !important;
 }
 
 /* Action Section */
