@@ -1,6 +1,11 @@
 /* Teacher Dashboard Page Specific Styles */
 /* 교사 대시보드 페이지에만 사용되는 스타일들 */
 
+/* Override main-content padding for dashboard */
+.main-content {
+    padding: 8px 128px 16px !important;
+}
+
 /* Dashboard Header */
 .dashboard-header {
     background: transparent;
@@ -33,17 +38,38 @@
     flex-wrap: wrap;
 }
 
-/* Dashboard Content */
-.dashboard-content {
-    flex: 1;
-    padding: 16px 40px 32px;
+
+/* Dashboard Main Content Layout */
+.dashboard-main-content {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    padding: 8px 40px 32px;
     background: #f5f5f5;
 }
 
 /* Students Section */
 .students-section {
-    flex: none;
-    flex-grow: 0;
+    flex: 1;
+    flex-grow: 1;
+    min-width: 0;
+    height: calc(100vh - 200px); /* Full height minus header/footer space */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Session Statistics - Moved to sidebar */
+.session-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 280px;
+    flex-shrink: 0;
+}
+
+/* Remove hover transform effects from stat cards */
+.stat-card:hover {
+    transform: none !important;
 }
 
 
@@ -55,6 +81,36 @@
     background: #FFFFFF;
     box-shadow: 0px 1.6px 3.6px rgba(0, 0, 0, 0.11), 0px 0.3px 0.9px rgba(0, 0, 0, 0.07);
     border-radius: 8px;
+    flex: 1;
+    min-height: 0;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.students-table-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    position: relative;
+}
+
+/* Custom scrollbar styling */
+.students-table-wrapper::-webkit-scrollbar {
+    width: 8px;
+}
+
+.students-table-wrapper::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.students-table-wrapper::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.students-table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
 }
 
 .students-table {
@@ -221,6 +277,18 @@
     text-align: center;
     padding: 60px 32px;
     color: #64748b;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #FFFFFF;
+    border-radius: 4px;
+    min-height: 300px;
+}
+
+.table-empty-state .primary-button {
+    align-self: center;
+    margin: 0 auto;
 }
 
 .empty-icon {
@@ -239,31 +307,9 @@
 .empty-description {
     font-size: 14px;
     line-height: 1.5;
-    margin: 0 0 24px 0;
+    margin: 0 0 32px 0;
 }
 
-.empty-state-qr-btn {
-    padding: 12px 24px;
-    background: #3574d9;
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-family: 'Pretendard', sans-serif;
-    box-shadow: 0 4px 12px rgba(53, 116, 217, 0.25);
-}
-
-.empty-state-qr-btn:hover {
-    background: #2a5bb8;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(53, 116, 217, 0.35);
-}
 
 /* Score Bar Component */
 .score-bar-container {
@@ -309,6 +355,101 @@
 /* Dashboard Modal Specific Styles */
 .modal-actions {
     margin-top: 32px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: flex-end;
+    padding: 0px;
+    gap: 16px;
+    flex: none;
+    order: 1;
+    align-self: stretch;
+    flex-grow: 0;
+}
+
+/* Common Button Base Styles - Shared across dashboard and modals */
+.secondary-button,
+.primary-button {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 14px 16px;
+    gap: 8px;
+    min-width: 82px;
+    height: 48px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-family: 'Pretendard', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 20px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    flex: none;
+    flex-grow: 0;
+    white-space: nowrap;
+    text-align: center;
+}
+
+/* Secondary Button (Gray) - Used for link copy in modals */
+.secondary-button {
+    background: #F6F6F6;
+    color: #363636;
+}
+
+.secondary-button:hover {
+    background: #DEDEDE !important;
+    transform: none !important;
+}
+
+/* White Button - Used for header actions like QR view, refresh */
+.white-button {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 14px 16px;
+    gap: 8px;
+    min-width: 82px;
+    height: 48px;
+    background: #FFFFFF;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-family: 'Pretendard', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 20px;
+    color: #363636;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    flex: none;
+    flex-grow: 0;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.white-button:hover {
+    background: #DEDEDE !important;
+    transform: none !important;
+}
+
+/* Primary Button (Blue) - Used for new session, dashboard navigation */
+.primary-button {
+    background: #3574D9;
+    color: #FFFFFF;
+}
+
+.primary-button:hover {
+    background: #2a5bb8 !important;
+    transform: none !important;
+}
+
+/* Global transform override for all buttons in teacher dashboard */
+button:hover {
+    transform: none !important;
 }
 
 /* AlertDialogue Styles */
@@ -642,10 +783,10 @@
 
 /* QR Modal Specific */
 .qr-display {
-    display: grid;
-    grid-template-columns: 300px 1fr;
-    gap: 32px;
-    align-items: start;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
 }
 
 .qr-code-section {
@@ -653,52 +794,21 @@
     justify-content: center;
 }
 
-.session-summary-section {
-    padding-left: 16px;
+.session-topic-section {
+    text-align: center;
 }
 
-.session-details {
-    margin-bottom: 24px;
-}
-
-.detail-item {
-    margin-bottom: 16px;
-    padding: 16px;
+.session-topic {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1a202c;
     background: #f8fafc;
-    border-radius: 8px;
-    border-left: 4px solid #3574d9;
+    padding: 16px 24px;
+    border-radius: 12px;
+    border: 2px solid #e2e8f0;
+    margin: 0;
 }
 
-.detail-item strong {
-    color: #374151;
-    font-weight: 600;
-}
-
-.detail-item a {
-    color: #3574d9;
-    text-decoration: none;
-    word-break: break-all;
-    display: block;
-    margin-top: 4px;
-}
-
-.detail-item a:hover {
-    text-decoration: underline;
-}
-
-/* 주요 키워드 하이라이트 */
-.main-keyword-highlight {
-    background: linear-gradient(135deg, #3574d9, #2a5bb8);
-    color: white;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-weight: 600;
-    font-size: 14px;
-    display: inline-block;
-    margin-left: 8px;
-    letter-spacing: -0.01em;
-    box-shadow: 0 2px 8px rgba(53, 116, 217, 0.3);
-}
 
 /* Dashboard Loading Override */
 .loading-overlay {
@@ -751,13 +861,7 @@
     }
 
     .qr-display {
-        grid-template-columns: 1fr;
-        gap: 24px;
-        text-align: center;
-    }
-
-    .session-summary-section {
-        padding-left: 0;
+        gap: 20px;
     }
 }
 

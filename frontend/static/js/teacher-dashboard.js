@@ -649,42 +649,17 @@ class TeacherDashboard {
         const modal = document.getElementById('qrModal');
         const qrCode = sessionData.qr_code;
 
-        // Update modal content
-        const sessionLink = document.getElementById('sessionLink');
-        sessionLink.href = qrCode.url;
-        sessionLink.textContent = qrCode.url;
-
         // Display QR code
         const qrCanvas = document.getElementById('qrCanvas');
         this.qrGenerator.displayQRCode(qrCanvas, qrCode.image_data);
 
-        // Update session summary
+        // Update session topic only
         const config = sessionData.session.config;
-        const sessionSummary = document.getElementById('sessionSummary');
+        const sessionTopic = document.getElementById('sessionTopic');
 
-        // 간소화된 학습주제 표시 로직 - 모든 상황에서 "학습주제:" 사용
-        const keywordSection = `
-            <strong>🔍 학습주제:</strong><br>
-            ${config.topic}
-        `;
-
-        sessionSummary.innerHTML = `
-            <div class="detail-item">
-                <strong>📋 제목:</strong> ${config.title}
-            </div>
-            <div class="detail-item">
-                ${keywordSection}
-            </div>
-            <div class="detail-item">
-                <strong>🎓 난이도:</strong> ${this.sessionManager.getDifficultyText(config.difficulty)}
-            </div>
-            <div class="detail-item">
-                <strong>📊 점수표시:</strong> ${config.show_score ? '보기' : '숨김'}
-            </div>
-            <div class="detail-item">
-                <strong>📅 생성시간:</strong> ${this.sessionManager.formatKoreanTime(sessionData.session.created_at)}
-            </div>
-        `;
+        if (sessionTopic) {
+            sessionTopic.textContent = config.topic || '학습 주제';
+        }
 
         // Store current session data for modal actions
         this.currentModalSession = sessionData;

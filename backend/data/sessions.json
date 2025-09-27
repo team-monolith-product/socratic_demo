@@ -655,5 +655,122 @@
       "recent_activities": []
     },
     "events": []
+  },
+  "58980063BE319D374": {
+    "id": "58980063BE319D374",
+    "teacher_fingerprint": "a354d353754afa99",
+    "config": {
+      "title": "1-1",
+      "topic": "프로덕트 디자인에서 사용자 경험과 비즈니스 전략의 통합적 접근이 어떻게 이루어지는가?",
+      "description": null,
+      "difficulty": "normal",
+      "show_score": true,
+      "source_type": "hybrid",
+      "pdf_content": "정기혁은 6년차 프로덕트 디자이너로, UI/UX 디자인, UX 리서치, 디자인 시스템 구축, 데이터 기반 디자인, 노코드 툴 활용 웹사이트 구축 등의 역량을 보유하고 있다. KAIST와 UNIST에서 디자인을 전공하였으며, 해외 디자인 저널에서 최우수 논문을 수상한 경험이 있다. 티맥스소프트, Kooky, 콴다 등에서 근무하며, Kooky에서는 CPO로서 K-POP 플랫폼을 제작하고, 콴다에서는 Cramify의 프로덕트 디자이너로서 스타트업의 0 to 1 경험을 쌓았다. UX 리서치와 데이터 분석을 통해 고객과 비즈니스 모두를 만족시키는 사용자 경험을 설계하였고, B2B IT 인프라 회사에서는 SaaS 제품 개발에 참여하였다. 최근 비전브릿지에서 프로덕트 매니징과 UI/UX 디자인을 총괄하며, K-POP 팬덤 플랫폼의 디자인과 프로젝트 리딩을 맡고 있다.",
+      "manual_content": "ux디자인의 중요성에 집중한다.",
+      "combined_topic": null,
+      "main_keyword": null,
+      "key_concepts": null,
+      "learning_objectives": null
+    },
+    "status": "active",
+    "created_at": "2025-09-27T22:34:23.019615+09:00",
+    "expires_at": "2025-09-28T00:34:23.019615+09:00",
+    "last_activity": "2025-09-27T22:34:23.019615+09:00",
+    "deleted_at": null,
+    "students": {},
+    "live_stats": {
+      "current_students": 0,
+      "total_joined": 0,
+      "average_score": 0.0,
+      "completion_rate": 0.0,
+      "dimension_averages": {
+        "depth": 0.0,
+        "breadth": 0.0,
+        "application": 0.0,
+        "metacognition": 0.0,
+        "engagement": 0.0
+      },
+      "recent_activities": []
+    },
+    "events": []
+  },
+  "589813721ADFD90B8": {
+    "id": "589813721ADFD90B8",
+    "teacher_fingerprint": "a354d353754afa99",
+    "config": {
+      "title": "ㅁㄴㅇ",
+      "topic": "ㅁㄴㅇ",
+      "description": null,
+      "difficulty": "normal",
+      "show_score": true,
+      "source_type": "manual",
+      "pdf_content": null,
+      "manual_content": "ㅁㄴㅇ",
+      "combined_topic": null,
+      "main_keyword": null,
+      "key_concepts": null,
+      "learning_objectives": null
+    },
+    "status": "active",
+    "created_at": "2025-09-27T22:56:12.296882+09:00",
+    "expires_at": "2025-09-28T00:56:12.296882+09:00",
+    "last_activity": "2025-09-27T22:56:12.296882+09:00",
+    "deleted_at": null,
+    "students": {},
+    "live_stats": {
+      "current_students": 0,
+      "total_joined": 0,
+      "average_score": 0.0,
+      "completion_rate": 0.0,
+      "dimension_averages": {
+        "depth": 0.0,
+        "breadth": 0.0,
+        "application": 0.0,
+        "metacognition": 0.0,
+        "engagement": 0.0
+      },
+      "recent_activities": []
+    },
+    "events": []
+  },
+  "58981826E43B7B7E8": {
+    "id": "58981826E43B7B7E8",
+    "teacher_fingerprint": "a354d353754afa99",
+    "config": {
+      "title": "ㅁㄴㅇ",
+      "topic": "ㅁㄴㅇ",
+      "description": null,
+      "difficulty": "normal",
+      "show_score": true,
+      "source_type": "manual",
+      "pdf_content": null,
+      "manual_content": "ㅁㄴㅇ",
+      "combined_topic": null,
+      "main_keyword": null,
+      "key_concepts": null,
+      "learning_objectives": null
+    },
+    "status": "active",
+    "created_at": "2025-09-27T23:03:46.366361+09:00",
+    "expires_at": "2025-09-28T01:03:46.366361+09:00",
+    "last_activity": "2025-09-27T23:03:46.366361+09:00",
+    "deleted_at": null,
+    "students": {},
+    "live_stats": {
+      "current_students": 0,
+      "total_joined": 0,
+      "average_score": 0.0,
+      "completion_rate": 0.0,
+      "dimension_averages": {
+        "depth": 0.0,
+        "breadth": 0.0,
+        "application": 0.0,
+        "metacognition": 0.0,
+        "engagement": 0.0
+      },
+      "recent_activities": []
+    },
+    "events": []
   }
 }

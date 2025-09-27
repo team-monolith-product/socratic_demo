@@ -1,5 +1,15 @@
 /* Apple-inspired Design System 2024 - Updated */
 
+/* Global Transform Override - Remove all hover lift effects */
+button:hover,
+.btn:hover,
+.primary-button:hover,
+.secondary-button:hover,
+.alert-button:hover,
+a:hover {
+    transform: none !important;
+}
+
 /* CSS Reset & Custom Properties */
 *, *::before, *::after {
     margin: 0;

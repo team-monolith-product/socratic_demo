@@ -7,11 +7,25 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/main.css?v=4">
+    <link rel="stylesheet" href="/static/css/main.css?v=5">
     <link rel="stylesheet" href="/static/css/shared.css?v=1">
     <link rel="stylesheet" href="/static/css/button-system.css?v=1">
     <link rel="stylesheet" href="/static/css/input-components.css?v=1">
-    <link rel="stylesheet" href="/static/css/teacher-dashboard-specific.css?v=1">
+    <link rel="stylesheet" href="/static/css/teacher-dashboard-specific.css?v=15">
+    <style>
+        /* Force remove all hover transform effects */
+        * {
+            transition: background-color 0.2s ease, color 0.2s ease !important;
+        }
+        button:hover, .btn:hover, .primary-button:hover, .secondary-button:hover, .alert-button:hover, a:hover {
+            transform: none !important;
+            transition: background-color 0.2s ease, color 0.2s ease !important;
+        }
+        .modal-actions button:hover {
+            transform: none !important;
+            transition: background-color 0.2s ease, color 0.2s ease !important;
+        }
+    </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
 </head>
 <body class="dashboard-body">
@@ -40,56 +54,23 @@
             </div>
 
             <div class="header-actions">
-                <button id="showQRBtn" class="btn btn-secondary btn-md">
-                    <span class="btn-icon btn-icon-left">📱</span>
+                <button id="showQRBtn" class="white-button">
                     QR 코드 보기
                 </button>
-                <button id="refreshBtn" class="btn btn-secondary btn-md">
-                    <span class="btn-icon btn-icon-left">🔄</span>
+                <button id="refreshBtn" class="white-button">
                     새로고침
                 </button>
-                <button id="newSessionBtn" class="btn btn-primary btn-md">
-                    <span class="btn-icon btn-icon-left">✨</span>
+                <button id="newSessionBtn" class="primary-button">
                     새 세션 시작
                 </button>
             </div>
         </header>
 
         <!-- Dashboard Content -->
-            <!-- Session Statistics Cards -->
-            <div class="session-stats">
-                <div class="stat-card">
-                    <div class="stat-icon">👥</div>
-                    <div class="stat-content">
-                        <div class="stat-value" id="studentCount">0</div>
-                        <div class="stat-label">참여 학생</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">⏱️</div>
-                    <div class="stat-content">
-                        <div class="stat-value" id="sessionDuration">0분</div>
-                        <div class="stat-label">진행 시간</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">📊</div>
-                    <div class="stat-content">
-                        <div class="stat-value" id="averageScore">0%</div>
-                        <div class="stat-label">평균 점수</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">💬</div>
-                    <div class="stat-content">
-                        <div class="stat-value" id="totalMessages">0</div>
-                        <div class="stat-label">총 메시지</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Students Table Section -->
-            <div class="students-section">
+            <!-- Main Content Area with Table and Stats -->
+            <div class="dashboard-main-content">
+                <!-- Students Table Section -->
+                <div class="students-section">
 
                 <div class="students-table-container">
                     <table class="students-table" id="studentsTable">
@@ -113,19 +94,56 @@
                                 </th>
                             </tr>
                         </thead>
-                        <tbody id="studentsTableBody">
-                            <!-- 학생 데이터가 여기에 동적으로 로드됩니다 -->
-                        </tbody>
                     </table>
 
-                    <div class="table-empty-state" id="tableEmptyState">
-                        <div class="empty-icon">👥</div>
-                        <div class="empty-title">아직 참여한 학생이 없습니다</div>
-                        <div class="empty-description">QR 코드를 공유하여 학생들의 참여를 기다려보세요</div>
-                        <button id="emptyStateQRBtn" class="empty-state-qr-btn">
-                            <span class="btn-icon">📱</span>
-                            QR 코드 보기
-                        </button>
+                    <div class="students-table-wrapper">
+                        <table class="students-table">
+                            <tbody id="studentsTableBody">
+                                <!-- 학생 데이터가 여기에 동적으로 로드됩니다 -->
+                            </tbody>
+                        </table>
+
+                        <div class="table-empty-state" id="tableEmptyState">
+                            <div class="empty-icon">👥</div>
+                            <div class="empty-title">아직 참여한 학생이 없습니다</div>
+                            <div class="empty-description">QR 코드를 공유하여 학생들의 참여를 기다려보세요</div>
+                            <button id="emptyStateQRBtn" class="primary-button">
+                                QR 코드 보기
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                </div>
+
+                <!-- Session Statistics Cards -->
+                <div class="session-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="studentCount">0</div>
+                            <div class="stat-label">참여 학생</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⏱️</div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="sessionDuration">0분</div>
+                            <div class="stat-label">진행 시간</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="averageScore">0%</div>
+                            <div class="stat-label">평균 점수</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">💬</div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="totalMessages">0</div>
+                            <div class="stat-label">총 메시지</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -144,23 +162,14 @@
                             <canvas id="qrCanvas" width="300" height="300"></canvas>
                         </div>
 
-                        <div class="session-summary-section">
-                            <div class="qr-info">
-                                <div class="session-details">
-                                    <div class="detail-item">
-                                        <strong>🌐 직접 링크:</strong>
-                                        <a id="sessionLink" href="#" target="_blank"></a>
-                                    </div>
-                                </div>
-                            </div>
-                            <div id="sessionSummary"></div>
+                        <div class="session-topic-section">
+                            <div id="sessionTopic" class="session-topic">학습 주제 로딩 중...</div>
                         </div>
                     </div>
 
                     <div class="modal-actions">
-                        <button id="copyLinkBtn" class="secondary-button">📋 링크 복사</button>
-                        <button id="downloadQRBtn" class="secondary-button">🖼️ QR 다운로드</button>
-                        <button id="closeFocusBtn" class="primary-button">📊 대시보드로 가기</button>
+                        <button id="copyLinkBtn" class="secondary-button">링크 복사</button>
+                        <button id="closeFocusBtn" class="primary-button">대시보드로 가기</button>
                     </div>
                 </div>
             </div>
