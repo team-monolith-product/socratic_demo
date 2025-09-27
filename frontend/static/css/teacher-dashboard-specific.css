@@ -315,63 +315,39 @@
 .alert-dialogue {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
-    padding: 24px;
-    gap: 16px;
-    width: 480px;
-    height: 212px;
+    justify-content: space-between;
+    padding: 32px;
+    gap: 24px;
+    width: 560px;
+    height: 280px;
     background: #FFFFFF;
     box-shadow: 0px 1.6px 3.6px rgba(0, 0, 0, 0.11), 0px 0.3px 0.9px rgba(0, 0, 0, 0.07);
     border-radius: 16px;
-    flex: none;
-    order: 0;
-    flex-grow: 0;
+    position: relative;
 }
 
 /* Content frame */
 .content-frame {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    padding: 0px;
-    gap: 8px;
-    width: 432px;
-    height: 100px;
-    flex: none;
-    order: 0;
-    align-self: stretch;
-    flex-grow: 0;
+    gap: 20px;
+    flex: 1;
 }
 
 /* Header */
 .alert-header {
     display: flex;
-    flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    padding: 0px;
-    gap: 10px;
-    width: 432px;
-    height: 36px;
-    flex: none;
-    order: 0;
-    flex-grow: 0;
+    position: relative;
+    margin-bottom: 8px;
 }
 
 /* Title */
 .alert-title {
     display: flex;
-    flex-direction: row;
-    justify-content: center;
     align-items: center;
-    padding: 0px;
     gap: 16px;
-    margin: 0 auto;
-    width: 244px;
-    height: 36px;
-    flex: none;
-    order: 0;
-    flex-grow: 0;
 }
 
 /* Alert icon */
@@ -385,44 +361,31 @@
 
 /* Title text */
 .alert-title-text {
-    width: 196px;
-    height: 28px;
     font-family: 'Pretendard';
-    font-style: normal;
     font-weight: 700;
-    font-size: 20px;
+    font-size: 22px;
     line-height: 28px;
-    display: flex;
-    align-items: center;
-    text-align: center;
-    letter-spacing: 0.25px;
     color: #363636;
     margin: 0;
-    flex: none;
-    order: 1;
-    flex-grow: 0;
+    white-space: nowrap;
 }
 
 /* Exit button */
 .alert-close {
-    margin: 0 auto;
     width: 36px;
     height: 36px;
-    flex: none;
-    order: 1;
-    flex-grow: 0;
     background: none;
     border: none;
     cursor: pointer;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 0px;
-    gap: 8px;
-    position: absolute;
-    left: 0px;
-    top: 0px;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.alert-close:hover {
+    background-color: #f1f5f9;
 }
 
 /* Close icon */
@@ -456,87 +419,57 @@
     display: flex;
     flex-direction: row;
     align-items: flex-start;
-    padding: 0px;
     gap: 16px;
-    width: 432px;
-    height: 56px;
-    flex: none;
-    order: 1;
-    flex-grow: 0;
+    flex: 1;
 }
 
 /* Spacer */
 .spacer {
     width: 32px;
-    height: 56px;
-    flex: none;
-    order: 0;
-    align-self: stretch;
-    flex-grow: 0;
+    flex-shrink: 0;
 }
 
 /* Description */
 .alert-description {
-    width: 384px;
-    height: 56px;
     font-family: 'Pretendard';
-    font-style: normal;
     font-weight: 400;
     font-size: 18px;
     line-height: 28px;
     color: #363636;
-    flex: none;
-    order: 1;
-    flex-grow: 1;
+    flex: 1;
 }
 
 /* Actions */
 .alert-actions {
     display: flex;
-    flex-direction: row;
     justify-content: flex-end;
-    align-items: flex-end;
-    padding: 0px;
     gap: 16px;
-    width: 432px;
-    height: 48px;
-    flex: none;
-    order: 1;
-    align-self: stretch;
-    flex-grow: 0;
+    margin-top: auto;
 }
 
 /* Button base styles */
 .alert-button {
     display: flex;
-    flex-direction: row;
     justify-content: center;
     align-items: center;
-    padding: 14px 16px;
-    gap: 8px;
-    min-width: 82px;
+    padding: 14px 24px;
+    min-width: 120px;
     height: 48px;
     border-radius: 10px;
-    flex: none;
     border: none;
     cursor: pointer;
     font-family: 'Pretendard';
-    font-style: normal;
     font-weight: 700;
-    font-size: 18px;
+    font-size: 16px;
     line-height: 20px;
-    display: flex;
-    align-items: center;
-    text-align: center;
     color: #FFFFFF;
     transition: all 0.2s ease;
+    white-space: nowrap;
 }
 
 /* Cancel button */
 .alert-button-cancel {
-    width: 82px;
     background: #B53720;
-    flex-grow: 0;
     order: 0;
 }
 
@@ -546,9 +479,7 @@
 
 /* Confirm button */
 .alert-button-confirm {
-    width: 95px;
     background: #3574D9;
-    flex-grow: 0;
     order: 1;
 }
 
@@ -809,7 +740,7 @@
         width: 100%;
         height: auto;
         flex-direction: column;
-        gap: 0;
+        gap: 16px;
     }
 
     .spacer {
@@ -828,6 +759,7 @@
         height: auto;
         flex-direction: column;
         gap: 12px;
+        justify-content: center;
     }
 
     .alert-button {
