@@ -79,107 +79,25 @@ class TeacherSetup {
     }
 
     showExistingSessionOption(sessionInfo) {
-        // Create a banner to show existing session option
-        const banner = document.createElement('div');
-        banner.className = 'existing-session-banner';
-        banner.innerHTML = `
-            <div class="banner-content">
-                <div class="banner-info">
-                    <h3>기존 세션이 있습니다</h3>
-                    <p>"${sessionInfo.title}" 세션이 진행 중입니다</p>
-                </div>
-                <div class="banner-actions">
-                    <button class="secondary-button" id="continueSession">대시보드로 이동</button>
-                    <button class="tertiary-button" id="createNewSession">새 세션 만들기</button>
-                </div>
-            </div>
-        `;
+        // Show existing session button in header
+        const existingSessionButton = document.getElementById('existingSessionButton');
+        const goToExistingSession = document.getElementById('goToExistingSession');
 
-        // Insert before main content
-        const mainContent = document.querySelector('.main-content');
-        if (mainContent) {
-            mainContent.insertBefore(banner, mainContent.firstChild);
+        if (existingSessionButton && goToExistingSession) {
+            // Update button text with session title
+            goToExistingSession.innerHTML = `
+                기존 세션으로 이동
+                <span class="btn-icon btn-icon-right">→</span>
+            `;
+
+            // Show the button
+            existingSessionButton.style.display = 'flex';
+
+            // Add event listener for navigation
+            goToExistingSession.addEventListener('click', () => {
+                this.goToDashboard(sessionInfo.sessionId);
+            });
         }
-
-        // Add event listeners
-        document.getElementById('continueSession')?.addEventListener('click', () => {
-            this.goToDashboard(sessionInfo.sessionId);
-        });
-
-        document.getElementById('createNewSession')?.addEventListener('click', () => {
-            banner.remove();
-            this.sessionManager.clearSavedSession();
-        });
-
-        // Add banner styles dynamically
-        const style = document.createElement('style');
-        style.textContent = `
-            .existing-session-banner {
-                background: linear-gradient(135deg, #3574d9, #2a5bb8);
-                color: white;
-                padding: 24px;
-                border-radius: 16px;
-                margin-bottom: 32px;
-            }
-            .banner-content {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                gap: 24px;
-            }
-            .banner-info h3 {
-                margin: 0 0 4px 0;
-                font-size: 18px;
-                font-weight: 600;
-            }
-            .banner-info p {
-                margin: 0;
-                opacity: 0.9;
-                font-size: 14px;
-            }
-            .banner-actions {
-                display: flex;
-                gap: 12px;
-                flex-shrink: 0;
-            }
-            .secondary-button, .tertiary-button {
-                padding: 10px 20px;
-                border-radius: 8px;
-                font-size: 14px;
-                font-weight: 500;
-                cursor: pointer;
-                transition: all 0.2s;
-                border: none;
-                font-family: 'Pretendard', sans-serif;
-            }
-            .secondary-button {
-                background: rgba(255, 255, 255, 0.2);
-                color: white;
-                border: 1px solid rgba(255, 255, 255, 0.3);
-            }
-            .secondary-button:hover {
-                background: rgba(255, 255, 255, 0.3);
-            }
-            .tertiary-button {
-                background: transparent;
-                color: white;
-                border: 1px solid rgba(255, 255, 255, 0.3);
-            }
-            .tertiary-button:hover {
-                background: rgba(255, 255, 255, 0.1);
-            }
-            @media (max-width: 768px) {
-                .banner-content {
-                    flex-direction: column;
-                    align-items: flex-start;
-                }
-                .banner-actions {
-                    width: 100%;
-                    justify-content: flex-start;
-                }
-            }
-        `;
-        document.head.appendChild(style);
     }
 
     async handleSessionCreate(event) {

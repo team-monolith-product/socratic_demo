@@ -39,8 +39,16 @@
             <main class="main-content">
                 <!-- Blue Header Card -->
                 <div class="session-header-card">
-                    <h1 class="session-header-title">새 세션 만들기</h1>
-                    <p class="session-header-subtitle">소크룸 설정하고 학생 참여시키기</p>
+                    <div class="header-left">
+                        <h1 class="session-header-title">새 세션 만들기</h1>
+                        <p class="session-header-subtitle">소크룸 설정하고 학생 참여시키기</p>
+                    </div>
+                    <div class="header-right" id="existingSessionButton" style="display: none;">
+                        <button class="btn btn-secondary btn-lg" id="goToExistingSession">
+                            기존 세션으로 이동
+                            <span class="btn-icon btn-icon-right">→</span>
+                        </button>
+                    </div>
                 </div>
 
                 <form id="sessionForm" class="apple-form">
