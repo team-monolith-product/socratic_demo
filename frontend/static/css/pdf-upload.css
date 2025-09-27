@@ -261,7 +261,7 @@
 
 /* 직접 입력 보조 영역 */
 .manual-input-auxiliary {
-    margin-bottom: 8px;
+    margin-bottom: 8px; /* 하단 여백 8px */
 }
 
 .manual-input-header {
