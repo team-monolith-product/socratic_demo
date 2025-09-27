@@ -52,7 +52,7 @@
                 </div>
 
                 <div class="student-form">
-                    <input type="text" id="student-name" class="input-field" placeholder="학생 이름을 입력하세요" maxlength="50">
+                    <input type="text" id="student-name" class="input-field" placeholder="이름을 입력하세요" maxlength="50">
                     <button id="join-session-btn" class="btn btn-success btn-lg btn-full">세션 참여하기</button>
                 </div>
             </div>
@@ -63,21 +63,6 @@
             <!-- This will be loaded from the existing chat interface -->
         </div>
 
-        <!-- Footer -->
-        <footer class="footer">
-            <div class="footer-container">
-                <div class="footer-logo">
-                    <img src="/static/TM-logo.png" alt="소크라테스 아카데미 로고" class="footer-logo-img">
-                </div>
-                <div class="footer-content">
-                    <div class="footer-text">
-                        <div class="footer-company">(주)팀모노리스 | 서울특별시 중구 퇴계로 15 9층</div>
-                        <div class="footer-copyright">©TEAM MONOLITH Inc.</div>
-                    </div>
-                    <a href="https://codle.io" target="_blank" class="footer-link">코들 바로가기</a>
-                </div>
-            </div>
-        </footer>
     </div>
 
     <!-- Scripts -->
@@ -155,20 +140,34 @@
 
         .student-form {
             margin-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
         }
 
         .student-form input {
             width: 100%;
-            padding: 1rem;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            font-size: 1.25rem;
-            margin-bottom: 1rem;
+            max-width: 400px;
+            padding: 1.25rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 20px;
+            font-weight: 600;
+            text-align: center;
+            background: #f8fafc;
         }
 
         .student-form input:focus {
             outline: none;
-            border-color: #007bff;
+            border-color: #3574d9;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(53, 116, 217, 0.1);
+        }
+
+        .student-form button {
+            width: 100%;
+            max-width: 400px;
         }
 
         .join-button {
