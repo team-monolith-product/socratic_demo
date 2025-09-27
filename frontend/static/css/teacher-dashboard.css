@@ -393,6 +393,8 @@
     background: #f8fafc;
     border-radius: 8px;
     border-left: 4px solid #3574d9;
+    word-break: keep-all;
+    word-wrap: break-word;
 }
 
 .detail-item strong {
@@ -403,7 +405,8 @@
 .detail-item a {
     color: #3574d9;
     text-decoration: none;
-    word-break: break-all;
+    word-break: keep-all;
+    word-wrap: break-word;
     display: block;
     margin-top: 4px;
 }

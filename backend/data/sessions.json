@@ -772,5 +772,83 @@
       "recent_activities": []
     },
     "events": []
+  },
+  "58983254006B4FDA9": {
+    "id": "58983254006B4FDA9",
+    "teacher_fingerprint": "a354d353754afa99",
+    "config": {
+      "title": "1학년1반",
+      "topic": "프로덕트 디자인에서 사용자 경험을 극대화하기 위한 데이터 기반 접근 방식의 중요성",
+      "description": null,
+      "difficulty": "easy",
+      "show_score": true,
+      "source_type": "pdf",
+      "pdf_content": "정기혁은 6년차 프로덕트 디자이너로, UI/UX 디자인, UX 리서치, 디자인 시스템 구축, 데이터 기반 디자인, 노코드 툴 활용 웹사이트 구축, 프로덕트 씽킹 및 기획 역량을 보유하고 있다. KAIST와 UNIST에서 디자인을 전공하였으며, 해외 디자인 저널에서 최우수 논문을 수상한 경험이 있다. 티맥스소프트, Kooky, 콴다 등에서 근무하며 K-POP 플랫폼과 AI 학습 툴의 디자인 및 전략 수립에 기여하였다. Kooky에서 CPO로서 글로벌 K-Pop 팬덤 플랫폼의 UI/UX 디자인을 총괄하며 사용자 데이터 분석과 프로덕트 전략 수립을 통해 성과를 달성하였다. 또한, B2B IT 인프라 회사에서 SaaS 제품 개발에 참여하여 사업 기획 및 개발 부서와 협업하였다.",
+      "manual_content": null,
+      "combined_topic": null,
+      "main_keyword": null,
+      "key_concepts": null,
+      "learning_objectives": null
+    },
+    "status": "active",
+    "created_at": "2025-09-27T23:27:34.740652+09:00",
+    "expires_at": "2025-09-28T01:27:34.740652+09:00",
+    "last_activity": "2025-09-27T23:27:34.740652+09:00",
+    "deleted_at": null,
+    "students": {},
+    "live_stats": {
+      "current_students": 0,
+      "total_joined": 0,
+      "average_score": 0.0,
+      "completion_rate": 0.0,
+      "dimension_averages": {
+        "depth": 0.0,
+        "breadth": 0.0,
+        "application": 0.0,
+        "metacognition": 0.0,
+        "engagement": 0.0
+      },
+      "recent_activities": []
+    },
+    "events": []
+  },
+  "58985801C4D4B594D": {
+    "id": "58985801C4D4B594D",
+    "teacher_fingerprint": "a354d353754afa99",
+    "config": {
+      "title": "1-1",
+      "topic": "프로덕트 디자인에서 사용자 경험과 비즈니스 전략의 융합이 어떻게 이루어지는지를 탐구하자.",
+      "description": null,
+      "difficulty": "hard",
+      "show_score": true,
+      "source_type": "pdf",
+      "pdf_content": "정기혁은 6년차 프로덕트 디자이너로 UI/UX 디자인, UX 리서치, 디자인 시스템 구축, 데이터 기반 디자인, 노코드 툴 활용 웹사이트 구축 등 다양한 역량을 보유하고 있다. KAIST와 UNIST에서 디자인을 전공하고, 해외 디자인 저널에서 최우수 논문을 수상한 경험이 있다. 티맥스소프트, Kooky, 콴다 등에서 근무하며 K-POP 플랫폼과 AI 학습 툴의 디자인 및 전략을 담당했다. Kooky에서 CPO로서 글로벌 K-Pop 팬덤 플랫폼의 UI/UX 디자인을 총괄하며, 사용자 데이터 분석을 통해 비즈니스 성과를 개선하였다. 또한, SaaS 제품 개발 및 서비스 운영 경험을 통해 비즈니스적 관점을 갖춘 디자인을 실현하고 있다.",
+      "manual_content": null,
+      "combined_topic": null,
+      "main_keyword": null,
+      "key_concepts": null,
+      "learning_objectives": null
+    },
+    "status": "active",
+    "created_at": "2025-09-28T00:10:01.975472+09:00",
+    "expires_at": "2025-09-28T02:10:01.975472+09:00",
+    "last_activity": "2025-09-28T00:10:01.975472+09:00",
+    "deleted_at": null,
+    "students": {},
+    "live_stats": {
+      "current_students": 0,
+      "total_joined": 0,
+      "average_score": 0.0,
+      "completion_rate": 0.0,
+      "dimension_averages": {
+        "depth": 0.0,
+        "breadth": 0.0,
+        "application": 0.0,
+        "metacognition": 0.0,
+        "engagement": 0.0
+      },
+      "recent_activities": []
+    },
+    "events": []
   }
 }

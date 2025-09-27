@@ -31,7 +31,6 @@
         <!-- Loading Screen -->
         <div id="loading-screen" class="loading-screen">
             <div class="loading-content">
-                <div class="brand-icon">🏛️</div>
                 <h1>소크라테스 아카데미</h1>
                 <p>세션에 참여하는 중...</p>
                 <div class="loading-spinner"></div>
@@ -51,19 +50,8 @@
         <!-- Session Info Screen -->
         <div id="session-info-screen" class="session-info-screen hidden">
             <div class="session-info-content">
-                <div class="brand-icon">🏛️</div>
-                <h1 id="session-topic">세션 주제</h1>
-                <p id="session-description">세션 설명</p>
-
-                <div class="session-details">
-                    <div class="detail-item">
-                        <span class="detail-label">난이도:</span>
-                        <span id="session-difficulty">보통</span>
-                    </div>
-                    <div class="detail-item">
-                        <span class="detail-label">시간 제한:</span>
-                        <span id="session-time-limit">60분</span>
-                    </div>
+                <div class="session-topic-section">
+                    <div id="session-topic" class="session-topic">세션 주제</div>
                 </div>
 
                 <div class="student-form">
@@ -149,22 +137,23 @@
             background: #0056b3;
         }
 
-        .session-details {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 1.5rem;
+        .session-topic-section {
+            text-align: center;
             margin: 2rem 0;
         }
 
-        .detail-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.5rem;
-        }
-
-        .detail-label {
+        .session-topic {
+            font-size: 20px;
             font-weight: 600;
-            color: #6c757d;
+            color: #1a202c;
+            background: #f8fafc;
+            padding: 16px 24px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            margin: 0;
+            word-break: keep-all;
+            word-wrap: break-word;
+            line-height: 1.4;
         }
 
         .student-form {
