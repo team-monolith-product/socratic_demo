@@ -315,39 +315,61 @@
 .alert-dialogue {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    padding: 32px;
-    gap: 24px;
-    width: 560px;
-    height: 280px;
+    align-items: flex-end;
+    padding: 24px;
+    gap: 16px;
+    width: 520px;
+    height: auto;
     background: #FFFFFF;
     box-shadow: 0px 1.6px 3.6px rgba(0, 0, 0, 0.11), 0px 0.3px 0.9px rgba(0, 0, 0, 0.07);
     border-radius: 16px;
-    position: relative;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
 }
 
 /* Content frame */
 .content-frame {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    flex: 1;
+    align-items: flex-start;
+    padding: 0px;
+    gap: 8px;
+    width: 472px;
+    height: auto;
+    flex: none;
+    order: 0;
+    align-self: stretch;
+    flex-grow: 0;
 }
 
 /* Header */
 .alert-header {
     display: flex;
+    flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    position: relative;
-    margin-bottom: 8px;
+    padding: 0px;
+    gap: 10px;
+    width: 472px;
+    height: 36px;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
 }
 
 /* Title */
 .alert-title {
     display: flex;
+    flex-direction: row;
     align-items: center;
+    padding: 0px;
     gap: 16px;
+    width: 377px;
+    height: 36px;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
 }
 
 /* Alert icon */
@@ -361,26 +383,43 @@
 
 /* Title text */
 .alert-title-text {
+    width: auto;
+    height: 28px;
     font-family: 'Pretendard';
+    font-style: normal;
     font-weight: 700;
-    font-size: 22px;
+    font-size: 20px;
     line-height: 28px;
+    display: flex;
+    align-items: center;
+    letter-spacing: 0.25px;
     color: #363636;
+    flex: none;
+    order: 1;
+    flex-grow: 0;
     margin: 0;
-    white-space: nowrap;
 }
 
 /* Exit button */
 .alert-close {
+    margin: 0 auto;
     width: 36px;
     height: 36px;
+    flex: none;
+    order: 1;
+    flex-grow: 0;
     background: none;
     border: none;
     cursor: pointer;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    border-radius: 8px;
+    padding: 0px;
+    gap: 8px;
+    position: absolute;
+    left: 0px;
+    top: 0px;
     transition: background-color 0.2s ease;
 }
 
@@ -419,67 +458,181 @@
     display: flex;
     flex-direction: row;
     align-items: flex-start;
+    padding: 0px;
     gap: 16px;
-    flex: 1;
+    width: 472px;
+    height: auto;
+    flex: none;
+    order: 1;
+    flex-grow: 0;
 }
 
 /* Spacer */
 .spacer {
     width: 32px;
-    flex-shrink: 0;
+    height: auto;
+    flex: none;
+    order: 0;
+    align-self: stretch;
+    flex-grow: 0;
+}
+
+/* Alert text frame */
+.alert-text-frame {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0px;
+    gap: 16px;
+    width: 424px;
+    height: auto;
+    flex: none;
+    order: 1;
+    flex-grow: 0;
 }
 
 /* Description */
 .alert-description {
+    width: 424px;
+    height: auto;
     font-family: 'Pretendard';
+    font-style: normal;
     font-weight: 400;
     font-size: 18px;
     line-height: 28px;
     color: #363636;
-    flex: 1;
+    flex: none;
+    order: 0;
+    align-self: stretch;
+    flex-grow: 0;
+}
+
+/* Banner */
+.alert-banner {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0px 12px;
+    width: 424px;
+    height: auto;
+    background: #ECF3FF;
+    border-radius: 12px;
+    flex: none;
+    order: 1;
+    align-self: stretch;
+    flex-grow: 0;
+}
+
+/* Banner text frame */
+.banner-text-frame {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 12px 8px;
+    gap: 4px;
+    width: 400px;
+    height: auto;
+    flex: none;
+    order: 1;
+    flex-grow: 1;
+}
+
+/* Banner headline (Tip 제목) */
+.banner-headline {
+    width: auto;
+    height: 20px;
+    font-family: 'Pretendard';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 20px;
+    display: flex;
+    align-items: center;
+    color: #2C61B5;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+}
+
+/* Banner text (본문) */
+.banner-text {
+    width: 344px;
+    height: auto;
+    font-family: 'Pretendard';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 24px;
+    display: flex;
+    align-items: flex-start;
+    color: #2C61B5;
+    flex: none;
+    order: 1;
+    align-self: stretch;
+    flex-grow: 0;
 }
 
 /* Actions */
 .alert-actions {
     display: flex;
+    flex-direction: row;
     justify-content: flex-end;
+    align-items: flex-end;
+    padding: 0px;
     gap: 16px;
-    margin-top: auto;
+    width: 472px;
+    height: 48px;
+    flex: none;
+    order: 1;
+    align-self: stretch;
+    flex-grow: 0;
 }
 
 /* Button base styles */
 .alert-button {
     display: flex;
+    flex-direction: row;
     justify-content: center;
     align-items: center;
-    padding: 14px 24px;
-    min-width: 120px;
+    padding: 14px 16px;
+    gap: 8px;
+    min-width: 82px;
     height: 48px;
     border-radius: 10px;
+    flex: none;
     border: none;
     cursor: pointer;
     font-family: 'Pretendard';
-    font-weight: 700;
-    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 18px;
     line-height: 20px;
-    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    text-align: center;
     transition: all 0.2s ease;
     white-space: nowrap;
 }
 
 /* Cancel button */
 .alert-button-cancel {
-    background: #B53720;
+    width: 146px;
+    background: #F6F6F6;
+    color: #363636;
+    flex-grow: 0;
     order: 0;
 }
 
 .alert-button-cancel:hover {
-    background: #9a2f1a;
+    background: #e5e5e5;
 }
 
 /* Confirm button */
 .alert-button-confirm {
+    width: 161px;
     background: #3574D9;
+    color: #FFFFFF;
+    flex-grow: 0;
     order: 1;
 }
 
@@ -704,7 +857,7 @@
         width: calc(100vw - 40px);
         max-width: 480px;
         height: auto;
-        min-height: 212px;
+        min-height: auto;
         padding: 20px;
     }
 
