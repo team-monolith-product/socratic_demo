@@ -16,15 +16,33 @@ class SimplifiedSessionManager {
 
     // LocalStorage Management
     saveSession(sessionData) {
+        const config = sessionData.session.config;
+
         const sessionInfo = {
             sessionId: sessionData.session.id,
-            title: sessionData.session.config.title,
-            topic: sessionData.session.config.topic,
-            difficulty: sessionData.session.config.difficulty,
-            showScore: sessionData.session.config.show_score,
+            title: config.title,
+            topic: config.topic,
+            difficulty: config.difficulty,
+            showScore: config.show_score,
             createdAt: sessionData.session.created_at,
-            lastAccessedAt: new Date().toISOString()
+            lastAccessedAt: new Date().toISOString(),
+            // PDF 관련 정보 저장
+            sourceType: config.source_type || 'manual',
+            mainKeyword: config.main_keyword || null,
+            keyConcepts: config.key_concepts || null,
+            learningObjectives: config.learning_objectives || null,
+            pdfContent: config.pdf_content || null,
+            manualContent: config.manual_content || null,
+            combinedTopic: config.combined_topic || null
         };
+
+        console.log('💾 세션 정보 저장 (PDF 키워드 포함):', {
+            sessionId: sessionInfo.sessionId,
+            sourceType: sessionInfo.sourceType,
+            mainKeyword: sessionInfo.mainKeyword,
+            keyConcepts: sessionInfo.keyConcepts
+        });
+
         localStorage.setItem(this.localStorageKey, JSON.stringify(sessionInfo));
         this.currentSession = sessionData;
         return sessionInfo;

@@ -5,9 +5,10 @@
 
 class PDFTopicManager {
     constructor() {
-        this.apiBase = window.API_BASE_URL || '/api/v1';
+        this.apiBase = window.__API_BASE__ || '/api/v1';
         this.state = {
-            pdfContent: null,
+            compressedContent: null,  // 압축된 PDF 본문
+            oneSentenceTopic: null,  // 한 문장 학습 주제 (UI 노출용)
             manualContent: null,
             finalTopic: null,
             sourceType: 'none', // 'pdf', 'manual', 'hybrid', 'none'
@@ -40,6 +41,12 @@ class PDFTopicManager {
         // 버튼 요소
         this.reprocessBtn = document.getElementById('reprocessBtn');
         this.replaceFileBtn = document.getElementById('replaceFileBtn');
+        this.viewCompressedContentBtn = document.getElementById('viewCompressedContentBtn');
+
+        // 모달 요소
+        this.pdfContentModal = document.getElementById('pdfContentModal');
+        this.closePdfContentModal = document.getElementById('closePdfContentModal');
+        this.compressedContentText = document.getElementById('compressedContentText');
 
         // 기존 세션 주제 필드 (폴백용)
         this.sessionTopicField = document.getElementById('sessionTopic');
@@ -71,22 +78,44 @@ class PDFTopicManager {
         if (this.replaceFileBtn) {
             this.replaceFileBtn.addEventListener('click', this.handleReplaceFile.bind(this));
         }
+
+        // 압축 전문 보기 버튼 이벤트
+        if (this.viewCompressedContentBtn) {
+            this.viewCompressedContentBtn.addEventListener('click', this.showCompressedContentModal.bind(this));
+        }
+
+        // 모달 닫기 이벤트
+        if (this.closePdfContentModal) {
+            this.closePdfContentModal.addEventListener('click', this.hideCompressedContentModal.bind(this));
+        }
+
+        // 모달 배경 클릭시 닫기
+        if (this.pdfContentModal) {
+            this.pdfContentModal.addEventListener('click', (e) => {
+                if (e.target === this.pdfContentModal) {
+                    this.hideCompressedContentModal();
+                }
+            });
+        }
     }
 
     // 드래그 앤 드롭 처리
     handleDragOver(e) {
         e.preventDefault();
-        this.pdfUploadZone.classList.add('dragover');
+        const target = e.currentTarget;
+        target.classList.add('dragover');
     }
 
     handleDragLeave(e) {
         e.preventDefault();
-        this.pdfUploadZone.classList.remove('dragover');
+        const target = e.currentTarget;
+        target.classList.remove('dragover');
     }
 
     handleDrop(e) {
         e.preventDefault();
-        this.pdfUploadZone.classList.remove('dragover');
+        const target = e.currentTarget;
+        target.classList.remove('dragover');
 
         const files = e.dataTransfer.files;
         if (files.length > 0) {
@@ -129,18 +158,36 @@ class PDFTopicManager {
             // 처리 단계 표시
             this.updateProcessingStep('파일 분석중...');
 
-            // API 호출
+            // API 호출 (배포 환경에서 타임아웃 처리)
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 30000); // 30초 타임아웃
+
             const response = await fetch(`${this.apiBase}/teacher/analyze-pdf`, {
                 method: 'POST',
-                body: formData
+                body: formData,
+                signal: controller.signal
             });
 
+            clearTimeout(timeoutId);
+
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.detail || '분석 요청 실패');
+                let errorMessage = '분석 요청 실패';
+                try {
+                    const errorData = await response.json();
+                    errorMessage = errorData.detail || errorMessage;
+                } catch (jsonError) {
+                    // JSON 파싱 실패 시 (404 HTML 페이지 등)
+                    errorMessage = `서버 오류 (${response.status}): API 엔드포인트를 찾을 수 없습니다`;
+                }
+                throw new Error(errorMessage);
             }
 
-            const analysisResult = await response.json();
+            let analysisResult;
+            try {
+                analysisResult = await response.json();
+            } catch (jsonError) {
+                throw new Error('서버 응답을 처리할 수 없습니다. JSON 형식이 올바르지 않습니다.');
+            }
 
             if (!analysisResult.success) {
                 throw new Error(analysisResult.error_message || '분석 실패');
@@ -156,7 +203,16 @@ class PDFTopicManager {
 
         } catch (error) {
             console.error('PDF 분석 오류:', error);
-            this.showError(`PDF 분석 실패: ${error.message}`);
+
+            // 배포 환경에서 발생할 수 있는 오류들에 대한 구체적인 메시지
+            let errorMessage = error.message;
+            if (error.name === 'AbortError') {
+                errorMessage = '요청 시간이 초과되었습니다. 파일 크기를 줄이거나 잠시 후 다시 시도해주세요.';
+            } else if (error.message.includes('fetch')) {
+                errorMessage = '네트워크 연결에 문제가 있습니다. 인터넷 연결을 확인해주세요.';
+            }
+
+            this.showError(`PDF 분석 실패: ${errorMessage}`);
             this.hideProcessingStatus();
         } finally {
             this.state.isProcessing = false;
@@ -176,28 +232,37 @@ class PDFTopicManager {
         this.destroyLottieAnimation();
     }
 
+
     updateProcessingStep(step) {
         this.currentStep.textContent = step;
     }
 
     // 분석 결과 표시
     showAnalysisResult(result) {
-        this.state.pdfContent = result.summary;
+        // PDF 분석 결과 저장 (핵심 필드만)
+        this.state.compressedContent = result.compressed_content;  // 압축된 본문
+        this.state.oneSentenceTopic = result.one_sentence_topic;  // 한 문장 주제
+
+        console.log('📄 PDF 분석 결과 저장됨:', {
+            oneSentenceTopic: this.state.oneSentenceTopic,
+            compressedContentLength: this.state.compressedContent?.length || 0
+        });
 
         this.hideProcessingStatus();
 
-        // PDF 분석 결과를 바로 세션 주제 필드에 설정
-        this.updateSessionTopic(result.summary);
+        // 한 문장 주제를 세션 주제 필드에 설정 (UI 노출용)
+        this.updateSessionTopic(result.one_sentence_topic || "학습 주제");
 
-        // 주요 개념 태그 표시
+        // 한 문장 학습 주제 표시
         this.pdfConceptTags.innerHTML = '';
-        if (result.key_concepts && result.key_concepts.length > 0) {
-            result.key_concepts.forEach(concept => {
-                const tag = document.createElement('span');
-                tag.className = 'concept-tag';
-                tag.textContent = concept;
-                this.pdfConceptTags.appendChild(tag);
-            });
+        if (result.one_sentence_topic) {
+            const topicElement = document.createElement('div');
+            topicElement.className = 'one-sentence-topic';
+            topicElement.innerHTML = `
+                <div class="topic-label">학습 주제</div>
+                <div class="topic-content">${result.one_sentence_topic}</div>
+            `;
+            this.pdfConceptTags.appendChild(topicElement);
         }
 
         // 분석 완료 후 결과 카드 표시 (업로드 영역은 숨김 유지)
@@ -214,21 +279,23 @@ class PDFTopicManager {
 
     // 주제 업데이트 (통합 또는 단독 사용)
     async handleTopicUpdate() {
-        const pdfContent = this.state.pdfContent;
+        const compressedContent = this.state.compressedContent;
         const manualContent = this.state.manualContent;
 
-        if (!pdfContent && !manualContent) {
+        if (!compressedContent && !manualContent) {
             // 둘 다 없으면 세션 주제 필드 비움
             this.updateSessionTopic('');
             return;
         }
 
-        if (pdfContent && manualContent) {
+        if (compressedContent && manualContent) {
             // 둘 다 있으면 통합
-            await this.combineTopics(pdfContent, manualContent);
-        } else if (pdfContent) {
-            // PDF만 있음
-            this.updateSessionTopic(pdfContent);
+            await this.combineTopics(compressedContent, manualContent);
+        } else if (compressedContent) {
+            // PDF만 있음 - 한 문장 주제 사용
+            if (this.state.oneSentenceTopic) {
+                this.updateSessionTopic(this.state.oneSentenceTopic);
+            }
         } else {
             // 직접 입력만 있음
             this.updateSessionTopic(manualContent);
@@ -236,7 +303,7 @@ class PDFTopicManager {
     }
 
     // 주제 통합
-    async combineTopics(pdfContent, manualContent) {
+    async combineTopics(compressedContent, manualContent) {
         try {
             const response = await fetch(`${this.apiBase}/teacher/combine-topic`, {
                 method: 'POST',
@@ -244,7 +311,7 @@ class PDFTopicManager {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    pdf_content: pdfContent,
+                    pdf_content: compressedContent,
                     manual_content: manualContent,
                     difficulty: this.getDifficulty()
                 })
@@ -265,7 +332,7 @@ class PDFTopicManager {
         } catch (error) {
             console.error('주제 통합 오류:', error);
             // 통합 실패시 간단 결합
-            const combined = `${pdfContent}\n\n추가 관점: ${manualContent}`;
+            const combined = `${compressedContent}\n\n추가 관점: ${manualContent}`;
             this.updateSessionTopic(combined);
         }
     }
@@ -294,25 +361,20 @@ class PDFTopicManager {
         this.pdfFileInput.click();
     }
 
-    // 파일 교체 처리 (새로운 플로우)
+    // 파일 교체 처리 (오류 상태와 분석 완료 상태 공통)
     handleReplaceFile() {
-        // 상태 초기화
-        this.state.pdfContent = null;
+        // PDF 관련 상태 초기화
+        this.state.compressedContent = null;
+        this.state.oneSentenceTopic = null;
 
-        // UI 초기화
+        // 모든 UI 상태 초기화
+        this.clearErrorState();
         this.hideResultCard();
-        this.pdfUploadZone.style.display = 'block';
+        this.hideProcessingStatus();
+        this.pdfUploadZone.style.display = 'flex';
 
         // 파일 입력 초기화
         if (this.pdfFileInput) this.pdfFileInput.value = '';
-
-        // 세션 주제 필드 초기화 (수동 입력이 없는 경우만)
-        if (!this.state.manualContent) {
-            this.updateSessionTopic('');
-        } else {
-            // 수동 입력만 남김
-            this.updateSessionTopic(this.state.manualContent);
-        }
 
         // 태그 영역 클리어
         if (this.pdfConceptTags) this.pdfConceptTags.innerHTML = '';
@@ -324,38 +386,48 @@ class PDFTopicManager {
         return difficultyInput ? difficultyInput.value : 'normal';
     }
 
-    // 에러 표시
+    // 에러 표시 (표준화된 오류 상태 사용)
     showError(message) {
-        // 기존 에러 메시지 제거
-        const existingError = document.querySelector('.pdf-error-message');
-        if (existingError) {
-            existingError.remove();
+        // 기존 상태 숨기기
+        this.hideAllSections();
+        this.pdfUploadZone.style.display = 'none';
+
+        // 오류 상태 컨테이너 생성 또는 업데이트
+        let errorContainer = document.querySelector('.pdf-error-state');
+        if (!errorContainer) {
+            errorContainer = document.createElement('div');
+            errorContainer.className = 'pdf-error-state';
+            this.pdfUploadZone.parentNode.appendChild(errorContainer);
         }
 
-        // 에러 메시지 생성
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'pdf-error-message';
-        errorDiv.style.cssText = `
-            background: #fff5f5;
-            border: 1px solid #fed7d7;
-            border-radius: 8px;
-            padding: 12px 16px;
-            margin-top: 12px;
-            color: #c53030;
-            font-size: 14px;
+        errorContainer.innerHTML = `
+            <div class="error-content">
+                <div class="error-icon">⚠️</div>
+                <div class="error-text">
+                    <h4>${message}</h4>
+                    <p>여기에 PDF 파일을 다시 업로드해주세요</p>
+                </div>
+            </div>
         `;
-        errorDiv.textContent = message;
 
-        // PDF 업로드 영역 다음에 추가
-        this.pdfUploadZone.parentNode.insertBefore(errorDiv, this.pdfUploadZone.nextSibling);
+        errorContainer.style.display = 'flex';
+        errorContainer.style.cursor = 'pointer';
 
-        // 5초 후 자동 제거
-        setTimeout(() => {
-            if (errorDiv.parentNode) {
-                errorDiv.remove();
-            }
-        }, 5000);
+        // 업로드 전 상태와 동일한 상호작용 추가
+        errorContainer.addEventListener('click', () => this.pdfFileInput.click());
+        errorContainer.addEventListener('dragover', this.handleDragOver.bind(this));
+        errorContainer.addEventListener('dragleave', this.handleDragLeave.bind(this));
+        errorContainer.addEventListener('drop', this.handleDrop.bind(this));
     }
+
+    // 오류 상태 숨기기
+    clearErrorState() {
+        const errorContainer = document.querySelector('.pdf-error-state');
+        if (errorContainer) {
+            errorContainer.style.display = 'none';
+        }
+    }
+
 
     // Lottie 애니메이션 초기화
     initializeLottieAnimation() {
@@ -413,6 +485,23 @@ class PDFTopicManager {
         }
     }
 
+    // 압축 전문 모달 표시
+    showCompressedContentModal() {
+        if (this.state.compressedContent && this.pdfContentModal && this.compressedContentText) {
+            this.compressedContentText.textContent = this.state.compressedContent;
+            this.pdfContentModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    // 압축 전문 모달 숨기기
+    hideCompressedContentModal() {
+        if (this.pdfContentModal) {
+            this.pdfContentModal.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+    }
+
     // 디바운스 유틸리티
     debounce(func, wait) {
         let timeout;
@@ -429,16 +518,18 @@ class PDFTopicManager {
     // 상태 초기화
     reset() {
         this.state = {
-            pdfContent: null,
+            compressedContent: null,  // 압축된 PDF 본문
+            oneSentenceTopic: null,  // 한 문장 학습 주제 (UI 노출용)
             manualContent: null,
             finalTopic: null,
             sourceType: 'none',
             isProcessing: false
         };
 
-        // UI 완전 초기화
+        // UI 완전 초기화 (에러 상태도 정리)
+        this.clearErrorState();
         this.hideAllSections();
-        this.pdfUploadZone.style.display = 'block'; // 업로드 영역 다시 표시
+        this.pdfUploadZone.style.display = 'flex'; // 업로드 영역 다시 표시
         this.updateSessionTopic('');
 
         if (this.pdfFileInput) this.pdfFileInput.value = '';

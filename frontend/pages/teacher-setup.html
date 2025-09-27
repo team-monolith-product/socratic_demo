@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="/static/css/button-system.css?v=1">
     <link rel="stylesheet" href="/static/css/input-components.css?v=1">
     <link rel="stylesheet" href="/static/css/teacher-setup.css?v=1">
-    <link rel="stylesheet" href="/static/css/pdf-upload.css?v=2">
+    <link rel="stylesheet" href="/static/css/pdf-upload.css?v=6">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
 </head>
 <body class="apple-body">
@@ -83,7 +83,7 @@
                                             <div class="upload-icon">📄</div>
                                             <div class="upload-text">
                                                 <h4>PDF 파일을 업로드하고 AI로 학습 주제 생성하기</h4>
-                                                <p>최대 10MB, 50페이지까지 지원</p>
+                                                <p>최대 10MB, 30페이지까지 지원</p>
                                             </div>
                                         </div>
                                         <input type="file" id="pdfFile" accept=".pdf" hidden>
@@ -108,10 +108,16 @@
                                                 <div class="success-icon">✅</div>
                                                 <h4>PDF 분석 완료</h4>
                                             </div>
-                                            <button type="button" class="btn btn-outline btn-sm" id="replaceFileBtn">
-                                                <span class="btn-icon">📁</span>
-                                                파일 교체
-                                            </button>
+                                            <div class="result-actions">
+                                                <button type="button" class="btn btn-outline btn-sm" id="viewCompressedContentBtn">
+                                                    <span class="btn-icon">🔍</span>
+                                                    상세 보기
+                                                </button>
+                                                <button type="button" class="btn btn-outline btn-sm" id="replaceFileBtn">
+                                                    <span class="btn-icon">📁</span>
+                                                    파일 교체
+                                                </button>
+                                            </div>
                                         </div>
 
                                         <div class="content-metadata">
@@ -247,6 +253,24 @@
             </div>
         </div>
 
+        <!-- PDF 분석 상세 보기 모달 -->
+        <div class="modal" id="pdfContentModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>📄 PDF 분석 상세 보기</h3>
+                    <button class="modal-close" id="closePdfContentModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="compressed-content-container">
+                        <h4>압축된 PDF 전문</h4>
+                        <div class="compressed-content-text" id="compressedContentText">
+                            <!-- 압축된 내용이 여기에 표시됩니다 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Footer -->
         <footer class="footer">
             <div class="footer-container">
@@ -268,7 +292,7 @@
     <script src="/static/config.js"></script>
     <script src="/static/js/shared/qr-generator.js?v=2"></script>
     <script src="/static/js/shared/simplified-session-manager.js?v=1"></script>
-    <script src="/static/js/pdf-upload.js?v=2"></script>
+    <script src="/static/js/pdf-upload.js?v=11"></script>
     <script src="/static/js/teacher-setup.js?v=1"></script>
 </body>
 </html>

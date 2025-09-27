@@ -141,12 +141,13 @@ class TeacherSetup {
             topic: formData.get('topic') || '', // PDF 시스템에서 설정됨
             difficulty: formData.get('difficulty'),
             show_score: formData.get('showScore') === 'true',
-            // PDF 관련 정보 추가
+            // PDF 관련 정보 초기화
             source_type: 'manual',
             pdf_content: null,
             manual_content: null,
             combined_topic: null,
             key_concepts: null,
+            main_keyword: null,
             learning_objectives: null
         };
 
@@ -154,25 +155,44 @@ class TeacherSetup {
         if (window.pdfTopicManager) {
             const pdfState = window.pdfTopicManager.state;
 
-            if (pdfState.pdfContent || pdfState.manualContent) {
+            console.log('📄 PDF 상태 확인:', {
+                compressedContent: !!pdfState.compressedContent,
+                oneSentenceTopic: pdfState.oneSentenceTopic,
+                manualContent: !!pdfState.manualContent
+            });
+
+            // PDF 압축 내용이나 수동 내용이 있는 경우
+            if (pdfState.compressedContent || pdfState.manualContent) {
                 // PDF 콘텐츠가 있는 경우
-                if (pdfState.pdfContent && pdfState.manualContent) {
+                if (pdfState.compressedContent && pdfState.manualContent) {
                     sessionConfig.source_type = 'hybrid';
-                    sessionConfig.pdf_content = pdfState.pdfContent;
+                    sessionConfig.pdf_content = pdfState.compressedContent;
                     sessionConfig.manual_content = pdfState.manualContent;
-                } else if (pdfState.pdfContent) {
+                } else if (pdfState.compressedContent) {
                     sessionConfig.source_type = 'pdf';
-                    sessionConfig.pdf_content = pdfState.pdfContent;
+                    sessionConfig.pdf_content = pdfState.compressedContent;
                 } else {
                     sessionConfig.source_type = 'manual';
                     sessionConfig.manual_content = pdfState.manualContent;
                 }
 
-                // 최종 주제가 있으면 사용
-                if (pdfState.finalTopic) {
-                    sessionConfig.topic = pdfState.finalTopic;
-                    sessionConfig.combined_topic = pdfState.finalTopic;
+                // PDF 압축 내용 및 한 문장 주제 추가
+                if (pdfState.compressedContent) {
+                    sessionConfig.compressed_content = pdfState.compressedContent;
                 }
+                if (pdfState.oneSentenceTopic) {
+                    sessionConfig.one_sentence_topic = pdfState.oneSentenceTopic;
+                    // UI 표시용으로는 한 문장 주제 사용
+                    sessionConfig.topic = pdfState.oneSentenceTopic;
+                }
+
+
+                console.log('✅ PDF 정보가 세션 설정에 포함됨:', {
+                    topic: sessionConfig.topic,
+                    one_sentence_topic: sessionConfig.one_sentence_topic,
+                    compressed_content_length: sessionConfig.compressed_content?.length || 0,
+                    source_type: sessionConfig.source_type
+                });
             }
         }
 

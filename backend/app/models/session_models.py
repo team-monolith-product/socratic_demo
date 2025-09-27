@@ -13,6 +13,7 @@ class SessionConfig(BaseModel):
     pdf_content: Optional[str] = None  # PDF 분석 3문단 요약
     manual_content: Optional[str] = None  # 사용자 직접 입력
     combined_topic: Optional[str] = None  # 최종 통합된 학습 주제
+    main_keyword: Optional[str] = None  # PDF 분석 시 추출된 대표 키워드
     key_concepts: Optional[List[str]] = None
     learning_objectives: Optional[List[str]] = None
 

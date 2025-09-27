@@ -19,10 +19,10 @@ class Settings:
         self.use_database: bool = os.getenv("USE_DATABASE", "false").lower() == "true"
         self.frontend_url: str = os.getenv("FRONTEND_URL", "https://socratic-nine.vercel.app")
 
-        # PDF 처리 설정
-        self.max_pdf_size_mb: int = int(os.getenv("MAX_PDF_SIZE_MB", "10"))
-        self.max_pdf_pages: int = int(os.getenv("MAX_PDF_PAGES", "50"))
-        self.max_text_length: int = int(os.getenv("MAX_TEXT_LENGTH", "50000"))
+        # PDF 처리 설정 (파일 크기는 10MB로 완화)
+        self.max_pdf_size_mb: int = int(os.getenv("MAX_PDF_SIZE_MB", "10"))  # 10MB로 복원
+        self.max_pdf_pages: int = int(os.getenv("MAX_PDF_PAGES", "30"))  # 30 페이지 유지
+        self.max_text_length: int = int(os.getenv("MAX_TEXT_LENGTH", "5000"))  # 5000자 유지
         self.allowed_pdf_types: List[str] = [".pdf"]
 
     @property

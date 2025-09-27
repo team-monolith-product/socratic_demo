@@ -543,7 +543,7 @@ class TeacherDashboard {
         try {
             this.showLoading(true, 'QR 코드를 생성하고 있습니다...');
 
-            // Get session info
+            // Get session info from localStorage
             const savedSession = this.sessionManager.getSavedSession();
             if (!savedSession) {
                 throw new Error('세션 정보를 찾을 수 없습니다');
@@ -552,7 +552,7 @@ class TeacherDashboard {
             // Generate QR code
             const qrImageData = await this.sessionManager.generateSessionQR(this.currentSessionId);
 
-            // Create session data for modal
+            // Create session data for modal using localStorage data
             const base_url = window.location.origin;
             const session_url = `${base_url}/s/${this.currentSessionId}`;
 
@@ -563,7 +563,12 @@ class TeacherDashboard {
                         title: savedSession.title,
                         topic: savedSession.topic,
                         difficulty: savedSession.difficulty,
-                        show_score: savedSession.showScore
+                        show_score: savedSession.showScore,
+                        // PDF 키워드 정보 추가 (localStorage에서 가져옴)
+                        source_type: savedSession.sourceType || 'manual',
+                        main_keyword: savedSession.mainKeyword || null,
+                        key_concepts: savedSession.keyConcepts || null,
+                        learning_objectives: savedSession.learningObjectives || null
                     },
                     created_at: savedSession.createdAt
                 },
@@ -572,6 +577,12 @@ class TeacherDashboard {
                     image_data: qrImageData
                 }
             };
+
+            console.log('🔍 QR 모달용 세션 데이터 (키워드 포함):', {
+                sourceType: sessionData.session.config.source_type,
+                mainKeyword: sessionData.session.config.main_keyword,
+                keyConcepts: sessionData.session.config.key_concepts
+            });
 
             this.showQRModal(sessionData);
 
@@ -588,7 +599,7 @@ class TeacherDashboard {
             // Keep loading screen active and update message
             this.showLoading(true, 'QR 코드를 생성하고 있습니다...');
 
-            // Get session info
+            // Get session info from localStorage
             const savedSession = this.sessionManager.getSavedSession();
             if (!savedSession) {
                 throw new Error('세션 정보를 찾을 수 없습니다');
@@ -597,7 +608,7 @@ class TeacherDashboard {
             // Generate QR code
             const qrImageData = await this.sessionManager.generateSessionQR(this.currentSessionId);
 
-            // Create session data for modal
+            // Create session data for modal using localStorage data
             const base_url = window.location.origin;
             const session_url = `${base_url}/s/${this.currentSessionId}`;
 
@@ -608,7 +619,12 @@ class TeacherDashboard {
                         title: savedSession.title,
                         topic: savedSession.topic,
                         difficulty: savedSession.difficulty,
-                        show_score: savedSession.showScore
+                        show_score: savedSession.showScore,
+                        // PDF 키워드 정보 추가 (localStorage에서 가져옴)
+                        source_type: savedSession.sourceType || 'manual',
+                        main_keyword: savedSession.mainKeyword || null,
+                        key_concepts: savedSession.keyConcepts || null,
+                        learning_objectives: savedSession.learningObjectives || null
                     },
                     created_at: savedSession.createdAt
                 },
@@ -646,20 +662,18 @@ class TeacherDashboard {
         const config = sessionData.session.config;
         const sessionSummary = document.getElementById('sessionSummary');
 
-        // 주요 키워드 추출 (main_keyword가 있으면 사용, 없으면 첫 번째 key_concept 사용)
-        let displayKeyword = '학습주제';
-        if (config.main_keyword) {
-            displayKeyword = config.main_keyword;
-        } else if (config.key_concepts && config.key_concepts.length > 0) {
-            displayKeyword = config.key_concepts[0];
-        }
+        // 간소화된 학습주제 표시 로직 - 모든 상황에서 "학습주제:" 사용
+        const keywordSection = `
+            <strong>🔍 학습주제:</strong><br>
+            ${config.topic}
+        `;
 
         sessionSummary.innerHTML = `
             <div class="detail-item">
                 <strong>📋 제목:</strong> ${config.title}
             </div>
             <div class="detail-item">
-                <strong>🔍 키워드:</strong> <span class="main-keyword-highlight">${displayKeyword}</span>
+                ${keywordSection}
             </div>
             <div class="detail-item">
                 <strong>🎓 난이도:</strong> ${this.sessionManager.getDifficultyText(config.difficulty)}
