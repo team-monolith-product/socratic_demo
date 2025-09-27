@@ -19,3 +19,5 @@ frontend/static/config.js
 # OS files
 .DS_Store
 Thumbs.db
+backend/data/sessions.json
+backend/data/students.json
