@@ -212,10 +212,6 @@
     background: #ECF3FF;
 }
 
-.students-table tbody tr:first-child td {
-    background: #ECF3FF;
-}
-
 .students-table tbody tr:last-child td {
     border-bottom: none;
 }
