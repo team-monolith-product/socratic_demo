@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>소크라테스 아카데미 - 학생용 페이지 (/student)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/main.css?v=4">
+    <link rel="stylesheet" href="/static/css/shared.css?v=1">
+    <link rel="stylesheet" href="/static/css/button-system.css?v=1">
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- Global Navigation Bar -->
+        <nav class="gnb">
+            <div class="gnb-container">
+                <div class="gnb-logo">
+                    <img src="/static/codle-logo.svg" alt="Codle" class="logo-image" />
+                    <div class="logo-divider"></div>
+                    <img src="/static/socrates-logo.svg" alt="소크라테스 아카데미" class="socrates-logo" />
+                </div>
+                <div class="gnb-actions">
+                    <a href="https://codle.io" target="_blank" class="codle-link-button">코들 바로가기</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-container">
+                <div class="hero-content">
+                    <h1 class="hero-title">
+                        학습의 <span class="hero-highlight">새로운 차원</span>을<br>
+                        경험해보세요
+                    </h1>
+                    <p class="hero-subtitle">
+                        AI와 함께하는 소크라테스식 대화를 통해<br>
+                        깊이 있는 사고력을 기를 수 있습니다
+                    </p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Main Content Section -->
+        <main class="main-content">
+            <div class="content-container">
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2 class="section-title">학습을 시작해보세요</h2>
+                        <p class="section-description">
+                            관심 있는 주제를 입력하시면 AI 튜터가 소크라테스식 질문을 통해 함께 탐구합니다
+                        </p>
+                    </div>
+
+                    <form id="topicForm" class="learning-form">
+                        <div class="form-card">
+                            <div class="input-section">
+                                <div class="input-group">
+                                    <label for="topicInput" class="input-label">학습 주제</label>
+                                    <div class="input-wrapper">
+                                        <textarea
+                                            id="topicInput"
+                                            name="topic"
+                                            class="topic-input"
+                                            placeholder="예: 기후변화의 원인과 해결방안"
+                                            rows="3"
+                                            required
+                                        ></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                    
+                            <!-- Options Grid -->
+                            <div class="options-grid">
+                                <!-- Content Type Selection -->
+                                <div class="option-card">
+                                    <div class="card-header">
+                                        <h3 class="card-title">입력 방식</h3>
+                                    </div>
+                                    <div class="card-content">
+                                        <div class="option-buttons" data-name="contentType">
+                                            <input type="radio" id="text" name="contentType" value="text" checked>
+                                            <label for="text" class="option-button">
+                                                <div class="button-content">
+                                                    <span class="button-icon">📝</span>
+                                                    <div class="button-text">
+                                                        <span class="button-title">텍스트</span>
+                                                        <span class="button-subtitle">직접 입력</span>
+                                                    </div>
+                                                </div>
+                                            </label>
+
+                                            <input type="radio" id="pdf" name="contentType" value="pdf" disabled>
+                                            <label for="pdf" class="option-button disabled">
+                                                <div class="button-content">
+                                                    <span class="button-icon">📄</span>
+                                                    <div class="button-text">
+                                                        <span class="button-title">PDF</span>
+                                                        <span class="button-subtitle">곧 지원</span>
+                                                    </div>
+                                                </div>
+                                            </label>
+
+                                            <input type="radio" id="url" name="contentType" value="url" disabled>
+                                            <label for="url" class="option-button disabled">
+                                                <div class="button-content">
+                                                    <span class="button-icon">🔗</span>
+                                                    <div class="button-text">
+                                                        <span class="button-title">링크</span>
+                                                        <span class="button-subtitle">곧 지원</span>
+                                                    </div>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                    
+                                <!-- Difficulty Selection -->
+                                <div class="option-card">
+                                    <div class="card-header">
+                                        <h3 class="card-title">학습 난이도</h3>
+                                    </div>
+                                    <div class="card-content">
+                                        <div class="option-buttons horizontal" data-name="difficulty">
+                                            <input type="radio" id="easy" name="difficulty" value="easy">
+                                            <label for="easy" class="option-button">
+                                                <div class="button-content">
+                                                    <span class="button-icon">🌱</span>
+                                                    <div class="button-text">
+                                                        <span class="button-title">쉬움</span>
+                                                        <span class="button-subtitle">기본 개념</span>
+                                                    </div>
+                                                </div>
+                                            </label>
+
+                                            <input type="radio" id="normal" name="difficulty" value="normal" checked>
+                                            <label for="normal" class="option-button">
+                                                <div class="button-content">
+                                                    <span class="button-icon">📚</span>
+                                                    <div class="button-text">
+                                                        <span class="button-title">보통</span>
+                                                        <span class="button-subtitle">중학생 수준</span>
+                                                    </div>
+                                                </div>
+                                            </label>
+
+                                            <input type="radio" id="hard" name="difficulty" value="hard">
+                                            <label for="hard" class="option-button">
+                                                <div class="button-content">
+                                                    <span class="button-icon">🎓</span>
+                                                    <div class="button-text">
+                                                        <span class="button-title">어려움</span>
+                                                        <span class="button-subtitle">깊이 있는 탐구</span>
+                                                    </div>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Score Display Selection -->
+                                <div class="option-card">
+                                    <div class="card-header">
+                                        <h3 class="card-title">학습 진행도</h3>
+                                    </div>
+                                    <div class="card-content">
+                                        <div class="option-buttons toggle" data-name="scoreDisplay">
+                                            <input type="radio" id="showScore" name="scoreDisplay" value="show" checked>
+                                            <label for="showScore" class="option-button">
+                                                <div class="button-content">
+                                                    <span class="button-icon">📊</span>
+                                                    <div class="button-text">
+                                                        <span class="button-title">점수 표시</span>
+                                                        <span class="button-subtitle">실시간 피드백</span>
+                                                    </div>
+                                                </div>
+                                            </label>
+
+                                            <input type="radio" id="hideScore" name="scoreDisplay" value="hide">
+                                            <label for="hideScore" class="option-button">
+                                                <div class="button-content">
+                                                    <span class="button-icon">🎯</span>
+                                                    <div class="button-text">
+                                                        <span class="button-title">점수 숨김</span>
+                                                        <span class="button-subtitle">집중 모드</span>
+                                                    </div>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    
+                            <!-- Start Button -->
+                            <div class="action-section">
+                                <button type="submit" class="btn btn-primary btn-xl">
+                                    <span class="btn-text">학습 시작하기</span>
+                                    <span class="btn-icon btn-icon-right">→</span>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+
+        <!-- Teacher Access Section -->
+        <section class="teacher-section">
+            <div class="teacher-container">
+                <div class="teacher-header">
+                    <h2 class="teacher-title">교사용 대시보드</h2>
+                    <p class="teacher-subtitle">학생들의 학습 세션을 관리하고 모니터링하세요</p>
+                </div>
+
+                <div class="teacher-options">
+                    <div class="teacher-card">
+                        <div class="teacher-icon">✨</div>
+                        <div class="teacher-content">
+                            <h3 class="teacher-option-title">교사 대시보드</h3>
+                            <p class="teacher-option-description">
+                                단일 세션 중심의 간편한 교사 인터페이스<br>
+                                학생들의 학습을 쉽게 관리하고 모니터링하세요
+                            </p>
+                            <a href="/teacher" class="btn btn-primary btn-lg">
+                                교사 대시보드 시작하기
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features-section">
+            <div class="features-container">
+                <div class="features-header">
+                    <h2 class="features-title">소크라테스식 학습의 힘</h2>
+                    <p class="features-subtitle">AI와 함께하는 새로운 학습 경험</p>
+                </div>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🤔</div>
+                        <div class="feature-content">
+                            <h3 class="feature-title">질문을 통한 탐구</h3>
+                            <p class="feature-description">
+                                직접적인 답 대신 체계적인 질문으로<br>
+                                스스로 생각하는 능력을 기릅니다
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🧠</div>
+                        <div class="feature-content">
+                            <h3 class="feature-title">비판적 사고력</h3>
+                            <p class="feature-description">
+                                단계별 질문을 통해 논리적이고<br>
+                                깊이 있는 사고를 개발합니다
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">📈</div>
+                        <div class="feature-content">
+                            <h3 class="feature-title">맞춤형 학습</h3>
+                            <p class="feature-description">
+                                실시간 이해도 측정으로<br>
+                                개인별 최적화된 학습을 제공합니다
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-container">
+                <div class="footer-logo">
+                    <img src="/static/TM-logo.png" alt="소크라테스 아카데미 로고" class="footer-logo-img">
+                </div>
+                <div class="footer-content">
+                    <div class="footer-text">
+                        <div class="footer-company">(주)팀모노리스 | 서울특별시 중구 퇴계로 15 9층</div>
+                        <div class="footer-copyright">©TEAM MONOLITH Inc.</div>
+                    </div>
+                    <a href="https://codle.io" target="_blank" class="footer-link">코들 바로가기</a>
+                </div>
+            </div>
+        </footer>
+        
+        <!-- Loading Overlay -->
+        <div id="loading" class="loading-overlay" style="display: none;">
+            <div class="loading-content">
+                <div class="loading-spinner"></div>
+                <p class="loading-text">학습 환경을 준비하고 있습니다...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/config.js"></script>
+    <script src="/static/js/main.js?v=3"></script>
+</body>
+</html>

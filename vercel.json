@@ -4,7 +4,7 @@
   "rewrites": [
     {
       "source": "/student",
-      "destination": "/index.html"
+      "destination": "/pages/student.html"
     },
     {
       "source": "/teacher",
@@ -17,10 +17,6 @@
     {
       "source": "/s/:sessionId",
       "destination": "/pages/student-session.html"
-    },
-    {
-      "source": "/",
-      "destination": "/student"
     }
   ]
 }
