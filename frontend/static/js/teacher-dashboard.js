@@ -750,7 +750,7 @@ class TeacherDashboard {
             // Store message to show after redirect
             sessionStorage.setItem('setupMessage', message);
         }
-        window.location.href = '/pages/teacher-setup.html';
+        window.location.href = '/teacher';
     }
 
     showLoading(show, message = '처리 중입니다...') {

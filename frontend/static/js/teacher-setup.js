@@ -210,7 +210,7 @@ class TeacherSetup {
 
     goToDashboard(sessionId, isNewSession = false) {
         // Navigate to the dashboard page
-        let dashboardUrl = `/pages/teacher-dashboard.html?session=${sessionId}`;
+        let dashboardUrl = `/teacher/dashboard?session=${sessionId}`;
 
         // Add newSession parameter if this is a newly created session
         if (isNewSession) {
@@ -316,3 +316,5 @@ class TeacherSetup {
 
 // Initialize the setup when script loads
 const teacherSetup = new TeacherSetup();
+
+// URL 구조 개편 - v2.0
