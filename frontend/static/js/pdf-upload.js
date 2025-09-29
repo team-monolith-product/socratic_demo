@@ -48,6 +48,7 @@ class PDFTopicManager {
         this.pdfContentModal = document.getElementById('pdfContentModal');
         this.closePdfContentModal = document.getElementById('closePdfContentModal');
         this.compressedContentText = document.getElementById('compressedContentText');
+        this.modalContentTitle = document.getElementById('modalContentTitle');
 
         // 기존 세션 주제 필드 (폴백용)
         this.sessionTopicField = document.getElementById('sessionTopic');
@@ -505,6 +506,12 @@ class PDFTopicManager {
     showCompressedContentModal() {
         if (this.state.compressedContent && this.pdfContentModal && this.compressedContentText) {
             this.compressedContentText.textContent = this.state.compressedContent;
+
+            // 모달 제목을 명사형 학습주제로 업데이트
+            if (this.modalContentTitle && this.state.nounTopic) {
+                this.modalContentTitle.textContent = this.state.nounTopic;
+            }
+
             this.pdfContentModal.style.display = 'flex';
             document.body.style.overflow = 'hidden';
         }

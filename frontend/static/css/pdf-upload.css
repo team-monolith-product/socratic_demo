@@ -78,7 +78,7 @@
 /* PDF 처리 상태 표시 */
 .pdf-processing-status {
     padding: 24px;
-    background: #f5f5f7;
+    background: linear-gradient(135deg, #f8fbff 0%, #f0f9ff 100%);
     text-align: center;
     flex-direction: column;
     border: 2px solid transparent;
