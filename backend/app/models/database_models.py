@@ -117,6 +117,7 @@ class Student(Base):
         index=True
     )
     name: Mapped[str] = mapped_column(String(100), nullable=False)
+    token: Mapped[Optional[str]] = mapped_column(String(50), nullable=True, index=True)  # Student session token
     joined_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),

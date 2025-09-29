@@ -18,6 +18,12 @@ class SocraticChatHandler {
         return '/api/v1';
     }
 
+    // Token management methods
+    getStoredStudentToken() {
+        const key = `student_token_${this.sessionId}`;
+        return localStorage.getItem(key);
+    }
+
     init() {
         // URL에서 주제, 난이도, 점수 표시 옵션 추출
         const urlParams = this.getUrlParams();
@@ -28,6 +34,9 @@ class SocraticChatHandler {
         this.sessionId = urlParams.session_id || '';
         this.studentId = urlParams.student_id || '';
         this.studentName = urlParams.student_name || '';
+
+        // Get student token from localStorage
+        this.studentToken = this.getStoredStudentToken();
         
         if (!this.topic) {
             alert('주제가 설정되지 않았습니다.');

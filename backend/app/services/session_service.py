@@ -1,5 +1,6 @@
 import hashlib
 import uuid
+import secrets
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any
 import asyncio
@@ -59,11 +60,15 @@ class SessionService:
         return f"{timestamp}{random_part}{checksum}"
 
     def generate_browser_fingerprint(self, request_headers: Dict[str, str]) -> str:
-        """Generate browser fingerprint from request headers"""
+        """Generate browser fingerprint from request headers (for teacher identification only)"""
         user_agent = request_headers.get('user-agent', '')
         accept_language = request_headers.get('accept-language', '')
         fingerprint_data = f"{user_agent}|{accept_language}"
         return hashlib.md5(fingerprint_data.encode()).hexdigest()[:16]
+
+    def generate_student_token(self) -> str:
+        """Generate unique student session token"""
+        return secrets.token_urlsafe(16)
 
     async def create_session(self, config: SessionConfig, teacher_fingerprint: str, base_url: str) -> Dict[str, Any]:
         """Create new session"""
@@ -227,30 +232,31 @@ class SessionService:
         print(f"🔍 Final result for session {session_id}: session has {len(students)} students")
         return result
 
-    async def join_session(self, session_id: str, student_name: str = "익명", student_fingerprint: str = None) -> Optional[Dict[str, Any]]:
-        """Student joins a session (supports re-entry via browser fingerprint)"""
+    async def join_session(self, session_id: str, student_name: str = "익명", student_token: str = None) -> Optional[Dict[str, Any]]:
+        """Student joins a session (supports re-entry via student token)"""
         await self._ensure_data_loaded()
         session_data = self.active_sessions.get(session_id)
         if not session_data:
             return None
 
-        # Check if student already exists in this session (by fingerprint)
-        existing_student = None
-        if student_fingerprint and session_id in self.session_students:
-            for student_id, student_data in self.session_students[session_id].items():
-                if student_data.get('fingerprint') == student_fingerprint:
-                    existing_student = student_data
-                    print(f"🔄 Returning student detected: {student_id} with fingerprint {student_fingerprint[:8]}...")
-                    break
-
         now = self.get_korea_time()
 
+        # Check if student already exists in this session (by token)
+        existing_student = None
+        if student_token and session_id in self.session_students:
+            for student_id, student_data in self.session_students[session_id].items():
+                if student_data.get('token') == student_token:
+                    existing_student = student_data
+                    print(f"🔄 Returning student detected: {student_id} with token {student_token[:8]}...")
+                    break
+
         if existing_student:
-            # Always check if the name is already taken by another student (even for returning students)
+            # Returning student with valid token
+            # Check if the name they want to use is taken by another student
             if session_id in self.session_students:
                 for existing_student_id, existing_student_data in self.session_students[session_id].items():
-                    # Skip if it's the same student (same fingerprint)
-                    if existing_student_data.get('fingerprint') == student_fingerprint:
+                    # Skip if it's the same student (same token)
+                    if existing_student_data.get('token') == student_token:
                         continue
                     # Check if name is already taken by a different student
                     if existing_student_data.get('name', '').strip().lower() == student_name.strip().lower():
@@ -260,7 +266,7 @@ class SessionService:
                             'message': f"'{student_name}' 이름은 이미 사용 중입니다. 다른 이름을 입력해주세요."
                         }
 
-            # Update existing student's last active time
+            # Update existing student's last active time and name
             existing_student['last_active'] = now.isoformat()
             existing_student['name'] = student_name  # Update name in case it changed
 
@@ -273,19 +279,17 @@ class SessionService:
 
             return {
                 'student_id': existing_student['id'],
+                'student_token': existing_student['token'],  # Return existing token
                 'session_config': SessionConfig(**session_data['config']),
                 'session_status': session_data['status'],
                 'is_returning': True,
                 'current_score': existing_student['progress']['current_score']
             }
 
-        # Check if the name is already taken by another student (excluding the current fingerprint)
+        # Check if the name is already taken by another student (new student case)
         if session_id in self.session_students:
             for existing_student_id, existing_student_data in self.session_students[session_id].items():
-                # Skip if it's the same student (same fingerprint)
-                if existing_student_data.get('fingerprint') == student_fingerprint:
-                    continue
-                # Check if name is already taken by a different student
+                # Check if name is already taken
                 if existing_student_data.get('name', '').strip().lower() == student_name.strip().lower():
                     print(f"❌ Name '{student_name}' is already taken in session {session_id}")
                     return {
@@ -295,13 +299,14 @@ class SessionService:
 
         # Create new student
         student_id = str(uuid.uuid4())
+        new_student_token = self.generate_student_token()  # Generate new token
 
         # Create student data
         student_data = {
             'id': student_id,
             'name': student_name,
             'session_id': session_id,
-            'fingerprint': student_fingerprint,  # Store fingerprint for re-entry
+            'token': new_student_token,  # Store token for re-entry
             'joined_at': now.isoformat(),  # Convert to ISO string with timezone
             'last_active': now.isoformat(),  # Convert to ISO string with timezone
             'progress': {
@@ -353,6 +358,7 @@ class SessionService:
 
         return {
             'student_id': student_id,
+            'student_token': new_student_token,  # Return new token to frontend
             'session_config': SessionConfig(**session_data['config']),
             'session_status': session_data['status'],
             'is_returning': False,

@@ -6,6 +6,7 @@ class StudentSession {
         this.sessionId = null;
         this.sessionData = null;
         this.studentName = null;
+        this.studentToken = null;
 
         // Get session ID from URL
         this.sessionId = this.extractSessionIdFromUrl();
@@ -29,6 +30,64 @@ class StudentSession {
         return match ? match[1] : null;
     }
 
+    // Token management methods
+    getStoredStudentToken() {
+        const key = `student_token_${this.sessionId}`;
+        return localStorage.getItem(key);
+    }
+
+    setStudentToken(token) {
+        const key = `student_token_${this.sessionId}`;
+        localStorage.setItem(key, token);
+        this.studentToken = token;
+    }
+
+    getStoredStudentName() {
+        const key = `student_name_${this.sessionId}`;
+        return localStorage.getItem(key);
+    }
+
+    setStoredStudentName(name) {
+        const key = `student_name_${this.sessionId}`;
+        localStorage.setItem(key, name);
+    }
+
+    clearStoredData() {
+        const tokenKey = `student_token_${this.sessionId}`;
+        const nameKey = `student_name_${this.sessionId}`;
+        localStorage.removeItem(tokenKey);
+        localStorage.removeItem(nameKey);
+    }
+
+    async joinSessionWithToken() {
+        console.log('Attempting re-entry with stored token...');
+
+        const response = await fetch(`${this.apiBaseUrl}/session/${this.sessionId}/join`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                student_name: this.studentName,
+                student_token: this.studentToken
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.detail || `HTTP ${response.status}`);
+        }
+
+        const joinResponse = await response.json();
+        console.log('Successfully re-entered session:', joinResponse);
+
+        // Update student_id
+        this.studentId = joinResponse.student_id;
+
+        // Redirect to chat interface
+        this.redirectToChatInterface();
+    }
+
     async init() {
         console.log('Initializing Student Session...', this.sessionId);
 
@@ -38,6 +97,27 @@ class StudentSession {
 
             // Setup event listeners
             this.setupEventListeners();
+
+            // Check for existing student token (for re-entry)
+            const storedToken = this.getStoredStudentToken();
+            const storedName = this.getStoredStudentName();
+
+            if (storedToken && storedName) {
+                console.log('Found stored token, attempting re-entry...');
+                this.studentToken = storedToken;
+                this.studentName = storedName;
+
+                // Try to join with existing token
+                try {
+                    await this.joinSessionWithToken();
+                    // If successful, go directly to chat
+                    return;
+                } catch (error) {
+                    console.log('Re-entry failed, clearing stored data:', error);
+                    this.clearStoredData();
+                    // Continue to show session info screen
+                }
+            }
 
             // Show session info screen
             this.showSessionInfo();
@@ -147,15 +227,22 @@ URL: ${window.location.href}
         joinButton.textContent = '참여 중...';
 
         try {
-            // Join session via API
+            // Join session via API (include token if available)
+            const requestBody = {
+                student_name: this.studentName
+            };
+
+            // Include token if available for re-entry
+            if (this.studentToken) {
+                requestBody.student_token = this.studentToken;
+            }
+
             const response = await fetch(`${this.apiBaseUrl}/session/${this.sessionId}/join`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    student_name: this.studentName
-                })
+                body: JSON.stringify(requestBody)
             });
 
             if (!response.ok) {
@@ -174,8 +261,13 @@ URL: ${window.location.href}
             const joinResponse = await response.json();
             console.log('Successfully joined session:', joinResponse);
 
-            // Store student_id from response
+            // Store student_id and token from response
             this.studentId = joinResponse.student_id;
+            this.studentToken = joinResponse.student_token;
+
+            // Save token and name to localStorage for re-entry
+            this.setStudentToken(joinResponse.student_token);
+            this.setStoredStudentName(this.studentName);
 
             // Redirect to chat interface
             this.redirectToChatInterface();

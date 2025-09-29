@@ -74,10 +74,12 @@ class SessionDetailsResponse(BaseModel):
 
 class SessionJoinRequest(BaseModel):
     student_name: str
+    student_token: Optional[str] = None  # For re-entry detection
 
 class SessionJoinResponse(BaseModel):
     success: bool
     student_id: str
+    student_token: str  # Return token to frontend
     session_config: SessionConfig
     initial_message: str
     understanding_score: int = 0

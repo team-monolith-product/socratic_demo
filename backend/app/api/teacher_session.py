@@ -258,11 +258,11 @@ async def join_session(session_id: str, request: SessionJoinRequest, http_reques
         session_service = get_session_service()
         socratic_service = get_socratic_service()
 
-        # Generate student fingerprint from browser
-        student_fingerprint = session_service.generate_browser_fingerprint(dict(http_request.headers))
+        # Get student token from request (if provided for re-entry)
+        student_token = request.student_token
 
-        # Join session (with fingerprint for re-entry detection)
-        join_result = await session_service.join_session(session_id, request.student_name, student_fingerprint)
+        # Join session (with token for re-entry detection)
+        join_result = await session_service.join_session(session_id, request.student_name, student_token)
         if not join_result:
             raise HTTPException(status_code=404, detail="Session not found or expired")
 
@@ -299,6 +299,7 @@ async def join_session(session_id: str, request: SessionJoinRequest, http_reques
         return SessionJoinResponse(
             success=True,
             student_id=student_id,
+            student_token=join_result['student_token'],
             session_config=session_config,
             initial_message=initial_message,
             understanding_score=current_score

@@ -141,6 +141,7 @@ class DatabaseService:
                     if existing_student:
                         # Update existing student
                         existing_student.name = student_data.get('name', '익명')
+                        existing_student.token = student_data.get('token')  # Update token
                         existing_student.last_active = self._parse_datetime(student_data.get('last_active'))
                         existing_student.conversation_turns = student_data['progress'].get('conversation_turns', 0)
                         existing_student.current_score = student_data['progress'].get('current_score', 0)
@@ -161,6 +162,7 @@ class DatabaseService:
                             id=student_id,
                             session_id=session_id,
                             name=student_data.get('name', '익명'),
+                            token=student_data.get('token'),  # Include token
                             joined_at=self._parse_datetime(student_data.get('joined_at')),
                             last_active=self._parse_datetime(student_data.get('last_active')),
                             conversation_turns=student_data['progress'].get('conversation_turns', 0),
@@ -202,6 +204,7 @@ class DatabaseService:
                         'id': student.id,
                         'name': student.name,
                         'session_id': student.session_id,
+                        'token': student.token,  # Include token
                         'joined_at': student.joined_at.isoformat(),
                         'last_active': student.last_active.isoformat(),
                         'progress': {

@@ -247,6 +247,57 @@ async def create_scores_table():
             raise
 
 
+async def add_student_token_column():
+    """Add token column to students table."""
+    async with AsyncSessionLocal() as session:
+        try:
+            db_type = await _detect_database_type(session)
+
+            # Check if token column already exists
+            if db_type == "postgresql":
+                check_query = text("""
+                    SELECT column_name FROM information_schema.columns
+                    WHERE table_name = 'students' AND column_name = 'token';
+                """)
+            else:
+                # SQLite
+                check_query = text("PRAGMA table_info(students);")
+
+            result = await session.execute(check_query)
+
+            if db_type == "postgresql":
+                existing_columns = [row[0] for row in result.fetchall()]
+                token_exists = 'token' in existing_columns
+            else:
+                # SQLite PRAGMA returns (cid, name, type, notnull, dflt_value, pk)
+                existing_columns = [row[1] for row in result.fetchall()]
+                token_exists = 'token' in existing_columns
+
+            if not token_exists:
+                print("➕ Adding token column to students table...")
+
+                # Add token column
+                alter_query = text("ALTER TABLE students ADD COLUMN token VARCHAR(50);")
+                await session.execute(alter_query)
+
+                # Add index on token column
+                if db_type == "postgresql":
+                    index_query = text("CREATE INDEX ix_students_token ON students (token);")
+                else:
+                    index_query = text("CREATE INDEX ix_students_token ON students (token);")
+
+                await session.execute(index_query)
+                await session.commit()
+                print("✅ Token column added to students table")
+            else:
+                print("ℹ️ Token column already exists in students table")
+
+        except Exception as e:
+            await session.rollback()
+            print(f"❌ Failed to add token column: {e}")
+            raise
+
+
 async def run_migrations():
     """Run all pending migrations."""
     print("🔄 Running database migrations...")
@@ -254,4 +305,5 @@ async def run_migrations():
     await drop_score_records_table()
     await add_deleted_at_column()
     await create_scores_table()
+    await add_student_token_column()
     print("✅ Migrations completed")
