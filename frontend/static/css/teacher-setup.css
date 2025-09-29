@@ -151,7 +151,6 @@
     box-shadow:
         0 20px 40px rgba(53, 116, 217, 0.08),
         0 4px 16px rgba(0, 0, 0, 0.04);
-    transform: translateY(-4px);
     border-color: rgba(53, 116, 217, 0.12);
 }
 
@@ -225,7 +224,6 @@
 }
 
 .apple-radio-card:hover, .apple-toggle-card:hover {
-    transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 

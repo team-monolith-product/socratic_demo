@@ -33,7 +33,10 @@ class SimplifiedSessionManager {
             learningObjectives: config.learning_objectives || null,
             pdfContent: config.pdf_content || null,
             manualContent: config.manual_content || null,
-            combinedTopic: config.combined_topic || null
+            combinedTopic: config.combined_topic || null,
+            // 명사형과 한문장 주제 저장
+            nounTopic: config.noun_topic || null,
+            oneSentenceTopic: config.one_sentence_topic || null
         };
 
         console.log('💾 세션 정보 저장 (PDF 키워드 포함):', {

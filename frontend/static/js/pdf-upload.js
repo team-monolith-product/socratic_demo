@@ -9,6 +9,7 @@ class PDFTopicManager {
         this.state = {
             compressedContent: null,  // 압축된 PDF 본문
             oneSentenceTopic: null,  // 한 문장 학습 주제 (UI 노출용)
+            nounTopic: null,  // 명사형 학습 주제 (QR/채팅용)
             manualContent: null,
             finalTopic: null,
             sourceType: 'none', // 'pdf', 'manual', 'hybrid', 'none'
@@ -242,9 +243,11 @@ class PDFTopicManager {
         // PDF 분석 결과 저장 (핵심 필드만)
         this.state.compressedContent = result.compressed_content;  // 압축된 본문
         this.state.oneSentenceTopic = result.one_sentence_topic;  // 한 문장 주제
+        this.state.nounTopic = result.noun_topic;  // 명사형 주제
 
         console.log('📄 PDF 분석 결과 저장됨:', {
             oneSentenceTopic: this.state.oneSentenceTopic,
+            nounTopic: this.state.nounTopic,
             compressedContentLength: this.state.compressedContent?.length || 0
         });
 
@@ -252,6 +255,12 @@ class PDFTopicManager {
 
         // 한 문장 주제를 세션 주제 필드에 설정 (UI 노출용)
         this.updateSessionTopic(result.one_sentence_topic || "학습 주제");
+
+        // PDF 결과 제목을 명사형 주제로 변경
+        const pdfResultTitle = document.getElementById('pdfResultTitle');
+        if (pdfResultTitle && result.noun_topic) {
+            pdfResultTitle.textContent = result.noun_topic;
+        }
 
         // 한 문장 학습 주제 표시
         this.pdfConceptTags.innerHTML = '';
@@ -366,6 +375,7 @@ class PDFTopicManager {
         // PDF 관련 상태 초기화
         this.state.compressedContent = null;
         this.state.oneSentenceTopic = null;
+        this.state.nounTopic = null;
 
         // 모든 UI 상태 초기화
         this.clearErrorState();
@@ -378,6 +388,12 @@ class PDFTopicManager {
 
         // 태그 영역 클리어
         if (this.pdfConceptTags) this.pdfConceptTags.innerHTML = '';
+
+        // PDF 결과 제목 초기화
+        const pdfResultTitle = document.getElementById('pdfResultTitle');
+        if (pdfResultTitle) {
+            pdfResultTitle.textContent = 'PDF 분석 완료';
+        }
     }
 
     // 현재 난이도 가져오기
@@ -520,6 +536,7 @@ class PDFTopicManager {
         this.state = {
             compressedContent: null,  // 압축된 PDF 본문
             oneSentenceTopic: null,  // 한 문장 학습 주제 (UI 노출용)
+            nounTopic: null,  // 명사형 학습 주제 (QR/채팅용)
             manualContent: null,
             finalTopic: null,
             sourceType: 'none',
@@ -535,6 +552,12 @@ class PDFTopicManager {
         if (this.pdfFileInput) this.pdfFileInput.value = '';
         if (this.manualTopicInput) this.manualTopicInput.value = '';
         if (this.pdfConceptTags) this.pdfConceptTags.innerHTML = '';
+
+        // PDF 결과 제목 초기화
+        const pdfResultTitle = document.getElementById('pdfResultTitle');
+        if (pdfResultTitle) {
+            pdfResultTitle.textContent = 'PDF 분석 완료';
+        }
     }
 }
 

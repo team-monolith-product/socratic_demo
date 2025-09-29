@@ -128,6 +128,7 @@ class TeacherSetup {
 
         } catch (error) {
             console.error('Failed to create session:', error);
+            console.error('Session config was:', sessionConfig);
             this.showError('세션 생성에 실패했습니다: ' + error.message);
         } finally {
             this.showLoading(false);
@@ -176,7 +177,7 @@ class TeacherSetup {
                     sessionConfig.manual_content = pdfState.manualContent;
                 }
 
-                // PDF 압축 내용 및 한 문장 주제 추가
+                // PDF 압축 내용 및 한 문장 주제, 명사형 주제 추가
                 if (pdfState.compressedContent) {
                     sessionConfig.compressed_content = pdfState.compressedContent;
                 }
@@ -184,6 +185,9 @@ class TeacherSetup {
                     sessionConfig.one_sentence_topic = pdfState.oneSentenceTopic;
                     // UI 표시용으로는 한 문장 주제 사용
                     sessionConfig.topic = pdfState.oneSentenceTopic;
+                }
+                if (pdfState.nounTopic) {
+                    sessionConfig.noun_topic = pdfState.nounTopic;
                 }
 
 

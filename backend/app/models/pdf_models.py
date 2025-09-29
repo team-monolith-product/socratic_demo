@@ -11,6 +11,7 @@ class PdfAnalysisResult(BaseModel):
     original_text: str
     compressed_content: str  # 압축된 PDF 본문 (핵심 기능)
     one_sentence_topic: str  # 한 문장 학습 주제 (UI 노출용, 핵심 기능)
+    noun_topic: str  # 명사형 학습 주제 (간략화된 주제, QR/채팅용)
     success: bool
     error_message: Optional[str] = None
 

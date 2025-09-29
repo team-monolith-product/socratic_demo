@@ -568,7 +568,10 @@ class TeacherDashboard {
                         source_type: savedSession.sourceType || 'manual',
                         main_keyword: savedSession.mainKeyword || null,
                         key_concepts: savedSession.keyConcepts || null,
-                        learning_objectives: savedSession.learningObjectives || null
+                        learning_objectives: savedSession.learningObjectives || null,
+                        // 명사형과 한문장 주제 추가
+                        noun_topic: savedSession.nounTopic || null,
+                        one_sentence_topic: savedSession.oneSentenceTopic || null
                     },
                     created_at: savedSession.createdAt
                 },
@@ -624,7 +627,10 @@ class TeacherDashboard {
                         source_type: savedSession.sourceType || 'manual',
                         main_keyword: savedSession.mainKeyword || null,
                         key_concepts: savedSession.keyConcepts || null,
-                        learning_objectives: savedSession.learningObjectives || null
+                        learning_objectives: savedSession.learningObjectives || null,
+                        // 명사형과 한문장 주제 추가
+                        noun_topic: savedSession.nounTopic || null,
+                        one_sentence_topic: savedSession.oneSentenceTopic || null
                     },
                     created_at: savedSession.createdAt
                 },
@@ -653,12 +659,18 @@ class TeacherDashboard {
         const qrCanvas = document.getElementById('qrCanvas');
         this.qrGenerator.displayQRCode(qrCanvas, qrCode.image_data);
 
-        // Update session topic only
+        // Update session topic with noun only
         const config = sessionData.session.config;
-        const sessionTopic = document.getElementById('sessionTopic');
+        const sessionTopicNoun = document.getElementById('sessionTopicNoun');
 
-        if (sessionTopic) {
-            sessionTopic.textContent = config.topic || '학습 주제';
+        if (sessionTopicNoun) {
+            // PDF에서 추출된 명사형 주제가 있는 경우
+            if (config.noun_topic) {
+                sessionTopicNoun.textContent = config.noun_topic;
+            } else {
+                // 직접 입력된 주제인 경우 기존 동작 유지
+                sessionTopicNoun.textContent = config.topic || '학습 주제';
+            }
         }
 
         // Store current session data for modal actions

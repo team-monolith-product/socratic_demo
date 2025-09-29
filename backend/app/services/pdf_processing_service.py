@@ -141,9 +141,9 @@ class PDFProcessingService:
             # 기본 정리
             cleaned_text = self._clean_extracted_text(text)
 
-            # AI를 사용한 압축 + 한 문장 학습 주제 생성 (한 번에 수행)
+            # AI를 사용한 압축 + 한 문장 학습 주제 + 명사형 학습 주제 생성 (한 번에 수행)
             system_prompt = f"""당신은 소크라테스식 교육법 전문가입니다.
-주어진 PDF 자료를 압축하고 학습 주제를 한 문장으로 요약하는 두 가지 작업을 수행하세요.
+주어진 PDF 자료를 압축하고 학습 주제를 두 가지 형태로 생성하는 세 가지 작업을 수행하세요.
 
 **작업 1: PDF 내용 압축**
 다음 규칙에 따라 교육 자료를 압축하세요:
@@ -161,6 +161,13 @@ PDF 내용의 핵심을 파악하여 소크라테스 대화에 적합한 한 문
 3. 소크라테스식 질문과 탐구를 유발할 수 있는 주제
 4. "~에 대해 설명하는 자료" 형태가 아닌 실제 학습할 내용
 
+**작업 3: 명사형 학습 주제 생성**
+PDF 내용의 핵심 개념을 명사형으로 간략하게 표현하세요:
+1. 한 문장 주제보다 더 짧고 간결한 명사형 표현 (예: "유니버셜 디자인", "기후변화와 환경보호")
+2. 2-6단어 정도의 핵심 키워드나 개념명
+3. 학습자가 한눈에 파악할 수 있는 주제의 핵심
+4. QR 코드나 채팅창 헤더에 적합한 간결한 표현
+
 **난이도별 접근**:
 - easy: 기본 개념 중심의 친근한 표현
 - normal: 개념 간 관계를 암시하는 표현
@@ -171,12 +178,14 @@ PDF 내용의 핵심을 파악하여 소크라테스 대화에 적합한 한 문
 **출력 형식**:
 {{
     "compressed_content": "압축된 PDF 전문",
-    "one_sentence_topic": "한 문장으로 표현한 핵심 학습 주제"
+    "one_sentence_topic": "한 문장으로 표현한 핵심 학습 주제",
+    "noun_topic": "명사형 핵심 학습 주제"
 }}
 
 **주의사항**:
 - compressed_content는 학습에 필요한 핵심 내용만 압축된 전문
-- one_sentence_topic은 반드시 한 문장으로 제한하며, UI에 바로 노출 가능한 수준으로 작성"""
+- one_sentence_topic은 반드시 한 문장으로 제한하며, UI에 바로 노출 가능한 수준으로 작성
+- noun_topic은 2-6단어의 간결한 명사형 표현으로 제한"""
 
             # 토큰 제한을 고려한 컨텍스트 크기 조정 (GPT-4o-mini 8K 토큰 제한)
             # 시스템 프롬프트 + 사용자 프롬프트 + 응답을 고려하여 더 안전한 크기로 설정
@@ -214,13 +223,15 @@ PDF 내용의 핵심을 파악하여 소크라테스 대화에 적합한 한 문
                 # 파싱 실패시 기본 응답 생성
                 result_data = {
                     "compressed_content": cleaned_text[:2000] + "..." if len(cleaned_text) > 2000 else cleaned_text,
-                    "one_sentence_topic": "학습 주제"
+                    "one_sentence_topic": "학습 주제",
+                    "noun_topic": "학습 주제"
                 }
 
             return PdfAnalysisResult(
                 original_text=text,
                 compressed_content=result_data.get("compressed_content", cleaned_text[:1000] + "..." if len(cleaned_text) > 1000 else cleaned_text),
                 one_sentence_topic=result_data.get("one_sentence_topic", "학습 주제"),
+                noun_topic=result_data.get("noun_topic", "학습 주제"),
                 success=True,
                 error_message=None
             )
@@ -233,6 +244,7 @@ PDF 내용의 핵심을 파악하여 소크라테스 대화에 적합한 한 문
                 original_text=text,
                 compressed_content=fallback_compressed,
                 one_sentence_topic="업로드된 PDF 자료를 바탕으로 한 학습 주제",
+                noun_topic="PDF 학습 주제",
                 success=False,
                 error_message=f"AI 분석 중 오류가 발생했습니다: {str(e)}"
             )
