@@ -298,12 +298,52 @@ async def add_student_token_column():
             raise
 
 
+async def drop_scores_table():
+    """Drop the scores table if it exists."""
+    async with AsyncSessionLocal() as session:
+        try:
+            db_type = await _detect_database_type(session)
+
+            if db_type == "postgresql":
+                # PostgreSQL: use information_schema
+                check_query = text("""
+                    SELECT table_name FROM information_schema.tables
+                    WHERE table_schema = 'public' AND table_name = 'scores';
+                """)
+            else:
+                # SQLite: use sqlite_master
+                check_query = text("""
+                    SELECT name FROM sqlite_master
+                    WHERE type='table' AND name='scores';
+                """)
+
+            result = await session.execute(check_query)
+            table_exists = result.fetchone() is not None
+
+            if table_exists:
+                if db_type == "postgresql":
+                    drop_query = text("DROP TABLE IF EXISTS scores CASCADE;")
+                else:
+                    drop_query = text("DROP TABLE IF EXISTS scores;")
+
+                await session.execute(drop_query)
+                await session.commit()
+                print("✅ scores table dropped successfully")
+            else:
+                print("ℹ️ scores table does not exist")
+
+        except Exception as e:
+            await session.rollback()
+            print(f"❌ Error dropping scores table: {e}")
+            raise
+
+
 async def run_migrations():
     """Run all pending migrations."""
     print("🔄 Running database migrations...")
     await drop_session_activities_table()
     await drop_score_records_table()
+    await drop_scores_table()
     await add_deleted_at_column()
-    await create_scores_table()
     await add_student_token_column()
     print("✅ Migrations completed")
