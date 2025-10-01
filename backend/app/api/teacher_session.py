@@ -397,9 +397,6 @@ async def session_chat(session_id: str, request: SessionChatRequest):
         if storage_service and await storage_service.is_database_enabled():
             try:
                 print(f"💬 Saving AI message for student {request.student_id}: {socratic_response[:50]}...")
-                # Get the message ID from the saved AI response for score record
-                from app.models.database_models import Message
-                from app.core.database import AsyncSessionLocal
 
                 result = await storage_service.save_message(
                     session_id=session_id,
@@ -410,20 +407,30 @@ async def session_chat(session_id: str, request: SessionChatRequest):
                 print(f"✅ AI message saved successfully: {result}")
 
                 # Get the user message ID for score record
-                async with AsyncSessionLocal() as db_session:
+                try:
+                    from app.models.database_models import Message
+                    from app.core.database import AsyncSessionLocal
                     from sqlalchemy import select, and_, desc
-                    stmt = select(Message.id).where(
-                        and_(
-                            Message.session_id == session_id,
-                            Message.student_id == request.student_id,
-                            Message.message_type == "user"
-                        )
-                    ).order_by(desc(Message.timestamp)).limit(1)
-                    result = await db_session.execute(stmt)
-                    message_id = result.scalar_one_or_none()
+
+                    async with AsyncSessionLocal() as db_session:
+                        stmt = select(Message.id).where(
+                            and_(
+                                Message.session_id == session_id,
+                                Message.student_id == request.student_id,
+                                Message.message_type == "user"
+                            )
+                        ).order_by(desc(Message.timestamp)).limit(1)
+                        result = await db_session.execute(stmt)
+                        message_id = result.scalar_one_or_none()
+                        print(f"📝 Found user message ID for scoring: {message_id}")
+                except Exception as msg_id_error:
+                    print(f"⚠️ Could not retrieve user message ID: {msg_id_error}")
+                    message_id = None
 
             except Exception as e:
-                print(f"Warning: Could not save AI message: {e}")
+                print(f"❌ Error saving AI message: {e}")
+                import traceback
+                traceback.print_exc()
 
         # Evaluate understanding using the new message and AI response
         evaluation_result = await assessment_service.evaluate_socratic_dimensions(
@@ -457,7 +464,7 @@ async def session_chat(session_id: str, request: SessionChatRequest):
             except Exception as e:
                 print(f"Warning: Could not save score to database: {e}")
 
-        # Update student progress in session service
+        # Update student progress in session service (without saving message again)
         try:
             await session_service.update_student_progress(
                 session_id,
@@ -465,7 +472,7 @@ async def session_chat(session_id: str, request: SessionChatRequest):
                 understanding_score,
                 evaluation_result["dimensions"],
                 is_completed,
-                request.message
+                ""  # Don't save message again - already saved above
             )
         except Exception as e:
             print(f"Warning: Could not update student progress: {e}")

@@ -400,6 +400,7 @@ class DatabaseService:
     async def save_message(self, session_id: str, student_id: str, content: str, message_type: str) -> bool:
         """Save a single message to database."""
         try:
+            print(f"🔍 Attempting to save message: session={session_id}, student={student_id}, type={message_type}")
             async with await self._get_session() as session:
                 new_message = Message(
                     student_id=student_id,
@@ -409,10 +410,14 @@ class DatabaseService:
                     timestamp=datetime.now(self.kst)
                 )
                 session.add(new_message)
+                print(f"🔍 Message added to session, committing...")
                 await session.commit()
+                print(f"✅ Message committed successfully to database")
                 return True
         except Exception as e:
-            print(f"Error saving message: {e}")
+            print(f"❌ Error saving message: {e}")
+            import traceback
+            traceback.print_exc()
             return False
 
     async def get_student_messages(self, session_id: str, student_id: str) -> List[Dict[str, Any]]:

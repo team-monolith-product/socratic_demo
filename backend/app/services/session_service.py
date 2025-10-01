@@ -367,6 +367,19 @@ class SessionService:
                 'type': 'user'
             })
 
+            # Save user message to database if database is enabled
+            if await self.storage_service.is_database_enabled():
+                try:
+                    await self.storage_service.save_message(
+                        session_id=session_id,
+                        student_id=student_id,
+                        content=last_message,
+                        message_type="user"
+                    )
+                    print(f"✅ User message saved to database for student {student_id}")
+                except Exception as e:
+                    print(f"❌ Failed to save user message to database: {e}")
+
         if is_completed and not student_data['progress']['is_completed']:
             student_data['progress']['is_completed'] = True
             student_data['progress']['completed_at'] = now.isoformat()  # Convert to ISO string with timezone
