@@ -371,7 +371,13 @@ class SocraticChatHandler {
         } catch (error) {
             console.error('Error initializing conversation:', error);
             // 실패시 기본 메시지로 시작
-            this.addMessage('ai', '안녕하세요! 함께 탐구해볼까요?');
+            const fallbackMessage = '안녕하세요! 함께 탐구해볼까요?';
+            this.addMessage('ai', fallbackMessage);
+            this.messages.push({ role: 'assistant', content: fallbackMessage });
+
+            // 대화 기록을 로컬 스토리지에 저장
+            this.saveConversationToStorage();
+
             this.hideLoadingMessage();
             this.enableInput();
         }
@@ -433,6 +439,10 @@ class SocraticChatHandler {
 
             // AI 첫 메시지 표시
             this.addMessage('ai', data.initial_message);
+            this.messages.push({ role: 'assistant', content: data.initial_message });
+
+            // 대화 기록을 로컬 스토리지에 저장
+            this.saveConversationToStorage();
 
             // 로딩 메시지 제거
             this.hideLoadingMessage();
@@ -442,8 +452,14 @@ class SocraticChatHandler {
 
         } catch (error) {
             console.error('Error loading initial message:', error);
+            const fallbackMessage = '안녕하세요! 함께 탐구해볼까요?';
+            this.addMessage('ai', fallbackMessage);
+            this.messages.push({ role: 'assistant', content: fallbackMessage });
+
+            // 대화 기록을 로컬 스토리지에 저장
+            this.saveConversationToStorage();
+
             this.hideLoadingMessage();
-            this.addMessage('ai', '안녕하세요! 함께 탐구해볼까요?');
             this.enableInput();
         }
     }
@@ -530,6 +546,10 @@ class SocraticChatHandler {
 
             const data = await response.json();
             this.addMessage('ai', data.initial_message);
+            this.messages.push({ role: 'assistant', content: data.initial_message });
+
+            // 대화 기록을 로컬 스토리지에 저장
+            this.saveConversationToStorage();
 
             // 로딩 메시지 제거 및 입력 필드 활성화
             this.hideLoadingMessage();
@@ -537,7 +557,12 @@ class SocraticChatHandler {
 
         } catch (error) {
             console.error('Error loading initial message for session:', error);
-            this.addMessage('ai', '안녕하세요! 함께 탐구해볼까요?');
+            const fallbackMessage = '안녕하세요! 함께 탐구해볼까요?';
+            this.addMessage('ai', fallbackMessage);
+            this.messages.push({ role: 'assistant', content: fallbackMessage });
+
+            // 대화 기록을 로컬 스토리지에 저장
+            this.saveConversationToStorage();
 
             // 오류 시에도 로딩 메시지 제거 및 입력 필드 활성화
             this.hideLoadingMessage();
