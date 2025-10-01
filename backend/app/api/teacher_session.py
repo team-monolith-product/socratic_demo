@@ -271,14 +271,16 @@ async def join_session(session_id: str, request: SessionJoinRequest, http_reques
             storage_service = get_storage_service()
             if storage_service and await storage_service.is_database_enabled():
                 try:
-                    await storage_service.save_message(
+                    print(f"💬 Saving initial AI message for student {student_id}: {initial_message[:50]}...")
+                    result = await storage_service.save_message(
                         session_id=session_id,
                         student_id=student_id,
                         content=initial_message,
                         message_type="assistant"
                     )
+                    print(f"✅ Initial AI message saved successfully: {result}")
                 except Exception as e:
-                    print(f"Warning: Could not save initial AI message: {e}")
+                    print(f"❌ Warning: Could not save initial AI message: {e}")
         else:
             # For returning students, we won't show a separate initial message
             # The frontend will load previous chat history instead
@@ -394,16 +396,18 @@ async def session_chat(session_id: str, request: SessionChatRequest):
         message_id = None
         if storage_service and await storage_service.is_database_enabled():
             try:
+                print(f"💬 Saving AI message for student {request.student_id}: {socratic_response[:50]}...")
                 # Get the message ID from the saved AI response for score record
                 from app.models.database_models import Message
                 from app.core.database import AsyncSessionLocal
 
-                await storage_service.save_message(
+                result = await storage_service.save_message(
                     session_id=session_id,
                     student_id=request.student_id,
                     content=socratic_response,
                     message_type="assistant"
                 )
+                print(f"✅ AI message saved successfully: {result}")
 
                 # Get the user message ID for score record
                 async with AsyncSessionLocal() as db_session:
