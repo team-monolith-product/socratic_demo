@@ -6,19 +6,30 @@ from app.core.config import get_settings
 
 settings = get_settings()
 
-# Create async engine
+# Create async engine with proper PostgreSQL settings
 engine = create_async_engine(
     settings.database_url,
     echo=False,  # Set to True for SQL debugging
     future=True,
     pool_pre_ping=True,
+    pool_recycle=300,  # Recycle connections every 5 minutes
+    pool_size=10,
+    max_overflow=20,
+    # PostgreSQL specific settings for transaction isolation
+    connect_args={
+        "server_settings": {
+            "jit": "off",  # Disable JIT for better performance on small queries
+        }
+    } if settings.database_url.startswith("postgresql") else {}
 )
 
-# Create async session factory
+# Create async session factory with proper transaction settings
 AsyncSessionLocal = async_sessionmaker(
     engine,
     class_=AsyncSession,
     expire_on_commit=False,
+    autoflush=True,  # Automatically flush before queries
+    autocommit=False,  # Use transactions explicitly
 )
 
 # Create declarative base
