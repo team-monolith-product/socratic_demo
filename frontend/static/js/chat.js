@@ -21,17 +21,53 @@ class SocraticChatHandler {
 
     // 학생 토큰 관리 (새로고침/재접속 시 대화 기록 보전)
     generateStudentToken() {
-        return 'student_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        // 더 고유한 토큰 생성 (주제 + 학생이름 + 타임스탬프 + 랜덤)
+        const base = this.studentName ? `${this.topic}_${this.studentName}` : this.topic;
+        const safeBase = encodeURIComponent(base).replace(/[^a-zA-Z0-9]/g, '_');
+        return `student_${safeBase}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+
+    getSessionKey() {
+        // 세션 키 생성: 주제 + 학생이름 (있을 경우)
+        if (this.studentName) {
+            // 교사 세션: 주제 + 학생이름으로 고유 식별
+            const safeTopic = encodeURIComponent(this.topic).replace(/[^a-zA-Z0-9]/g, '_');
+            const safeName = encodeURIComponent(this.studentName).replace(/[^a-zA-Z0-9]/g, '_');
+            return `${safeTopic}_${safeName}`;
+        } else {
+            // 개별 학습: 주제만으로 식별
+            return encodeURIComponent(this.topic).replace(/[^a-zA-Z0-9]/g, '_');
+        }
     }
 
     getStoredStudentToken() {
-        const key = `student_token_${this.topic}`;
+        const key = `student_token_${this.getSessionKey()}`;
         return localStorage.getItem(key);
     }
 
     setStoredStudentToken(token) {
-        const key = `student_token_${this.topic}`;
+        const key = `student_token_${this.getSessionKey()}`;
         localStorage.setItem(key, token);
+    }
+
+    // 저장된 대화가 현재 세션과 일치하는지 검증
+    isValidSavedConversation(savedData) {
+        // 주제가 일치해야 함
+        if (savedData.topic !== this.topic) {
+            return false;
+        }
+
+        // 학생 이름이 있는 경우 (교사 세션) 학생 이름도 일치해야 함
+        if (this.studentName && savedData.studentName !== this.studentName) {
+            return false;
+        }
+
+        // 학생 이름이 없는 경우 (개별 학습) 저장된 데이터에도 학생 이름이 없어야 함
+        if (!this.studentName && savedData.studentName) {
+            return false;
+        }
+
+        return true;
     }
 
     // 대화 기록 저장/복원
@@ -40,6 +76,7 @@ class SocraticChatHandler {
 
         const conversationData = {
             topic: this.topic,
+            studentName: this.studentName || null, // 학생 이름 포함 (없으면 null)
             messages: this.messages,
             understandingScore: this.understandingScore,
             isCompleted: this.isCompleted,
@@ -350,10 +387,10 @@ class SocraticChatHandler {
     // 대화 초기화: 저장된 기록이 있으면 복원, 없으면 새로 시작
     async initializeConversation() {
         try {
-            // 1. 먼저 저장된 대화 기록 확인 (같은 주제, 같은 토큰)
+            // 1. 먼저 저장된 대화 기록 확인 (같은 주제 + 같은 학생이름)
             const savedConversation = this.loadConversationFromStorage();
 
-            if (savedConversation && savedConversation.topic === this.topic) {
+            if (savedConversation && this.isValidSavedConversation(savedConversation)) {
                 // 저장된 대화 기록 복원
                 console.log('Restoring saved conversation:', savedConversation);
                 this.restoreConversationFromSaved(savedConversation);
@@ -991,24 +1028,46 @@ const chatUtils = {
         return message.trim().length > 0 && message.length <= 1000;
     },
 
-    // 세션 데이터 정리 (오래된 대화 기록 삭제)
+    // 세션 데이터 정리 (오래된 대화 기록 및 토큰 삭제)
     cleanupOldSessions() {
         const MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 7일
         const now = Date.now();
+        const keysToRemove = [];
 
+        // localStorage의 모든 키를 먼저 수집
         for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
+
+            // 대화 기록 정리
             if (key.startsWith('conversation_')) {
                 try {
                     const data = JSON.parse(localStorage.getItem(key));
                     if (data.timestamp && (now - data.timestamp) > MAX_AGE) {
-                        localStorage.removeItem(key);
-                        console.log('Cleaned up old session:', key);
+                        keysToRemove.push(key);
                     }
                 } catch (error) {
-                    localStorage.removeItem(key);
+                    keysToRemove.push(key); // 잘못된 데이터도 제거
                 }
             }
+
+            // 고아 토큰 정리 (해당하는 대화 기록이 없는 토큰)
+            if (key.startsWith('student_token_')) {
+                const token = localStorage.getItem(key);
+                const conversationKey = `conversation_${token}`;
+                if (!localStorage.getItem(conversationKey)) {
+                    keysToRemove.push(key); // 대화 기록이 없는 토큰 제거
+                }
+            }
+        }
+
+        // 수집된 키들을 실제로 제거
+        keysToRemove.forEach(key => {
+            localStorage.removeItem(key);
+            console.log('Cleaned up old data:', key);
+        });
+
+        if (keysToRemove.length > 0) {
+            console.log(`Cleaned up ${keysToRemove.length} old session items`);
         }
     }
 };
