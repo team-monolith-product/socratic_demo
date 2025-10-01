@@ -280,7 +280,9 @@ async def join_session(session_id: str, request: SessionJoinRequest, http_reques
                 except Exception as e:
                     print(f"Warning: Could not save initial AI message: {e}")
         else:
-            initial_message = "다시 오셨군요! 이전 대화를 이어서 계속해보세요."
+            # For returning students, we won't show a separate initial message
+            # The frontend will load previous chat history instead
+            initial_message = ""
 
         # Get current score for returning students
         current_score = join_result.get('current_score', 0)
