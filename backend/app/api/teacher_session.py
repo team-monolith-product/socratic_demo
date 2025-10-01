@@ -620,3 +620,42 @@ async def get_student_scores(session_id: str, student_id: str, request: Request)
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/session/{session_id}/history/{student_id}")
+async def get_student_chat_history(session_id: str, student_id: str):
+    """Get chat history for a specific student (public endpoint for student access)"""
+    try:
+        session_service = get_session_service()
+        storage_service = session_service.storage_service
+
+        # Verify session exists and is active
+        session_data = session_service.active_sessions.get(session_id)
+        if not session_data:
+            raise HTTPException(status_code=404, detail="Session not found")
+
+        # Verify student is part of this session
+        student_exists = False
+        if hasattr(session_service, 'session_students'):
+            session_students = session_service.session_students.get(session_id, {})
+            if student_id in session_students:
+                student_exists = True
+
+        if not student_exists:
+            raise HTTPException(status_code=403, detail="Student not authorized for this session")
+
+        # Get chat history from database if available
+        if storage_service and await storage_service.is_database_enabled():
+            try:
+                messages = await storage_service.get_student_messages(session_id, student_id)
+                return {"messages": messages}
+            except Exception as e:
+                print(f"Warning: Could not load message history: {e}")
+                return {"messages": []}
+        else:
+            return {"messages": [], "message": "Database not available"}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

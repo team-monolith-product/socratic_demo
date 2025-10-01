@@ -81,8 +81,9 @@ class StudentSession {
         const joinResponse = await response.json();
         console.log('Successfully re-entered session:', joinResponse);
 
-        // Update student_id
+        // Update student_id and current score
         this.studentId = joinResponse.student_id;
+        this.currentScore = joinResponse.understanding_score || 0;
 
         // Redirect to chat interface
         this.redirectToChatInterface();
@@ -264,6 +265,7 @@ URL: ${window.location.href}
             // Store student_id and token from response
             this.studentId = joinResponse.student_id;
             this.studentToken = joinResponse.student_token;
+            this.currentScore = joinResponse.understanding_score || 0;
 
             // Save token and name to localStorage for re-entry
             this.setStudentToken(joinResponse.student_token);
@@ -316,7 +318,8 @@ URL: ${window.location.href}
             topic: config.topic || '소크라테스 학습',
             difficulty: config.difficulty || 'normal',
             showScore: config.show_score || false,
-            mode: 'student'
+            mode: 'student',
+            currentScore: this.currentScore || 0  // Include current score for returning students
         });
 
         const chatUrl = `/pages/socratic-chat.html?${params.toString()}`;

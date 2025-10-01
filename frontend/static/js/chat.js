@@ -300,6 +300,107 @@ class SocraticChatHandler {
     
     async loadInitialMessage() {
         try {
+            // Session mode: Load previous chat history and scores for returning students
+            if (this.sessionId && this.studentId) {
+                await this.loadSessionHistory();
+            } else {
+                // Legacy standalone mode
+                const response = await fetch(`${this.apiBase}/chat/initial`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        topic: this.topic,
+                        difficulty: this.difficulty
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('초기 메시지 로드에 실패했습니다.');
+                }
+
+                const data = await response.json();
+
+                // AI 첫 메시지 표시
+                this.addMessage('ai', data.initial_message);
+            }
+
+            // 로딩 메시지 제거
+            this.hideLoadingMessage();
+
+            // 입력 필드 활성화
+            this.enableInput();
+
+        } catch (error) {
+            console.error('Error loading initial message:', error);
+            this.hideLoadingMessage();
+            this.addMessage('ai', '안녕하세요! 함께 탐구해볼까요?');
+            this.enableInput();
+        }
+    }
+
+    async loadSessionHistory() {
+        try {
+            console.log('Loading session history for student:', this.studentId);
+
+            // Get current score from URL parameters (passed from join session response)
+            const urlParams = this.getUrlParams();
+            const currentScore = parseInt(urlParams.currentScore) || 0;
+            if (currentScore > 0) {
+                this.understandingScore = currentScore;
+                if (this.showScore) {
+                    this.updateUnderstandingGauge(this.understandingScore);
+                }
+                console.log('Restored understanding score from URL:', this.understandingScore);
+            }
+
+            // Load chat history using the API call
+            const historyResponse = await fetch(`${this.apiBase}/session/${this.sessionId}/history/${this.studentId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            if (historyResponse.ok) {
+                const historyData = await historyResponse.json();
+                console.log('Chat history loaded:', historyData);
+
+                // Restore previous messages to UI
+                if (historyData.messages && historyData.messages.length > 0) {
+                    // Clear any existing messages
+                    const messagesContainer = document.getElementById('messagesContainer');
+                    if (messagesContainer) {
+                        messagesContainer.innerHTML = '';
+                    }
+
+                    // Add previous messages to UI
+                    historyData.messages.forEach(msg => {
+                        const role = msg.message_type === 'assistant' ? 'ai' : 'user';
+                        this.addMessage(role, msg.content);
+                        this.messages.push({ role: role, content: msg.content });
+                    });
+
+                    console.log('Restored', historyData.messages.length, 'previous messages');
+                } else {
+                    // No previous messages, load initial message
+                    await this.loadInitialMessageForSession();
+                }
+            } else {
+                // Fallback: load initial message
+                await this.loadInitialMessageForSession();
+            }
+
+        } catch (error) {
+            console.error('Error loading session history:', error);
+            // Fallback: load initial message
+            await this.loadInitialMessageForSession();
+        }
+    }
+
+    async loadInitialMessageForSession() {
+        try {
             const response = await fetch(`${this.apiBase}/chat/initial`, {
                 method: 'POST',
                 headers: {
@@ -310,30 +411,20 @@ class SocraticChatHandler {
                     difficulty: this.difficulty
                 })
             });
-            
+
             if (!response.ok) {
                 throw new Error('초기 메시지 로드에 실패했습니다.');
             }
-            
+
             const data = await response.json();
-            
-            // 로딩 메시지 제거
-            this.hideLoadingMessage();
-            
-            // AI 첫 메시지 표시
             this.addMessage('ai', data.initial_message);
-            
-            // 입력 필드 활성화
-            this.enableInput();
-            
+
         } catch (error) {
-            console.error('Error loading initial message:', error);
-            this.hideLoadingMessage();
+            console.error('Error loading initial message for session:', error);
             this.addMessage('ai', '안녕하세요! 함께 탐구해볼까요?');
-            this.enableInput();
         }
     }
-    
+
     async handleChatSubmit(event) {
         event.preventDefault();
         
