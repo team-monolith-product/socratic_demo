@@ -65,6 +65,26 @@ class Session(Base):
     time_limit: Mapped[Optional[int]] = mapped_column(Integer)
     max_students: Mapped[Optional[int]] = mapped_column(Integer)
     status: Mapped[str] = mapped_column(String(10), default="active", index=True)
+
+    # Enhanced topic tracking fields
+    topic_type: Mapped[str] = mapped_column(String(20), default="manual", index=True)  # manual, pdf_noun, pdf_sentence, pdf_summary, hybrid
+    topic_source: Mapped[str] = mapped_column(String(20), default="manual")  # manual, pdf, hybrid
+
+    # PDF-related topic variations (nullable for manual topics)
+    pdf_noun_topic: Mapped[Optional[str]] = mapped_column(String(500))  # 2-6 words for QR/chat display
+    pdf_sentence_topic: Mapped[Optional[str]] = mapped_column(Text)  # One sentence for UI display
+    pdf_summary_topic: Mapped[Optional[str]] = mapped_column(Text)  # 3-4 paragraphs compressed content
+    pdf_original_content: Mapped[Optional[str]] = mapped_column(Text)  # Original extracted PDF text
+
+    # Manual input content
+    manual_topic_content: Mapped[Optional[str]] = mapped_column(Text)  # Teacher direct input
+
+    # Combined/final topic content (what gets used for chat)
+    final_topic_content: Mapped[str] = mapped_column(Text, nullable=False)  # Final processed topic for AI
+
+    # Topic metadata
+    topic_metadata: Mapped[Optional[dict]] = mapped_column(JSON)  # Additional topic information
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),

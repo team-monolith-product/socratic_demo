@@ -8,14 +8,29 @@ class SessionConfig(BaseModel):
     description: Optional[str] = None
     difficulty: str = "normal"  # easy, normal, hard
     show_score: bool = True
-    # 통합 학습 주제를 위한 새로운 필드
+
+    # Enhanced topic tracking fields
     source_type: str = "manual"  # "manual", "pdf", "hybrid"
-    pdf_content: Optional[str] = None  # PDF 분석 3문단 요약
-    manual_content: Optional[str] = None  # 사용자 직접 입력
+
+    # PDF analysis results (4 types)
+    pdf_noun_topic: Optional[str] = None  # 명사형 주제 (2-6 words)
+    pdf_sentence_topic: Optional[str] = None  # 한 문장 주제 (UI display)
+    pdf_summary_topic: Optional[str] = None  # 요약 줄글 (3-4 paragraphs)
+    pdf_original_content: Optional[str] = None  # Original extracted PDF text
+
+    # Manual input
+    manual_content: Optional[str] = None  # 교사 직접 입력 주제
+
+    # Final processed content
     combined_topic: Optional[str] = None  # 최종 통합된 학습 주제
+    final_topic_content: Optional[str] = None  # Final content used for AI chat
+
+    # Legacy fields for compatibility
+    pdf_content: Optional[str] = None  # Legacy field - maps to one of the PDF types
     main_keyword: Optional[str] = None  # PDF 분석 시 추출된 대표 키워드
     key_concepts: Optional[List[str]] = None
     learning_objectives: Optional[List[str]] = None
+    original_text: Optional[str] = None  # Legacy mapping to pdf_original_content
 
 class SessionCreateRequest(BaseModel):
     config: SessionConfig

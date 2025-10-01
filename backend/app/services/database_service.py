@@ -66,6 +66,9 @@ class DatabaseService:
                     existing_session.status = session_data.get('status', 'active')
                     existing_session.last_activity = self._parse_datetime(session_data.get('last_activity'))
                     existing_session.ended_at = self._parse_datetime(session_data.get('ended_at'))
+
+                    # Update enhanced topic tracking fields
+                    self._update_topic_fields(existing_session, session_data['config'])
                 else:
                     # Create new session
                     new_session = Session(
@@ -84,6 +87,9 @@ class DatabaseService:
                         last_activity=self._parse_datetime(session_data.get('last_activity')),
                         ended_at=self._parse_datetime(session_data.get('ended_at'))
                     )
+
+                    # Set enhanced topic tracking fields for new session
+                    self._update_topic_fields(new_session, session_data['config'])
                     db_session.add(new_session)
 
                 await db_session.commit()
@@ -625,6 +631,60 @@ class DatabaseService:
 
 
 
+
+
+    def _update_topic_fields(self, session, config: Dict[str, Any]):
+        """Update enhanced topic tracking fields from session config."""
+        # Determine topic type and source
+        source_type = config.get('source_type', 'manual')
+
+        # Map source types to our enhanced classification
+        if source_type == 'manual':
+            session.topic_type = 'manual'
+            session.topic_source = 'manual'
+            session.manual_topic_content = config.get('manual_content') or config.get('topic')
+            session.final_topic_content = config.get('combined_topic') or config.get('topic')
+        elif source_type == 'pdf':
+            # Determine which PDF variant based on what's available
+            if config.get('pdf_content'):
+                # Check if it's the compressed content (longer) or others
+                pdf_content = config.get('pdf_content', '')
+                if len(pdf_content) > 500:  # Likely the compressed content (요약 줄글)
+                    session.topic_type = 'pdf_summary'
+                    session.pdf_summary_topic = pdf_content
+                elif len(pdf_content) < 50:  # Likely noun topic (명사형)
+                    session.topic_type = 'pdf_noun'
+                    session.pdf_noun_topic = pdf_content
+                else:  # Likely sentence topic (한 문장)
+                    session.topic_type = 'pdf_sentence'
+                    session.pdf_sentence_topic = pdf_content
+            else:
+                session.topic_type = 'pdf_summary'  # Default fallback
+
+            session.topic_source = 'pdf'
+            session.pdf_original_content = config.get('original_text')
+            session.final_topic_content = config.get('combined_topic') or config.get('topic')
+        elif source_type == 'hybrid':
+            session.topic_type = 'hybrid'
+            session.topic_source = 'hybrid'
+            session.pdf_summary_topic = config.get('pdf_content')
+            session.manual_topic_content = config.get('manual_content')
+            session.final_topic_content = config.get('combined_topic') or config.get('topic')
+        else:
+            # Fallback to manual
+            session.topic_type = 'manual'
+            session.topic_source = 'manual'
+            session.manual_topic_content = config.get('topic')
+            session.final_topic_content = config.get('topic')
+
+        # Store additional metadata
+        session.topic_metadata = {
+            'source_type': source_type,
+            'key_concepts': config.get('key_concepts', []),
+            'learning_objectives': config.get('learning_objectives', []),
+            'main_keyword': config.get('main_keyword'),
+            'processing_timestamp': datetime.now(self.kst).isoformat()
+        }
 
 
 # Singleton instance
