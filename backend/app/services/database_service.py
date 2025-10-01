@@ -401,7 +401,10 @@ class DatabaseService:
         """Save a single message to database."""
         try:
             print(f"🔍 Attempting to save message: session={session_id}, student={student_id}, type={message_type}")
-            async with await self._get_session() as session:
+
+            # Use a separate session to ensure isolation
+            session = AsyncSessionLocal()
+            try:
                 new_message = Message(
                     student_id=student_id,
                     session_id=session_id,
@@ -412,8 +415,16 @@ class DatabaseService:
                 session.add(new_message)
                 print(f"🔍 Message added to session, committing...")
                 await session.commit()
-                print(f"✅ Message committed successfully to database")
+
+                # Get the ID of the saved message
+                await session.refresh(new_message)
+                message_id = new_message.id
+                print(f"✅ Message committed successfully to database with ID: {message_id}")
                 return True
+
+            finally:
+                await session.close()
+
         except Exception as e:
             print(f"❌ Error saving message: {e}")
             import traceback
@@ -423,7 +434,12 @@ class DatabaseService:
     async def get_student_messages(self, session_id: str, student_id: str) -> List[Dict[str, Any]]:
         """Get all messages for a specific student in a session."""
         try:
-            async with await self._get_session() as session:
+            print(f"🔍 Getting messages for session={session_id}, student={student_id}")
+
+            # Use a separate session to ensure consistency
+            session = AsyncSessionLocal()
+            try:
+                from sqlalchemy import select, and_
                 stmt = select(Message).where(
                     and_(Message.session_id == session_id, Message.student_id == student_id)
                 ).order_by(Message.timestamp.desc())
@@ -431,7 +447,9 @@ class DatabaseService:
                 result = await session.execute(stmt)
                 messages = result.scalars().all()
 
-                return [
+                print(f"🔍 Found {len(messages)} messages for student")
+
+                result_list = [
                     {
                         "content": msg.content,
                         "message_type": msg.message_type,
@@ -439,8 +457,17 @@ class DatabaseService:
                     }
                     for msg in messages
                 ]
+
+                print(f"✅ Returning {len(result_list)} messages")
+                return result_list
+
+            finally:
+                await session.close()
+
         except Exception as e:
-            print(f"Error getting student messages: {e}")
+            print(f"❌ Error getting student messages: {e}")
+            import traceback
+            traceback.print_exc()
             return []
 
     async def get_session_messages(self, session_id: str) -> List[Dict[str, Any]]:
