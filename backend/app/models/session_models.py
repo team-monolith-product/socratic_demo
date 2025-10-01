@@ -74,6 +74,7 @@ class SessionDetailsResponse(BaseModel):
 
 class SessionJoinRequest(BaseModel):
     student_name: str
+    student_token: Optional[str] = None  # Optional token for reconnection
 
 class SessionJoinResponse(BaseModel):
     success: bool

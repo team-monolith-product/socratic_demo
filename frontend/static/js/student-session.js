@@ -59,6 +59,25 @@ class StudentSession {
         localStorage.removeItem(nameKey);
     }
 
+    checkForStoredData() {
+        // Pre-fill name if stored
+        const storedName = this.getStoredStudentName();
+        const storedToken = this.getStoredStudentToken();
+
+        if (storedName && storedToken) {
+            console.log(`🔄 Found stored data - Name: ${storedName}, Token: ${storedToken?.substring(0, 8)}...`);
+
+            // Auto-fill the name input when it becomes available
+            setTimeout(() => {
+                const nameInput = document.getElementById('student-name');
+                if (nameInput) {
+                    nameInput.value = storedName;
+                    this.validateInput(); // Enable join button if name is valid
+                }
+            }, 100);
+        }
+    }
+
 
     async init() {
         console.log('Initializing Student Session...', this.sessionId);
@@ -69,6 +88,9 @@ class StudentSession {
 
             // Setup event listeners
             this.setupEventListeners();
+
+            // Pre-fill name if stored and check for auto-reconnection
+            this.checkForStoredData();
 
             // Always show session info screen (require name input)
             this.showSessionInfo();
@@ -178,9 +200,11 @@ URL: ${window.location.href}
         joinButton.textContent = '참여 중...';
 
         try {
-            // Join session via API (name-based matching)
+            // Join session via API (token + name-based matching)
+            const storedToken = this.getStoredStudentToken();
             const requestBody = {
-                student_name: this.studentName
+                student_name: this.studentName,
+                student_token: storedToken  // Include stored token for reconnection
             };
 
             const response = await fetch(`${this.apiBaseUrl}/session/${this.sessionId}/join`, {

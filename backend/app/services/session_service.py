@@ -234,16 +234,27 @@ class SessionService:
 
         now = self.get_korea_time()
 
-        # Check if student already exists in this session (by name)
+        # Check if student already exists in this session (by token first, then by name)
         existing_student = None
         existing_student_id = None
         if session_id in self.session_students:
-            for student_id, student_data in self.session_students[session_id].items():
-                if student_data.get('name', '').strip().lower() == student_name.strip().lower():
-                    existing_student = student_data
-                    existing_student_id = student_id
-                    print(f"🔄 Returning student detected: {student_id} with name '{student_name}'")
-                    break
+            # First try to match by token (more reliable)
+            if student_token:
+                for student_id, student_data in self.session_students[session_id].items():
+                    if student_data.get('token') == student_token:
+                        existing_student = student_data
+                        existing_student_id = student_id
+                        print(f"🔄 Returning student detected by TOKEN: {student_id} with token '{student_token[:8]}...'")
+                        break
+
+            # If no token match, fall back to name matching (legacy support)
+            if not existing_student:
+                for student_id, student_data in self.session_students[session_id].items():
+                    if student_data.get('name', '').strip().lower() == student_name.strip().lower():
+                        existing_student = student_data
+                        existing_student_id = student_id
+                        print(f"🔄 Returning student detected by NAME: {student_id} with name '{student_name}'")
+                        break
 
         if existing_student:
             # Returning student with same name

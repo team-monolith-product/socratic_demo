@@ -250,8 +250,8 @@ async def join_session(session_id: str, request: SessionJoinRequest, http_reques
         session_service = get_session_service()
         socratic_service = get_socratic_service()
 
-        # Join session (name-based matching for returning students)
-        join_result = await session_service.join_session(session_id, request.student_name)
+        # Join session (token + name-based matching for returning students)
+        join_result = await session_service.join_session(session_id, request.student_name, request.student_token)
         if not join_result:
             raise HTTPException(status_code=404, detail="Session not found or expired")
 
