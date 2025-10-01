@@ -226,7 +226,7 @@ class SessionService:
         return result
 
     async def join_session(self, session_id: str, student_name: str = "익명", student_token: str = None) -> Optional[Dict[str, Any]]:
-        """Student joins a session (supports re-entry via session token)"""
+        """Student joins a session (name-based matching for returning students)"""
         await self._ensure_data_loaded()
         session_data = self.active_sessions.get(session_id)
         if not session_data:
@@ -234,39 +234,26 @@ class SessionService:
 
         now = self.get_korea_time()
 
-        # Check if student already exists in this session (by token)
+        # Check if student already exists in this session (by name)
         existing_student = None
-        if student_token and session_id in self.session_students:
+        existing_student_id = None
+        if session_id in self.session_students:
             for student_id, student_data in self.session_students[session_id].items():
-                if student_data.get('token') == student_token:
+                if student_data.get('name', '').strip().lower() == student_name.strip().lower():
                     existing_student = student_data
-                    print(f"🔄 Returning student detected: {student_id} with token {student_token[:8]}...")
+                    existing_student_id = student_id
+                    print(f"🔄 Returning student detected: {student_id} with name '{student_name}'")
                     break
 
         if existing_student:
-            # Returning student with valid token
-            # Check if the name they want to use is taken by another student
-            if session_id in self.session_students:
-                for existing_student_id, existing_student_data in self.session_students[session_id].items():
-                    # Skip if it's the same student (same token)
-                    if existing_student_data.get('token') == student_token:
-                        continue
-                    # Check if name is already taken by a different student
-                    if existing_student_data.get('name', '').strip().lower() == student_name.strip().lower():
-                        print(f"❌ Returning student trying to use taken name '{student_name}' in session {session_id}")
-                        return {
-                            'error': 'name_taken',
-                            'message': f"'{student_name}' 이름은 이미 사용 중입니다. 다른 이름을 입력해주세요."
-                        }
-
-            # Update existing student's last active time and name
+            # Returning student with same name
+            # Update existing student's last active time
             existing_student['last_active'] = now.isoformat()
-            existing_student['name'] = student_name  # Update name in case it changed
 
             # Save updated data
             try:
                 await self.storage_service.save_session_students(session_id, self.session_students[session_id])
-                print(f"💾 Updated returning student {existing_student['id']} in session {session_id}")
+                print(f"💾 Updated returning student {existing_student_id} in session {session_id}")
             except Exception as e:
                 print(f"❌ Failed to save returning student: {e}")
 
@@ -279,20 +266,11 @@ class SessionService:
                 'current_score': existing_student['progress']['current_score']
             }
 
-        # Check if the name is already taken by another student (new student case)
-        if session_id in self.session_students:
-            for existing_student_id, existing_student_data in self.session_students[session_id].items():
-                # Check if name is already taken
-                if existing_student_data.get('name', '').strip().lower() == student_name.strip().lower():
-                    print(f"❌ Name '{student_name}' is already taken in session {session_id}")
-                    return {
-                        'error': 'name_taken',
-                        'message': f"'{student_name}' 이름은 이미 사용 중입니다. 다른 이름을 입력해주세요."
-                    }
-
-        # Create new student
+        # Create new student (name is unique now since we didn't find existing one)
         student_id = str(uuid.uuid4())
         new_student_token = self.generate_student_token()  # Generate new token
+
+        print(f"✨ Creating new student: {student_id} with name '{student_name}'")
 
         # Create student data
         student_data = {

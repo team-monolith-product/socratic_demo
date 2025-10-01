@@ -74,7 +74,6 @@ class SessionDetailsResponse(BaseModel):
 
 class SessionJoinRequest(BaseModel):
     student_name: str
-    student_token: Optional[str] = None  # For re-entry detection
 
 class SessionJoinResponse(BaseModel):
     success: bool

@@ -59,35 +59,6 @@ class StudentSession {
         localStorage.removeItem(nameKey);
     }
 
-    async joinSessionWithToken() {
-        console.log('Attempting re-entry with stored token...');
-
-        const response = await fetch(`${this.apiBaseUrl}/session/${this.sessionId}/join`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                student_name: this.studentName,
-                student_token: this.studentToken
-            })
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.detail || `HTTP ${response.status}`);
-        }
-
-        const joinResponse = await response.json();
-        console.log('Successfully re-entered session:', joinResponse);
-
-        // Update student_id and current score
-        this.studentId = joinResponse.student_id;
-        this.currentScore = joinResponse.understanding_score || 0;
-
-        // Redirect to chat interface
-        this.redirectToChatInterface();
-    }
 
     async init() {
         console.log('Initializing Student Session...', this.sessionId);
@@ -99,28 +70,7 @@ class StudentSession {
             // Setup event listeners
             this.setupEventListeners();
 
-            // Check for existing student token (for re-entry)
-            const storedToken = this.getStoredStudentToken();
-            const storedName = this.getStoredStudentName();
-
-            if (storedToken && storedName) {
-                console.log('Found stored token, attempting re-entry...');
-                this.studentToken = storedToken;
-                this.studentName = storedName;
-
-                // Try to join with existing token
-                try {
-                    await this.joinSessionWithToken();
-                    // If successful, go directly to chat
-                    return;
-                } catch (error) {
-                    console.log('Re-entry failed, clearing stored data:', error);
-                    this.clearStoredData();
-                    // Continue to show session info screen
-                }
-            }
-
-            // Show session info screen
+            // Always show session info screen (require name input)
             this.showSessionInfo();
 
         } catch (error) {
@@ -228,15 +178,10 @@ URL: ${window.location.href}
         joinButton.textContent = '참여 중...';
 
         try {
-            // Join session via API (include token if available)
+            // Join session via API (name-based matching)
             const requestBody = {
                 student_name: this.studentName
             };
-
-            // Include token if available for re-entry
-            if (this.studentToken) {
-                requestBody.student_token = this.studentToken;
-            }
 
             const response = await fetch(`${this.apiBaseUrl}/session/${this.sessionId}/join`, {
                 method: 'POST',
