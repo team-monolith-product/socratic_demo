@@ -136,15 +136,8 @@ class SessionService:
         current_korea_time = self.get_korea_time()
         print(f"🕐 DEBUG - get_teacher_sessions current Korea time: {current_korea_time}")
 
-        print(f"🔍 DEBUG - Total active sessions: {len(self.active_sessions)}")
-        print(f"🔍 DEBUG - Looking for fingerprint: {teacher_fingerprint}")
-
         for session_id, session_data in self.active_sessions.items():
-            session_fingerprint = session_data['teacher_fingerprint']
-            print(f"🔍 DEBUG - Session {session_id} has fingerprint: {session_fingerprint}")
-
             if session_data['teacher_fingerprint'] == teacher_fingerprint:
-                print(f"🔍 DEBUG - MATCH! Processing session {session_id}")
 
                 # Update live stats before returning
                 await self._update_session_live_stats(session_id)
@@ -233,7 +226,7 @@ class SessionService:
         return result
 
     async def join_session(self, session_id: str, student_name: str = "익명", student_token: str = None) -> Optional[Dict[str, Any]]:
-        """Student joins a session (supports re-entry via student token)"""
+        """Student joins a session (supports re-entry via session token)"""
         await self._ensure_data_loaded()
         session_data = self.active_sessions.get(session_id)
         if not session_data:

@@ -128,17 +128,9 @@ async def get_session_details(session_id: str, request: Request):
 
         # Generate teacher fingerprint
         teacher_fingerprint = session_service.generate_browser_fingerprint(dict(request.headers))
-        print(f"🔍 Generated fingerprint: {teacher_fingerprint}")
-
-        # Check if session exists in memory
-        active_sessions = getattr(session_service, 'active_sessions', {})
-        print(f"🔍 Active sessions: {list(active_sessions.keys())}")
-        print(f"🔍 Looking for session: {session_id}")
-        print(f"🔍 Session exists: {session_id in active_sessions}")
 
         # Get session details
         session_details = await session_service.get_session_details(session_id, teacher_fingerprint)
-        print(f"🔍 Session details result: {session_details}")
 
         if not session_details:
             print(f"❌ Session not found: {session_id}")
@@ -578,8 +570,8 @@ async def get_session_scores(session_id: str, request: Request):
         storage_service = session_service.storage_service
 
         # Validate teacher access
-        teacher_fingerprint = session_service._generate_teacher_fingerprint(request)
-        session_data = await session_service.get_session(session_id)
+        teacher_fingerprint = session_service.generate_browser_fingerprint(dict(request.headers))
+        session_data = session_service.active_sessions.get(session_id)
 
         if not session_data:
             raise HTTPException(status_code=404, detail="Session not found")
@@ -608,8 +600,8 @@ async def get_student_scores(session_id: str, student_id: str, request: Request)
         storage_service = session_service.storage_service
 
         # Validate teacher access
-        teacher_fingerprint = session_service._generate_teacher_fingerprint(request)
-        session_data = await session_service.get_session(session_id)
+        teacher_fingerprint = session_service.generate_browser_fingerprint(dict(request.headers))
+        session_data = session_service.active_sessions.get(session_id)
 
         if not session_data:
             raise HTTPException(status_code=404, detail="Session not found")
