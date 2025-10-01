@@ -353,28 +353,11 @@ const utils = {
     validateTextLength(text, maxLength = 1000) {
         return text.length <= maxLength;
     },
-    
+
     // 안전한 HTML 인코딩
     escapeHtml(text) {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
-    },
-    
-    // 로컬 스토리지에 주제 저장 (나중에 활용 가능)
-    saveTopicHistory(topic) {
-        try {
-            const history = JSON.parse(localStorage.getItem('topicHistory') || '[]');
-            if (!history.includes(topic)) {
-                history.unshift(topic);
-                // 최대 10개까지만 저장
-                if (history.length > 10) {
-                    history.pop();
-                }
-                localStorage.setItem('topicHistory', JSON.stringify(history));
-            }
-        } catch (error) {
-            console.warn('Failed to save topic history:', error);
-        }
     }
 };

@@ -7,10 +7,11 @@ class SocraticChatHandler {
         this.isCompleted = false;
         this.showScore = true; // 점수 표시 여부
         this.difficulty = 'normal'; // 학습 난이도
-        
+        this.studentToken = null; // 학생 고유 토큰 (지속성을 위해)
+
         this.init();
     }
-    
+
     getApiBase() {
         if (typeof window !== 'undefined' && window.__API_BASE__) {
             return window.__API_BASE__;
@@ -18,10 +19,54 @@ class SocraticChatHandler {
         return '/api/v1';
     }
 
-    // Token management methods
+    // 학생 토큰 관리 (새로고침/재접속 시 대화 기록 보전)
+    generateStudentToken() {
+        return 'student_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
+
     getStoredStudentToken() {
-        const key = `student_token_${this.sessionId}`;
+        const key = `student_token_${this.topic}`;
         return localStorage.getItem(key);
+    }
+
+    setStoredStudentToken(token) {
+        const key = `student_token_${this.topic}`;
+        localStorage.setItem(key, token);
+    }
+
+    // 대화 기록 저장/복원
+    saveConversationToStorage() {
+        if (!this.studentToken) return;
+
+        const conversationData = {
+            topic: this.topic,
+            messages: this.messages,
+            understandingScore: this.understandingScore,
+            isCompleted: this.isCompleted,
+            difficulty: this.difficulty,
+            showScore: this.showScore,
+            timestamp: Date.now()
+        };
+
+        const key = `conversation_${this.studentToken}`;
+        localStorage.setItem(key, JSON.stringify(conversationData));
+    }
+
+    loadConversationFromStorage() {
+        if (!this.studentToken) return null;
+
+        const key = `conversation_${this.studentToken}`;
+        const stored = localStorage.getItem(key);
+
+        if (stored) {
+            try {
+                return JSON.parse(stored);
+            } catch (error) {
+                console.error('Failed to parse stored conversation:', error);
+                localStorage.removeItem(key);
+            }
+        }
+        return null;
     }
 
     init() {
@@ -35,23 +80,29 @@ class SocraticChatHandler {
         this.studentId = urlParams.student_id || '';
         this.studentName = urlParams.student_name || '';
 
-        // Get student token from localStorage
-        this.studentToken = this.getStoredStudentToken();
-        
         if (!this.topic) {
             alert('주제가 설정되지 않았습니다.');
             window.location.href = '/';
             return;
         }
-        
+
+        // 학생 토큰 관리: 기존 토큰이 있으면 사용, 없으면 새로 생성
+        this.studentToken = this.getStoredStudentToken();
+        if (!this.studentToken) {
+            this.studentToken = this.generateStudentToken();
+            this.setStoredStudentToken(this.studentToken);
+        }
+
+        console.log('Student token for persistence:', this.studentToken);
+
         // UI 초기화
         this.initializeUI();
-        
+
         // 이벤트 리스너 설정
         this.setupEventListeners();
-        
-        // 첫 메시지 로드
-        this.loadInitialMessage();
+
+        // 저장된 대화 기록 시도 또는 첫 메시지 로드
+        this.initializeConversation();
     }
     
     getUrlParams() {
@@ -296,35 +347,92 @@ class SocraticChatHandler {
         }
     }
     
-    // 글로우 효과는 드로어 방식에서는 자동 열기로 대체
-    
-    async loadInitialMessage() {
+    // 대화 초기화: 저장된 기록이 있으면 복원, 없으면 새로 시작
+    async initializeConversation() {
         try {
-            // Session mode: Load previous chat history and scores for returning students
+            // 1. 먼저 저장된 대화 기록 확인 (같은 주제, 같은 토큰)
+            const savedConversation = this.loadConversationFromStorage();
+
+            if (savedConversation && savedConversation.topic === this.topic) {
+                // 저장된 대화 기록 복원
+                console.log('Restoring saved conversation:', savedConversation);
+                this.restoreConversationFromSaved(savedConversation);
+                return;
+            }
+
+            // 2. 세션 모드인 경우 서버에서 기록 로드 시도
             if (this.sessionId && this.studentId) {
                 await this.loadSessionHistory();
             } else {
-                // Legacy standalone mode
-                const response = await fetch(`${this.apiBase}/chat/initial`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        topic: this.topic,
-                        difficulty: this.difficulty
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error('초기 메시지 로드에 실패했습니다.');
-                }
-
-                const data = await response.json();
-
-                // AI 첫 메시지 표시
-                this.addMessage('ai', data.initial_message);
+                // 3. 완전히 새로운 대화 시작
+                await this.loadInitialMessage();
             }
+
+        } catch (error) {
+            console.error('Error initializing conversation:', error);
+            // 실패시 기본 메시지로 시작
+            this.hideLoadingMessage();
+            this.addMessage('ai', '안녕하세요! 함께 탐구해볼까요?');
+            this.enableInput();
+        }
+    }
+
+    // 저장된 대화 기록에서 복원
+    restoreConversationFromSaved(savedData) {
+        // 메시지 기록 복원
+        this.messages = savedData.messages || [];
+        this.understandingScore = savedData.understandingScore || 0;
+        this.isCompleted = savedData.isCompleted || false;
+
+        // UI에 메시지 표시
+        const messagesContainer = document.getElementById('messagesContainer');
+        if (messagesContainer) {
+            messagesContainer.innerHTML = '';
+        }
+
+        this.messages.forEach(msg => {
+            const role = msg.role === 'assistant' ? 'ai' : msg.role;
+            this.addMessage(role, msg.content);
+        });
+
+        // 점수 표시가 활성화된 경우 점수 복원
+        if (this.showScore) {
+            this.updateUnderstandingGauge(this.understandingScore);
+        }
+
+        // 완료 상태 확인
+        if (this.isCompleted && this.showScore) {
+            this.showCompletionCelebration();
+        }
+
+        console.log(`Restored ${this.messages.length} messages, score: ${this.understandingScore}`);
+
+        // 로딩 메시지 제거 및 입력 활성화
+        this.hideLoadingMessage();
+        this.enableInput();
+    }
+
+    async loadInitialMessage() {
+        try {
+            const response = await fetch(`${this.apiBase}/chat/initial`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    topic: this.topic,
+                    difficulty: this.difficulty
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('초기 메시지 로드에 실패했습니다.');
+            }
+
+            const data = await response.json();
+
+            // AI 첫 메시지 표시
+            this.addMessage('ai', data.initial_message);
 
             // 로딩 메시지 제거
             this.hideLoadingMessage();
@@ -500,7 +608,7 @@ class SocraticChatHandler {
             // 점수 표시가 활성화된 경우에만 이해도 업데이트
             if (this.showScore) {
                 this.updateSocraticEvaluation(data);
-                
+
                 // 완료 체크
                 if (data.is_completed && !this.isCompleted) {
                     this.showCompletionCelebration();
@@ -510,7 +618,10 @@ class SocraticChatHandler {
                 // 점수 숨김 모드에서는 내부적으로만 점수 추적
                 this.understandingScore = data.understanding_score;
             }
-            
+
+            // 대화 기록을 로컬 스토리지에 저장 (새로고침 시 복원용)
+            this.saveConversationToStorage();
+
         } catch (error) {
             console.error('Error:', error);
             this.addMessage('ai', '죄송해요, 일시적인 오류가 발생했습니다. 다시 말씀해 주세요.');
@@ -838,26 +949,38 @@ class SocraticChatHandler {
 
 // 유틸리티 함수들
 const chatUtils = {
-    // 메시지 시간 포맷팅
-    formatTime(date = new Date()) {
-        return date.toLocaleTimeString('ko-KR', { 
-            hour: '2-digit', 
-            minute: '2-digit' 
-        });
-    },
-    
     // 텍스트 길이 체크
     isValidMessage(message) {
         return message.trim().length > 0 && message.length <= 1000;
     },
-    
-    // 키보드 단축키 도움말
-    showKeyboardHelp() {
-        alert('키보드 단축키:\\n- Enter: 메시지 전송\\n- Shift + Enter: 줄바꿈');
+
+    // 세션 데이터 정리 (오래된 대화 기록 삭제)
+    cleanupOldSessions() {
+        const MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 7일
+        const now = Date.now();
+
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key.startsWith('conversation_')) {
+                try {
+                    const data = JSON.parse(localStorage.getItem(key));
+                    if (data.timestamp && (now - data.timestamp) > MAX_AGE) {
+                        localStorage.removeItem(key);
+                        console.log('Cleaned up old session:', key);
+                    }
+                } catch (error) {
+                    localStorage.removeItem(key);
+                }
+            }
+        }
     }
 };
 
 // 페이지 로드 시 초기화
 document.addEventListener('DOMContentLoaded', () => {
+    // 오래된 세션 데이터 정리
+    chatUtils.cleanupOldSessions();
+
+    // 채팅 핸들러 초기화
     new SocraticChatHandler();
 });
