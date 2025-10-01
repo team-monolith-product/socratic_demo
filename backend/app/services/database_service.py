@@ -262,21 +262,31 @@ class DatabaseService:
             return False
 
     async def _save_student_messages(self, db_session: AsyncSession, student_id: str, session_id: str, messages: List[Dict]):
-        """Save student messages to database."""
-        # Delete existing messages for this student
-        stmt = delete(Message).where(Message.student_id == student_id)
-        await db_session.execute(stmt)
+        """Save student messages to database without deleting existing ones."""
+        # DO NOT DELETE existing messages - they should persist
+        # Only add new messages that don't already exist
 
-        # Add new messages
+        # Add new messages (skip if content already exists to avoid duplicates)
         for msg in messages:
-            new_message = Message(
-                student_id=student_id,
-                session_id=session_id,
-                content=msg.get('content', ''),
-                message_type=msg.get('type', 'user'),
-                timestamp=self._parse_datetime(msg.get('timestamp'))
-            )
-            db_session.add(new_message)
+            content = msg.get('content', '')
+            if content:  # Only save non-empty messages
+                # Check if message already exists
+                existing_stmt = select(Message).where(
+                    Message.student_id == student_id,
+                    Message.content == content,
+                    Message.message_type == msg.get('type', 'user')
+                )
+                existing = await db_session.execute(existing_stmt)
+                if existing.scalar_one_or_none() is None:
+                    # Message doesn't exist, create new one
+                    new_message = Message(
+                        student_id=student_id,
+                        session_id=session_id,
+                        content=content,
+                        message_type=msg.get('type', 'user'),
+                        timestamp=self._parse_datetime(msg.get('timestamp'))
+                    )
+                    db_session.add(new_message)
 
     async def _calculate_live_stats(self, session_id: str) -> Dict[str, Any]:
         """Calculate live statistics for a session."""
