@@ -371,8 +371,8 @@ class SocraticChatHandler {
         } catch (error) {
             console.error('Error initializing conversation:', error);
             // 실패시 기본 메시지로 시작
-            this.hideLoadingMessage();
             this.addMessage('ai', '안녕하세요! 함께 탐구해볼까요?');
+            this.hideLoadingMessage();
             this.enableInput();
         }
     }
@@ -491,6 +491,10 @@ class SocraticChatHandler {
                     });
 
                     console.log('Restored', historyData.messages.length, 'previous messages');
+
+                    // 로딩 메시지 제거 및 입력 필드 활성화
+                    this.hideLoadingMessage();
+                    this.enableInput();
                 } else {
                     // No previous messages, load initial message
                     await this.loadInitialMessageForSession();
@@ -527,9 +531,17 @@ class SocraticChatHandler {
             const data = await response.json();
             this.addMessage('ai', data.initial_message);
 
+            // 로딩 메시지 제거 및 입력 필드 활성화
+            this.hideLoadingMessage();
+            this.enableInput();
+
         } catch (error) {
             console.error('Error loading initial message for session:', error);
             this.addMessage('ai', '안녕하세요! 함께 탐구해볼까요?');
+
+            // 오류 시에도 로딩 메시지 제거 및 입력 필드 활성화
+            this.hideLoadingMessage();
+            this.enableInput();
         }
     }
 
