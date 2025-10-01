@@ -338,9 +338,55 @@ async def drop_scores_table():
             raise
 
 
+async def check_database_health():
+    """Check database connection and basic operations."""
+    async with AsyncSessionLocal() as session:
+        try:
+            db_type = await _detect_database_type(session)
+            print(f"✅ Database type detected: {db_type}")
+
+            # Test basic query
+            if db_type == "postgresql":
+                test_query = text("SELECT 1 as test;")
+            else:
+                test_query = text("SELECT 1 as test;")
+
+            result = await session.execute(test_query)
+            test_result = result.scalar()
+            print(f"✅ Database connection test: {test_result}")
+
+            # Check if messages table exists and is accessible
+            if db_type == "postgresql":
+                table_check = text("""
+                    SELECT COUNT(*) FROM information_schema.tables
+                    WHERE table_name = 'messages' AND table_schema = 'public';
+                """)
+            else:
+                table_check = text("""
+                    SELECT COUNT(*) FROM sqlite_master
+                    WHERE type='table' AND name='messages';
+                """)
+
+            result = await session.execute(table_check)
+            table_exists = result.scalar()
+            print(f"✅ Messages table exists: {table_exists > 0}")
+
+            return True
+
+        except Exception as e:
+            print(f"❌ Database health check failed: {e}")
+            return False
+
+
 async def run_migrations():
     """Run all pending migrations."""
     print("🔄 Running database migrations...")
+
+    # Check database health first
+    if not await check_database_health():
+        print("❌ Database health check failed, skipping migrations")
+        return
+
     await drop_session_activities_table()
     await drop_score_records_table()
     await drop_scores_table()

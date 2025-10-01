@@ -398,13 +398,29 @@ class DatabaseService:
         return True  # DatabaseService is always database-enabled
 
     async def save_message(self, session_id: str, student_id: str, content: str, message_type: str) -> bool:
-        """Save a single message to database."""
+        """Save a single message to database with proper transaction handling."""
         try:
             print(f"🔍 Attempting to save message: session={session_id}, student={student_id}, type={message_type}")
 
-            # Use a separate session to ensure isolation
-            session = AsyncSessionLocal()
-            try:
+            async with await self._get_session() as session:
+                # First verify that the student and session exist
+                student_stmt = select(Student).where(Student.id == student_id, Student.session_id == session_id)
+                student_result = await session.execute(student_stmt)
+                student = student_result.scalar_one_or_none()
+
+                if not student:
+                    print(f"❌ Student {student_id} not found in session {session_id}")
+                    return False
+
+                session_stmt = select(Session).where(Session.id == session_id)
+                session_result = await session.execute(session_stmt)
+                session_obj = session_result.scalar_one_or_none()
+
+                if not session_obj:
+                    print(f"❌ Session {session_id} not found")
+                    return False
+
+                # Create and save the message
                 new_message = Message(
                     student_id=student_id,
                     session_id=session_id,
@@ -412,6 +428,7 @@ class DatabaseService:
                     message_type=message_type,
                     timestamp=datetime.now(self.kst)
                 )
+
                 session.add(new_message)
                 print(f"🔍 Message added to session, committing...")
                 await session.commit()
@@ -420,10 +437,18 @@ class DatabaseService:
                 await session.refresh(new_message)
                 message_id = new_message.id
                 print(f"✅ Message committed successfully to database with ID: {message_id}")
-                return True
 
-            finally:
-                await session.close()
+                # Verify the message was actually saved
+                verify_stmt = select(Message).where(Message.id == message_id)
+                verify_result = await session.execute(verify_stmt)
+                saved_message = verify_result.scalar_one_or_none()
+
+                if saved_message:
+                    print(f"✅ Message verification successful: {message_id}")
+                    return True
+                else:
+                    print(f"❌ Message verification failed: {message_id}")
+                    return False
 
         except Exception as e:
             print(f"❌ Error saving message: {e}")
@@ -432,13 +457,21 @@ class DatabaseService:
             return False
 
     async def get_student_messages(self, session_id: str, student_id: str) -> List[Dict[str, Any]]:
-        """Get all messages for a specific student in a session."""
+        """Get all messages for a specific student in a session with retry logic."""
         try:
             print(f"🔍 Getting messages for session={session_id}, student={student_id}")
 
-            # Use a separate session to ensure consistency
-            session = AsyncSessionLocal()
-            try:
+            async with await self._get_session() as session:
+                # First verify the student exists
+                student_stmt = select(Student).where(Student.id == student_id, Student.session_id == session_id)
+                student_result = await session.execute(student_stmt)
+                student = student_result.scalar_one_or_none()
+
+                if not student:
+                    print(f"❌ Student {student_id} not found in session {session_id}")
+                    return []
+
+                # Get messages for this student in this session with proper joins
                 from sqlalchemy import select, and_
                 stmt = select(Message).where(
                     and_(Message.session_id == session_id, Message.student_id == student_id)
@@ -447,7 +480,7 @@ class DatabaseService:
                 result = await session.execute(stmt)
                 messages = result.scalars().all()
 
-                print(f"🔍 Found {len(messages)} messages for student")
+                print(f"🔍 Found {len(messages)} messages for student in database")
 
                 result_list = [
                     {
@@ -459,10 +492,12 @@ class DatabaseService:
                 ]
 
                 print(f"✅ Returning {len(result_list)} messages")
-                return result_list
 
-            finally:
-                await session.close()
+                # Debug: Print message IDs for tracking
+                if result_list:
+                    print(f"🔍 Recent messages: {[msg['content'][:30] + '...' for msg in result_list[:3]]}")
+
+                return result_list
 
         except Exception as e:
             print(f"❌ Error getting student messages: {e}")
