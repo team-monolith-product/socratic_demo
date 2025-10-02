@@ -145,7 +145,7 @@ body {
     padding: 8px 20px;
     background: rgba(0, 122, 255, 0.08);
     color: var(--primary-700);
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 500;
     border-radius: 20px;
     border: 1px solid rgba(0, 122, 255, 0.2);
@@ -436,7 +436,7 @@ body {
 
 @media (max-width: 480px) {
     .hero-badge-text {
-        font-size: 12px;
+        font-size: 14px;
         padding: 6px 16px;
     }
 
