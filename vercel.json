@@ -1,6 +1,33 @@
 {
   "buildCommand": "bash scripts/generate-config.sh",
   "outputDirectory": "frontend",
+  "redirects": [
+    {
+      "source": "/pages/student.html",
+      "destination": "/student",
+      "permanent": true
+    },
+    {
+      "source": "/pages/teacher-setup.html",
+      "destination": "/teacher",
+      "permanent": true
+    },
+    {
+      "source": "/pages/teacher-dashboard.html",
+      "destination": "/teacher/dashboard",
+      "permanent": true
+    },
+    {
+      "source": "/pages/socratic-chat.html",
+      "destination": "/chat",
+      "permanent": true
+    },
+    {
+      "source": "/pages/student-session.html",
+      "destination": "/student",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/student",
@@ -13,6 +40,10 @@
     {
       "source": "/teacher/dashboard",
       "destination": "/pages/teacher-dashboard.html"
+    },
+    {
+      "source": "/chat",
+      "destination": "/pages/socratic-chat.html"
     },
     {
       "source": "/s/:sessionId",
