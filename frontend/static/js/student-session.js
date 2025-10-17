@@ -291,7 +291,7 @@ URL: ${window.location.href}
             currentScore: this.currentScore || 0  // Include current score for returning students
         });
 
-        const chatUrl = `/pages/socratic-chat.html?${params.toString()}`;
+        const chatUrl = `/chat?${params.toString()}`;
         window.location.href = chatUrl;
     }
 
