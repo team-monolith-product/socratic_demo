@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NNT1R8YF3Z"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-NNT1R8YF3Z');
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>소크라테스 아카데미 - 교사 대시보드 (/teacher/dashboard)</title>
@@ -39,7 +48,7 @@
                     <img src="/static/socrates-logo.svg" alt="소크라테스 아카데미" class="socrates-logo" />
                 </div>
                 <div class="gnb-actions">
-                    <a href="https://codle.io" target="_blank" class="codle-link-button">코들 바로가기</a>
+                    <a href="https://codle.io" target="_blank" class="codle-link-button" data-ga-event="track">코들 바로가기</a>
                 </div>
             </div>
         </nav>
@@ -54,13 +63,13 @@
             </div>
 
             <div class="header-actions">
-                <button id="showQRBtn" class="white-button">
+                <button id="showQRBtn" class="white-button" data-ga-event="track">
                     QR 코드 보기
                 </button>
-                <button id="refreshBtn" class="white-button">
+                <button id="refreshBtn" class="white-button" data-ga-event="track">
                     새로고침
                 </button>
-                <button id="newSessionBtn" class="primary-button">
+                <button id="newSessionBtn" class="primary-button" data-ga-event="track">
                     새 세션 시작
                 </button>
             </div>
@@ -243,7 +252,7 @@
                         <div class="footer-company">(주)팀모노리스 | 서울특별시 중구 퇴계로 15 9층</div>
                         <div class="footer-copyright">©TEAM MONOLITH Inc.</div>
                     </div>
-                    <a href="https://codle.io" target="_blank" class="footer-link">코들 바로가기</a>
+                    <a href="https://codle.io" target="_blank" class="footer-link" data-ga-event="track">코들 바로가기</a>
                 </div>
             </div>
         </footer>
@@ -254,5 +263,36 @@
     <script src="/static/js/shared/qr-generator.js?v=2"></script>
     <script src="/static/js/shared/simplified-session-manager.js?v=1"></script>
     <script src="/static/js/teacher-dashboard.js?v=11"></script>
+    <script>
+        // Google Analytics event tracking
+        document.addEventListener('DOMContentLoaded', () => {
+            const trackableElements = document.querySelectorAll('[data-ga-event]');
+            trackableElements.forEach(element => {
+                element.addEventListener('click', function(e) {
+                    if (typeof gtag !== 'undefined') {
+                        // Generate event label from element properties
+                        const classList = Array.from(this.classList).join(' ');
+                        const id = this.id || '';
+                        const text = this.textContent?.trim().substring(0, 50) || '';
+                        const tag = this.tagName.toLowerCase();
+
+                        // Create descriptive label
+                        let label = `${tag}`;
+                        if (id) label += ` #${id}`;
+                        if (classList) label += ` .${classList.split(' ')[0]}`;
+                        if (text) label += ` - ${text}`;
+
+                        gtag('event', 'click', {
+                            'event_category': 'engagement',
+                            'event_label': label,
+                            'element_classes': classList,
+                            'element_id': id,
+                            'element_text': text
+                        });
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

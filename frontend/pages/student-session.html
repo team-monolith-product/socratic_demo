@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NNT1R8YF3Z"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-NNT1R8YF3Z');
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>학생 세션 - 소크라테스 아카데미</title>
@@ -40,7 +49,7 @@
                 <div class="error-icon">⚠️</div>
                 <h2>세션 참여 오류</h2>
                 <p id="error-message">세션을 찾을 수 없습니다.</p>
-                <button onclick="location.reload()" class="btn btn-primary btn-md">다시 시도</button>
+                <button onclick="location.reload()" class="btn btn-primary btn-md" data-ga-event="track">다시 시도</button>
             </div>
         </div>
 
@@ -53,7 +62,7 @@
 
                 <div class="student-form">
                     <input type="text" id="student-name" class="input-field" placeholder="이름을 입력하세요" maxlength="50">
-                    <button id="join-session-btn" class="btn btn-success btn-lg btn-full">세션 참여하기</button>
+                    <button id="join-session-btn" class="btn btn-success btn-lg btn-full" data-ga-event="track">세션 참여하기</button>
                 </div>
             </div>
         </div>
@@ -204,5 +213,36 @@
             display: none !important;
         }
     </style>
+    <script>
+        // Google Analytics event tracking
+        document.addEventListener('DOMContentLoaded', () => {
+            const trackableElements = document.querySelectorAll('[data-ga-event]');
+            trackableElements.forEach(element => {
+                element.addEventListener('click', function(e) {
+                    if (typeof gtag !== 'undefined') {
+                        // Generate event label from element properties
+                        const classList = Array.from(this.classList).join(' ');
+                        const id = this.id || '';
+                        const text = this.textContent?.trim().substring(0, 50) || '';
+                        const tag = this.tagName.toLowerCase();
+
+                        // Create descriptive label
+                        let label = `${tag}`;
+                        if (id) label += ` #${id}`;
+                        if (classList) label += ` .${classList.split(' ')[0]}`;
+                        if (text) label += ` - ${text}`;
+
+                        gtag('event', 'click', {
+                            'event_category': 'engagement',
+                            'event_label': label,
+                            'element_classes': classList,
+                            'element_id': id,
+                            'element_text': text
+                        });
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

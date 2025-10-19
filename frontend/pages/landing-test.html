@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NNT1R8YF3Z"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-NNT1R8YF3Z');
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>소크룸(SocRoom) - 학생 주도 학습을 돕는 문답형 AI 수업</title>
@@ -21,7 +30,7 @@
                 <img src="/static/socrates-logo.svg" alt="소크룸(SocRoom)" class="socrates-logo" />
             </div>
             <div class="gnb-actions">
-                <a href="https://codle.io" target="_blank" class="codle-link-button">코들 바로가기</a>
+                <a href="https://codle.io" target="_blank" class="codle-link-button" data-ga-event="track">코들 바로가기</a>
             </div>
         </div>
     </nav>
@@ -50,7 +59,7 @@
             </div>
 
             <div class="hero-actions">
-                <a href="/pages/teacher-setup.html" class="action-card primary">
+                <a href="/pages/teacher-setup.html" class="action-card primary" data-ga-event="track">
                     <div class="action-icon">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                             <path d="M12 2L22 7L12 12L2 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -69,7 +78,7 @@
                     </div>
                 </a>
 
-                <a href="/pages/student.html" class="action-card secondary">
+                <a href="/pages/student.html" class="action-card secondary" data-ga-event="track">
                     <div class="action-icon">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                             <path d="M21 16V8C20.9996 7.64927 20.9071 7.30481 20.7315 7.00116C20.556 6.69751 20.3037 6.44536 20 6.27L13 2.27C12.696 2.09446 12.3511 2.00205 12 2.00205C11.6489 2.00205 11.304 2.09446 11 2.27L4 6.27C3.69626 6.44536 3.44398 6.69751 3.26846 7.00116C3.09294 7.30481 3.00036 7.64927 3 8V16C3.00036 16.3507 3.09294 16.6952 3.26846 16.9988C3.44398 17.3025 3.69626 17.5546 4 17.73L11 21.73C11.304 21.9055 11.6489 21.9979 12 21.9979C12.3511 21.9979 12.696 21.9055 13 21.73L20 17.73C20.3037 17.5546 20.556 17.3025 20.7315 16.9988C20.9071 16.6952 20.9996 16.3507 21 16Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -284,7 +293,7 @@
             </div>
 
             <div class="cta-actions">
-                <a href="/pages/teacher-setup.html" class="cta-card primary">
+                <a href="/pages/teacher-setup.html" class="cta-card primary" data-ga-event="track">
                     <div class="cta-icon">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                             <path d="M12 2L22 7L12 12L2 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -303,7 +312,7 @@
                     </div>
                 </a>
 
-                <a href="/pages/student.html" class="cta-card secondary">
+                <a href="/pages/student.html" class="cta-card secondary" data-ga-event="track">
                     <div class="cta-icon">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                             <path d="M21 16V8C20.9996 7.64927 20.9071 7.30481 20.7315 7.00116C20.556 6.69751 20.3037 6.44536 20 6.27L13 2.27C12.696 2.09446 12.3511 2.00205 12 2.00205C11.6489 2.00205 11.304 2.09446 11 2.27L4 6.27C3.69626 6.44536 3.44398 6.69751 3.26846 7.00116C3.09294 7.30481 3.00036 7.64927 3 8V16C3.00036 16.3507 3.09294 16.6952 3.26846 16.9988C3.44398 17.3025 3.69626 17.5546 4 17.73L11 21.73C11.304 21.9055 11.6489 21.9979 12 21.9979C12.3511 21.9979 12.696 21.9055 13 21.73L20 17.73C20.3037 17.5546 20.556 17.3025 20.7315 16.9988C20.9071 16.6952 20.9996 16.3507 21 16Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -341,13 +350,13 @@
                     코들에서 더 많은 기능과 콘텐츠를 만나보세요.
                 </p>
                 <div class="brand-actions">
-                    <a href="https://codle.io" target="_blank" class="brand-link primary">
+                    <a href="https://codle.io" target="_blank" class="brand-link primary" data-ga-event="track">
                         코들 바로가기
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                             <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </a>
-                    <a href="#" class="brand-link secondary">
+                    <a href="#" class="brand-link secondary" data-ga-event="track">
                         불편·건의 사항 전달하기
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                             <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -369,7 +378,7 @@
                     <div class="footer-company">(주)팀모노리스 | 서울특별시 중구 퇴계로 15 9층</div>
                     <div class="footer-copyright">©TEAM MONOLITH Inc.</div>
                 </div>
-                <a href="https://codle.io" target="_blank" class="footer-link">코들 바로가기</a>
+                <a href="https://codle.io" target="_blank" class="footer-link" data-ga-event="track">코들 바로가기</a>
             </div>
         </div>
     </footer>
@@ -398,6 +407,34 @@
                     el.style.transitionDelay = `${index * 0.1}s`;
                 }
                 observer.observe(el);
+            });
+
+            // Google Analytics event tracking
+            const trackableElements = document.querySelectorAll('[data-ga-event]');
+            trackableElements.forEach(element => {
+                element.addEventListener('click', function(e) {
+                    if (typeof gtag !== 'undefined') {
+                        // Generate event label from element properties
+                        const classList = Array.from(this.classList).join(' ');
+                        const id = this.id || '';
+                        const text = this.textContent?.trim().substring(0, 50) || '';
+                        const tag = this.tagName.toLowerCase();
+
+                        // Create descriptive label
+                        let label = `${tag}`;
+                        if (id) label += ` #${id}`;
+                        if (classList) label += ` .${classList.split(' ')[0]}`;
+                        if (text) label += ` - ${text}`;
+
+                        gtag('event', 'click', {
+                            'event_category': 'engagement',
+                            'event_label': label,
+                            'element_classes': classList,
+                            'element_id': id,
+                            'element_text': text
+                        });
+                    }
+                });
             });
         });
     </script>

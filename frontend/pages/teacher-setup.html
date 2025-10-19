@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NNT1R8YF3Z"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-NNT1R8YF3Z');
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>소크라테스 아카데미 - 교사 세션 설정 (/teacher)</title>
@@ -29,7 +38,7 @@
                         <img src="/static/socrates-logo.svg" alt="소크라테스 아카데미" class="socrates-logo" />
                     </div>
                     <div class="gnb-actions">
-                        <a href="https://codle.io" target="_blank" class="codle-link-button">코들 바로가기</a>
+                        <a href="https://codle.io" target="_blank" class="codle-link-button" data-ga-event="track">코들 바로가기</a>
                     </div>
                 </div>
             </nav>
@@ -44,7 +53,7 @@
                         <p class="session-header-subtitle">소크룸 설정하고 학생 참여시키기</p>
                     </div>
                     <div class="header-right" id="existingSessionButton" style="display: none;">
-                        <button class="btn btn-secondary btn-lg" id="goToExistingSession">
+                        <button class="btn btn-secondary btn-lg" id="goToExistingSession" data-ga-event="track">
                             기존 세션으로 이동
                             <span class="btn-icon btn-icon-right">→</span>
                         </button>
@@ -233,7 +242,7 @@
 
                             <!-- Action Button - 별도 영역 -->
                             <div class="apple-action-section-right">
-                                <button type="submit" class="btn btn-primary btn-xl">
+                                <button type="submit" class="btn btn-primary btn-xl" data-ga-event="track">
                                     세션 시작하기
                                     <span class="btn-icon btn-icon-right">→</span>
                                 </button>
@@ -281,7 +290,7 @@
                         <div class="footer-company">(주)팀모노리스 | 서울특별시 중구 퇴계로 15 9층</div>
                         <div class="footer-copyright">©TEAM MONOLITH Inc.</div>
                     </div>
-                    <a href="https://codle.io" target="_blank" class="footer-link">코들 바로가기</a>
+                    <a href="https://codle.io" target="_blank" class="footer-link" data-ga-event="track">코들 바로가기</a>
                 </div>
             </div>
         </footer>
@@ -293,5 +302,36 @@
     <script src="/static/js/shared/simplified-session-manager.js?v=1"></script>
     <script src="/static/js/pdf-upload.js?v=13"></script>
     <script src="/static/js/teacher-setup.js?v=2"></script>
+    <script>
+        // Google Analytics event tracking
+        document.addEventListener('DOMContentLoaded', () => {
+            const trackableElements = document.querySelectorAll('[data-ga-event]');
+            trackableElements.forEach(element => {
+                element.addEventListener('click', function(e) {
+                    if (typeof gtag !== 'undefined') {
+                        // Generate event label from element properties
+                        const classList = Array.from(this.classList).join(' ');
+                        const id = this.id || '';
+                        const text = this.textContent?.trim().substring(0, 50) || '';
+                        const tag = this.tagName.toLowerCase();
+
+                        // Create descriptive label
+                        let label = `${tag}`;
+                        if (id) label += ` #${id}`;
+                        if (classList) label += ` .${classList.split(' ')[0]}`;
+                        if (text) label += ` - ${text}`;
+
+                        gtag('event', 'click', {
+                            'event_category': 'engagement',
+                            'event_label': label,
+                            'element_classes': classList,
+                            'element_id': id,
+                            'element_text': text
+                        });
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

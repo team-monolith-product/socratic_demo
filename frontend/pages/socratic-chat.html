@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NNT1R8YF3Z"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-NNT1R8YF3Z');
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>소크라테스식 대화 - LLM Classroom Proto4</title>
@@ -29,7 +38,7 @@
         <header class="chat-header">
             <div class="topic-info">
                 <h1>🏛️ <span id="topicTitle">학습 주제</span></h1>
-                <button id="backBtn" class="btn btn-ghost btn-sm">
+                <button id="backBtn" class="btn btn-ghost btn-sm" data-ga-event="track">
                     <span class="btn-icon btn-icon-left">←</span>
                     주제 변경
                 </button>
@@ -55,7 +64,7 @@
                                 rows="3"
                                 disabled
                             ></textarea>
-                            <button type="submit" id="sendBtn" class="btn btn-primary btn-md" disabled>
+                            <button type="submit" id="sendBtn" class="btn btn-primary btn-md" disabled data-ga-event="track">
                                 <span class="btn-icon btn-icon-left">📤</span>
                                 전송
                             </button>
@@ -73,7 +82,7 @@
                         rows="2"
                         disabled
                     ></textarea>
-                    <button type="submit" id="sendBtnMobile" class="btn btn-primary btn-md" disabled>
+                    <button type="submit" id="sendBtnMobile" class="btn btn-primary btn-md" disabled data-ga-event="track">
                         <span class="btn-icon">📤</span>
                     </button>
                 </form>
@@ -128,8 +137,39 @@
     </div>
 
     </div>
-    
+
     <script src="/static/config.js"></script>
     <script src="/static/js/chat.js"></script>
+    <script>
+        // Google Analytics event tracking
+        document.addEventListener('DOMContentLoaded', () => {
+            const trackableElements = document.querySelectorAll('[data-ga-event]');
+            trackableElements.forEach(element => {
+                element.addEventListener('click', function(e) {
+                    if (typeof gtag !== 'undefined') {
+                        // Generate event label from element properties
+                        const classList = Array.from(this.classList).join(' ');
+                        const id = this.id || '';
+                        const text = this.textContent?.trim().substring(0, 50) || '';
+                        const tag = this.tagName.toLowerCase();
+
+                        // Create descriptive label
+                        let label = `${tag}`;
+                        if (id) label += ` #${id}`;
+                        if (classList) label += ` .${classList.split(' ')[0]}`;
+                        if (text) label += ` - ${text}`;
+
+                        gtag('event', 'click', {
+                            'event_category': 'engagement',
+                            'event_label': label,
+                            'element_classes': classList,
+                            'element_id': id,
+                            'element_text': text
+                        });
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
