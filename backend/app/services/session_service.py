@@ -268,7 +268,7 @@ class SessionService:
         is_completed: bool = False,
         last_message: str = ""
     ):
-        """Update student progress"""
+        """Update student progress (message should be saved separately by caller)"""
         # Update progress in database
         success = await self.db_service.update_student_progress(
             student_id=student_id,
@@ -277,14 +277,8 @@ class SessionService:
             is_completed=is_completed
         )
 
-        # Save message if provided
-        if last_message:
-            await self.db_service.save_message(
-                session_id=session_id,
-                student_id=student_id,
-                content=last_message,
-                message_type="user"
-            )
+        # Note: Messages are saved by the API endpoint to avoid duplicate saves
+        # The last_message parameter is kept for compatibility but not used
 
         return success
 
@@ -339,9 +333,6 @@ class SessionService:
                         student.engagement_score) / 5.0
         progress_percentage = min(100, int(avg_dimension))
 
-        # Get message count from database
-        message_count = await self.db_service.get_message_count(student.id, 'user')
-
         # Get last message
         messages = await self.db_service.get_student_messages(student.session_id, student.id)
         last_message = messages[0]['content'] if messages else None
@@ -350,7 +341,7 @@ class SessionService:
             'student_id': student.id,
             'student_name': student.name,
             'latest_score': student.current_score,
-            'message_count': message_count,
+            'message_count': student.conversation_turns,  # Use conversation_turns from students table
             'joined_at': joined_at,
             'last_activity': last_active,
             'minutes_since_last_activity': minutes_since_last_activity,

@@ -474,7 +474,7 @@ async def session_chat(session_id: str, request: SessionChatRequest):
                 print(f"Warning: Could not save score to database: {e}")
 
         # Update student progress in session service
-        # Pass actual message to keep in-memory data in sync with database
+        # Note: Message is already saved above, no duplicate save needed
         try:
             await session_service.update_student_progress(
                 session_id,
@@ -482,7 +482,7 @@ async def session_chat(session_id: str, request: SessionChatRequest):
                 understanding_score,
                 evaluation_result["dimensions"],
                 is_completed,
-                request.message  # Pass actual message for in-memory tracking
+                ""  # Message already saved separately above
             )
         except Exception as e:
             print(f"Warning: Could not update student progress: {e}")
