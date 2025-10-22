@@ -402,6 +402,9 @@ async def session_chat(session_id: str, request: SessionChatRequest):
             0  # understanding_level - will be calculated
         )
 
+        # Add AI response to messages array for complete conversation context in evaluation
+        messages.append({"role": "assistant", "content": socratic_response})
+
         # Store AI response in database
         message_id = None
         try:
