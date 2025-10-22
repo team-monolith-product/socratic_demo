@@ -30,7 +30,7 @@ allow_origin_regex = settings.allow_origin_regex
 print(f"🔧 CORS DEBUG - Allowed origins: {settings.allow_origins}")
 print(f"🔧 CORS DEBUG - Origin regex: {allow_origin_regex}")
 print(f"🔧 CORS DEBUG - ALLOWED_ORIGINS env: {settings._allowed_origins_raw}")
-print(f"💾 Storage mode: {'Database' if settings.use_database else 'File-based'}")
+print(f"💾 Storage mode: Database (PostgreSQL)")
 print(f"🗄️ Database URL: {settings.database_url}")
 
 app.add_middleware(

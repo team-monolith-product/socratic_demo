@@ -629,6 +629,43 @@ class DatabaseService:
             print(f"Error getting student scores: {e}")
             return []
 
+    async def get_session_scores(self, session_id: str) -> List[Dict[str, Any]]:
+        """Get all score records for a session."""
+        try:
+            async with await self._get_session() as session:
+                stmt = select(Score, Student.name).join(
+                    Student, Score.student_id == Student.id
+                ).where(
+                    Score.session_id == session_id
+                ).order_by(Score.created_at.desc())
+
+                result = await session.execute(stmt)
+                score_student_pairs = result.all()
+
+                return [
+                    {
+                        "id": score.id,
+                        "message_id": score.message_id,
+                        "student_id": score.student_id,
+                        "student_name": student_name,
+                        "overall_score": score.overall_score,
+                        "dimensions": {
+                            "depth": score.depth_score,
+                            "breadth": score.breadth_score,
+                            "application": score.application_score,
+                            "metacognition": score.metacognition_score,
+                            "engagement": score.engagement_score
+                        },
+                        "evaluation_data": score.evaluation_data,
+                        "is_completed": score.is_completed,
+                        "created_at": self._format_korea_time(score.created_at) if score.created_at else None
+                    }
+                    for score, student_name in score_student_pairs
+                ]
+        except Exception as e:
+            print(f"Error getting session scores: {e}")
+            return []
+
     async def get_session_by_id(self, session_id: str) -> Optional[Session]:
         """Get a session by ID."""
         try:

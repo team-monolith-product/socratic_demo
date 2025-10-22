@@ -175,10 +175,8 @@ class StorageService:
         print(f"Session message history not available in file-based storage mode")
         return []
 
-# Singleton instances
-_storage_service = StorageService()
-
+# Storage service factory - always returns DatabaseService
 def get_storage_service():
-    """Get database storage service."""
+    """Get database storage service (PostgreSQL only)."""
     from app.services.database_service import get_database_service
     return get_database_service()

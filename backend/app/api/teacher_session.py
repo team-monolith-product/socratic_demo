@@ -219,13 +219,22 @@ async def get_session_info(session_id: str):
     """Get session info for student (public endpoint)"""
     try:
         session_service = get_session_service()
+        storage_service = get_storage_service()
 
-        # Check if session exists and is active
-        session_data = session_service.active_sessions.get(session_id)
-        if not session_data:
+        # Check if session exists in database
+        db_session = await storage_service.get_session_by_id(session_id)
+        if not db_session:
             raise HTTPException(status_code=404, detail="Session not found")
 
-        config = SessionConfig(**session_data['config'])
+        config = SessionConfig(
+            title=db_session.title,
+            topic=db_session.topic,
+            description=db_session.description,
+            difficulty=db_session.difficulty,
+            show_score=db_session.show_score,
+            time_limit=db_session.time_limit,
+            max_students=db_session.max_students
+        )
 
         return {
             "session": {
@@ -308,10 +317,11 @@ async def download_qr_code(session_id: str, request: Request):
     try:
         session_service = get_session_service()
         qr_service = get_qr_service()
+        storage_service = get_storage_service()
 
-        # Check if session exists
-        session_data = session_service.active_sessions.get(session_id)
-        if not session_data:
+        # Check if session exists in database
+        db_session = await storage_service.get_session_by_id(session_id)
+        if not db_session:
             raise HTTPException(status_code=404, detail="Session not found")
 
         # Generate QR code for download (larger size) - use Vercel frontend URL
@@ -339,23 +349,26 @@ async def session_chat(session_id: str, request: SessionChatRequest):
         assessment_service = get_socratic_assessment_service()
         storage_service = get_storage_service()
 
-        # Verify session exists and is active
-        session_data = session_service.active_sessions.get(session_id)
-        if not session_data:
+        # Verify session exists in database
+        db_session = await storage_service.get_session_by_id(session_id)
+        if not db_session:
             raise HTTPException(status_code=404, detail="Session not found")
 
         # Verify student is part of this session
-        student_exists = False
-        if hasattr(session_service, 'session_students'):
-            session_students = session_service.session_students.get(session_id, {})
-            if request.student_id in session_students:
-                student_exists = True
-
-        if not student_exists:
+        db_student = await storage_service.get_student_by_id(request.student_id)
+        if not db_student or db_student.session_id != session_id:
             raise HTTPException(status_code=403, detail="Student not authorized for this session")
 
         # Get session configuration
-        config = SessionConfig(**session_data['config'])
+        config = SessionConfig(
+            title=db_session.title,
+            topic=db_session.topic,
+            description=db_session.description,
+            difficulty=db_session.difficulty,
+            show_score=db_session.show_score,
+            time_limit=db_session.time_limit,
+            max_students=db_session.max_students
+        )
 
         # Get student's chat history from database if available
         messages = []
@@ -494,21 +507,37 @@ async def validate_session(session_id: str, request: Request):
     """Validate if session exists and is accessible by teacher"""
     try:
         session_service = get_session_service()
+        storage_service = get_storage_service()
 
         # Generate teacher fingerprint
         teacher_fingerprint = session_service.generate_browser_fingerprint(dict(request.headers))
 
-        # Check if session exists in active sessions
-        session_data = session_service.active_sessions.get(session_id)
-        if not session_data:
+        # Check if session exists in database
+        db_session = await storage_service.get_session_by_id(session_id)
+        if not db_session:
             return {"valid": False, "session": None}
 
         # Check if session belongs to this teacher
-        if session_data.get('teacher_fingerprint') != teacher_fingerprint:
+        if db_session.teacher.fingerprint != teacher_fingerprint:
             return {"valid": False, "session": None}
 
-        # Convert datetime objects for JSON serialization
-        session_copy = session_data.copy()
+        # Convert to dict for JSON serialization
+        session_copy = {
+            'id': db_session.id,
+            'teacher_fingerprint': db_session.teacher.fingerprint,
+            'config': {
+                'title': db_session.title,
+                'topic': db_session.topic,
+                'description': db_session.description,
+                'difficulty': db_session.difficulty,
+                'show_score': db_session.show_score,
+                'time_limit': db_session.time_limit,
+                'max_students': db_session.max_students
+            },
+            'status': db_session.status,
+            'created_at': db_session.created_at.isoformat(),
+            'expires_at': db_session.expires_at.isoformat()
+        }
         for field in ['created_at', 'expires_at', 'last_activity', 'ended_at']:
             if field in session_copy and hasattr(session_copy[field], 'isoformat'):
                 session_copy[field] = session_copy[field].isoformat()
@@ -532,24 +561,24 @@ async def archive_session(session_id: str, request: Request):
     """Soft archive a session (doesn't delete, but marks as inactive)"""
     try:
         session_service = get_session_service()
+        storage_service = get_storage_service()
 
         # Generate teacher fingerprint
         teacher_fingerprint = session_service.generate_browser_fingerprint(dict(request.headers))
 
-        # Check if session exists and belongs to teacher
-        session_data = session_service.active_sessions.get(session_id)
-        if not session_data:
+        # Check if session exists in database and belongs to teacher
+        db_session = await storage_service.get_session_by_id(session_id)
+        if not db_session:
             raise HTTPException(status_code=404, detail="Session not found")
 
-        if session_data.get('teacher_fingerprint') != teacher_fingerprint:
+        if db_session.teacher.fingerprint != teacher_fingerprint:
             raise HTTPException(status_code=403, detail="Not authorized to archive this session")
 
-        # Mark session as archived (keep data but mark as inactive)
-        session_data['status'] = 'archived'
-        session_data['archived_at'] = datetime.now()
+        # Mark session as deleted (soft delete - data preserved)
+        success = await session_service.delete_session(session_id, teacher_fingerprint)
 
-        # Optional: Remove from active sessions but keep in a separate archived sessions store
-        # For now, we'll just mark it as archived
+        if not success:
+            raise HTTPException(status_code=500, detail="Failed to archive session")
 
         return {"success": True, "message": "Session archived successfully"}
 
@@ -578,12 +607,12 @@ async def get_session_scores(session_id: str, request: Request):
 
         # Validate teacher access
         teacher_fingerprint = session_service.generate_browser_fingerprint(dict(request.headers))
-        session_data = session_service.active_sessions.get(session_id)
+        db_session = await storage_service.get_session_by_id(session_id)
 
-        if not session_data:
+        if not db_session:
             raise HTTPException(status_code=404, detail="Session not found")
 
-        if session_data.get('teacher_fingerprint') != teacher_fingerprint:
+        if db_session.teacher.fingerprint != teacher_fingerprint:
             raise HTTPException(status_code=403, detail="Access denied")
 
         # Get scores from database if available
@@ -605,12 +634,12 @@ async def get_student_scores(session_id: str, student_id: str, request: Request)
 
         # Validate teacher access
         teacher_fingerprint = session_service.generate_browser_fingerprint(dict(request.headers))
-        session_data = session_service.active_sessions.get(session_id)
+        db_session = await storage_service.get_session_by_id(session_id)
 
-        if not session_data:
+        if not db_session:
             raise HTTPException(status_code=404, detail="Session not found")
 
-        if session_data.get('teacher_fingerprint') != teacher_fingerprint:
+        if db_session.teacher.fingerprint != teacher_fingerprint:
             raise HTTPException(status_code=403, detail="Access denied")
 
         # Get scores from database
@@ -628,21 +657,16 @@ async def get_student_chat_history(session_id: str, student_id: str):
     """Get chat history for a specific student (public endpoint for student access)"""
     try:
         session_service = get_session_service()
-        storage_service = session_service.storage_service
+        storage_service = get_storage_service()
 
-        # Verify session exists and is active
-        session_data = session_service.active_sessions.get(session_id)
-        if not session_data:
+        # Verify session exists in database
+        db_session = await storage_service.get_session_by_id(session_id)
+        if not db_session:
             raise HTTPException(status_code=404, detail="Session not found")
 
         # Verify student is part of this session
-        student_exists = False
-        if hasattr(session_service, 'session_students'):
-            session_students = session_service.session_students.get(session_id, {})
-            if student_id in session_students:
-                student_exists = True
-
-        if not student_exists:
+        db_student = await storage_service.get_student_by_id(student_id)
+        if not db_student or db_student.session_id != session_id:
             raise HTTPException(status_code=403, detail="Student not authorized for this session")
 
         # Get chat history from database
