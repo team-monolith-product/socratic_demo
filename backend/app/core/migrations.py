@@ -392,4 +392,9 @@ async def run_migrations():
     await drop_scores_table()
     await add_deleted_at_column()
     await add_student_token_column()
+
+    # Add topic tracking fields migration
+    from app.migrations.add_topic_tracking_fields import migrate_add_topic_tracking_fields
+    await migrate_add_topic_tracking_fields()
+
     print("✅ Migrations completed")
