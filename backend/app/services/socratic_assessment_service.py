@@ -68,16 +68,19 @@ class SocraticAssessmentService:
         
         # 대화 맥락 분석
         context_analysis = self._analyze_conversation_context(conversation_history)
-        
-        # 5차원 평가 프롬프트 생성
-        evaluation_prompt = self._build_multidimensional_prompt(
+
+        # 5차원 평가 프롬프트 생성 (system 지침 + user 대화 히스토리)
+        system_prompt, user_prompt = self._build_multidimensional_prompt(
             topic, student_response, ai_response, context_analysis, difficulty
         )
-        
+
         try:
             response = await self.client.chat.completions.create(
                 model=self.model,
-                messages=[{"role": "system", "content": evaluation_prompt}],
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt}
+                ],
                 temperature=0.3,
                 max_tokens=800
             )
@@ -185,17 +188,55 @@ class SocraticAssessmentService:
         ai_response: str,
         context: Dict,
         difficulty: str
-    ) -> str:
-        """5차원 평가를 위한 프롬프트 생성"""
+    ) -> tuple[str, str]:
+        """5차원 평가를 위한 프롬프트 생성 (system 지침, user 대화 히스토리)"""
 
         criteria = self.difficulty_criteria[difficulty]
 
         # 전체 대화 내용(AI 질문 + 학생 답변)을 맥락으로 포함
         conversation_summary = self._build_conversation_summary(context.get('full_conversation', []))
-        
-        return f"""당신은 소크라테스식 5차원 평가 전문가입니다.
 
-주제: {topic}
+        # System 메시지: 평가 지침
+        system_prompt = """당신은 소크라테스식 5차원 평가 전문가입니다.
+
+**평가 원칙**:
+- 학생의 최신 답변만이 아니라, 전체 대화 과정을 통해 나타난 학습자의 누적된 이해도와 성장을 종합적으로 평가하세요
+- 대화가 진행될수록 점수는 점진적으로 상승해야 합니다
+- 한 번 달성한 이해도는 쉽게 후퇴하지 않습니다
+- 급격한 점수 변동보다는 안정적인 성장을 반영하세요
+- 학습자의 전반적인 발전 궤도를 고려하세요
+
+**5차원 평가 기준**:
+1. 사고 깊이 (0-100): 표면적 → 본질적 이해 (누적적 평가)
+2. 사고 확장 (0-100): 단일 → 다각적 관점 (누적적 평가)
+3. 실생활 적용 (0-100): 추상적 → 구체적 연결 (누적적 평가)
+4. 메타인지 (0-100): 사고 과정 인식 (누적적 평가)
+5. 소크라테스적 참여 (0-100): 수동적 → 능동적 탐구 (누적적 평가)
+
+**응답 형식**:
+반드시 아래 JSON 형식으로만 응답하세요:
+
+{
+    "dimensions": {
+        "depth": 점수,
+        "breadth": 점수,
+        "application": 점수,
+        "metacognition": 점수,
+        "engagement": 점수
+    },
+    "insights": {
+        "depth": "깊이 평가 설명",
+        "breadth": "확장 평가 설명",
+        "application": "적용 평가 설명",
+        "metacognition": "메타인지 평가 설명",
+        "engagement": "참여 평가 설명"
+    },
+    "growth_indicators": ["성장지표1", "성장지표2"],
+    "next_focus": "다음 학습 방향 제안"
+}"""
+
+        # User 메시지: 대화 히스토리
+        user_prompt = f"""주제: {topic}
 난이도: {difficulty}
 대화 턴: {context['turn_count']}회
 
@@ -204,41 +245,9 @@ class SocraticAssessmentService:
 
 학생의 최신 답변: "{student_response}"
 
-**중요**: 학생의 최신 답변만이 아니라, 위의 전체 대화 과정을 통해 나타난 학습자의 누적된 이해도와 성장을 종합적으로 평가하세요.
+위 대화를 종합적으로 분석하여 5차원 평가를 수행해주세요."""
 
-**평가 원칙**:
-- 대화가 진행될수록 점수는 점진적으로 상승해야 합니다
-- 한 번 달성한 이해도는 쉽게 후퇴하지 않습니다
-- 급격한 점수 변동보다는 안정적인 성장을 반영하세요
-- 학습자의 전반적인 발전 궤도를 고려하세요
-
-다음 5차원으로 평가하세요:
-1. 사고 깊이 (0-100): 표면적 → 본질적 이해 (누적적 평가)
-2. 사고 확장 (0-100): 단일 → 다각적 관점 (누적적 평가)  
-3. 실생활 적용 (0-100): 추상적 → 구체적 연결 (누적적 평가)
-4. 메타인지 (0-100): 사고 과정 인식 (누적적 평가)
-5. 소크라테스적 참여 (0-100): 수동적 → 능동적 탐구 (누적적 평가)
-
-반드시 아래 JSON 형식으로만 응답하세요:
-
-{{
-    "dimensions": {{
-        "depth": 점수,
-        "breadth": 점수,
-        "application": 점수,
-        "metacognition": 점수,
-        "engagement": 점수
-    }},
-    "insights": {{
-        "depth": "깊이 평가 설명",
-        "breadth": "확장 평가 설명",
-        "application": "적용 평가 설명", 
-        "metacognition": "메타인지 평가 설명",
-        "engagement": "참여 평가 설명"
-    }},
-    "growth_indicators": ["성장지표1", "성장지표2"],
-    "next_focus": "다음 학습 방향 제안"
-}}"""
+        return system_prompt, user_prompt
 
     def _calculate_weighted_score(self, dimensions: Dict[str, int]) -> int:
         """가중치를 적용한 종합 점수 계산"""

@@ -414,14 +414,13 @@ class DatabaseService:
         return True  # DatabaseService is always database-enabled
 
     async def save_message(self, session_id: str, student_id: str, content: str, message_type: str) -> bool:
-        """Save a single message to database with proper transaction handling and immediate commit."""
+        """Save a message by appending to conversation_history JSON in students table."""
         try:
-            print(f"🔍 Attempting to save message: session={session_id}, student={student_id}, type={message_type}")
+            print(f"🔍 Saving message to conversation_history: session={session_id}, student={student_id}, type={message_type}")
 
-            # Use explicit transaction control
             async with AsyncSessionLocal() as db_session:
-                async with db_session.begin():  # Explicit transaction
-                    # First verify that the student and session exist
+                async with db_session.begin():
+                    # Get the student
                     student_stmt = select(Student).where(Student.id == student_id, Student.session_id == session_id)
                     student_result = await db_session.execute(student_stmt)
                     student = student_result.scalar_one_or_none()
@@ -430,107 +429,62 @@ class DatabaseService:
                         print(f"❌ Student {student_id} not found in session {session_id}")
                         return False
 
-                    session_stmt = select(Session).where(Session.id == session_id)
-                    session_result = await db_session.execute(session_stmt)
-                    session_obj = session_result.scalar_one_or_none()
+                    # Get current conversation history
+                    conversation_history = student.conversation_history or []
 
-                    if not session_obj:
-                        print(f"❌ Session {session_id} not found")
-                        return False
+                    # Append new message
+                    conversation_history.append({
+                        "role": message_type,
+                        "content": content
+                    })
 
-                    # Create and save the message
-                    new_message = Message(
-                        student_id=student_id,
-                        session_id=session_id,
-                        content=content,
-                        message_type=message_type,
-                        timestamp=datetime.now(self.kst)
-                    )
+                    # Update student's conversation_history
+                    student.conversation_history = conversation_history
+                    await db_session.flush()
 
-                    db_session.add(new_message)
-                    await db_session.flush()  # Flush to get the ID
-                    message_id = new_message.id
-                    print(f"🔍 Message flushed to session with ID: {message_id}")
-
-                # Transaction is automatically committed here
-                print(f"✅ Message transaction committed successfully: {message_id}")
-
-                # Verify in a new transaction to ensure persistence
-                async with AsyncSessionLocal() as verify_session:
-                    verify_stmt = select(Message).where(Message.id == message_id)
-                    verify_result = await verify_session.execute(verify_stmt)
-                    saved_message = verify_result.scalar_one_or_none()
-
-                    if saved_message:
-                        print(f"✅ Message persistence verified: {message_id}")
-                        return True
-                    else:
-                        print(f"❌ Message persistence verification failed: {message_id}")
-                        return False
+                print(f"✅ Message saved to conversation_history (total messages: {len(conversation_history)})")
+                return True
 
         except Exception as e:
-            print(f"❌ Error saving message: {e}")
+            print(f"❌ Error saving message to conversation_history: {e}")
             import traceback
             traceback.print_exc()
             return False
 
     async def get_student_messages(self, session_id: str, student_id: str) -> List[Dict[str, Any]]:
-        """Get all messages for a specific student in a session with fresh transaction."""
+        """Get all messages from conversation_history JSON in students table."""
         try:
-            print(f"🔍 Getting messages for session={session_id}, student={student_id}")
+            print(f"🔍 Getting messages from conversation_history: session={session_id}, student={student_id}")
 
-            # Use a fresh session to avoid any stale transaction issues
-            async with AsyncSessionLocal() as fresh_session:
-                # First verify the student exists
+            async with AsyncSessionLocal() as db_session:
+                # Get the student
                 student_stmt = select(Student).where(Student.id == student_id, Student.session_id == session_id)
-                student_result = await fresh_session.execute(student_stmt)
+                student_result = await db_session.execute(student_stmt)
                 student = student_result.scalar_one_or_none()
 
                 if not student:
                     print(f"❌ Student {student_id} not found in session {session_id}")
                     return []
 
-                # Get messages for this student in this session - use fresh query
-                from sqlalchemy import select, and_, text
+                # Get conversation_history
+                conversation_history = student.conversation_history or []
 
-                # Force a fresh read from the database (bypass any cache)
-                await fresh_session.execute(text("COMMIT"))  # Ensure we see latest committed data
+                print(f"✅ Loaded {len(conversation_history)} messages from conversation_history")
 
-                stmt = select(Message).where(
-                    and_(Message.session_id == session_id, Message.student_id == student_id)
-                ).order_by(Message.timestamp.desc())
-
-                result = await fresh_session.execute(stmt)
-                messages = result.scalars().all()
-
-                print(f"🔍 Found {len(messages)} messages for student in database")
-
+                # Convert to expected format (with message_type instead of role for compatibility)
                 result_list = [
                     {
-                        "content": msg.content,
-                        "message_type": msg.message_type,
-                        "timestamp": self._format_korea_time(msg.timestamp) if msg.timestamp else None
+                        "content": msg.get("content", ""),
+                        "message_type": msg.get("role", "user"),  # role -> message_type for compatibility
+                        "timestamp": None  # No timestamp in JSON storage
                     }
-                    for msg in messages
+                    for msg in conversation_history
                 ]
-
-                print(f"✅ Returning {len(result_list)} messages")
-
-                # Debug: Print message content for tracking
-                if result_list:
-                    print(f"🔍 Recent messages: {[msg['content'][:30] + '...' for msg in result_list[:3]]}")
-                else:
-                    print("🔍 No messages found - checking if any messages exist for this student globally")
-                    # Global check to see if there are any messages for this student
-                    global_stmt = select(Message).where(Message.student_id == student_id)
-                    global_result = await fresh_session.execute(global_stmt)
-                    global_messages = global_result.scalars().all()
-                    print(f"🔍 Global message count for student {student_id}: {len(global_messages)}")
 
                 return result_list
 
         except Exception as e:
-            print(f"❌ Error getting student messages: {e}")
+            print(f"❌ Error getting student messages from conversation_history: {e}")
             import traceback
             traceback.print_exc()
             return []

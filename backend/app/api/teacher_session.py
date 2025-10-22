@@ -370,21 +370,7 @@ async def session_chat(session_id: str, request: SessionChatRequest):
             max_students=db_session.max_students
         )
 
-        # Get student's chat history from database if available
-        messages = []
-        # Get previous messages for this student in this session
-        try:
-            stored_messages = await storage_service.get_student_messages(session_id, request.student_id)
-            # Reverse the order since we get them newest-first from DB, but need oldest-first for conversation context
-            stored_messages.reverse()
-            messages = [{"role": msg["message_type"], "content": msg["content"]} for msg in stored_messages]
-        except Exception as e:
-            print(f"Warning: Could not load message history: {e}")
-
-        # Add the new user message
-        messages.append({"role": "user", "content": request.message})
-
-        # Store user message in database
+        # Store user message in database FIRST
         try:
             await storage_service.save_message(
                 session_id=session_id,
@@ -395,18 +381,24 @@ async def session_chat(session_id: str, request: SessionChatRequest):
         except Exception as e:
             print(f"Warning: Could not save user message: {e}")
 
-        # Generate AI response
+        # Load conversation history from DB (includes the just-saved user message)
+        messages = []
+        try:
+            stored_messages = await storage_service.get_student_messages(session_id, request.student_id)
+            messages = [{"role": msg["message_type"], "content": msg["content"]} for msg in stored_messages]
+        except Exception as e:
+            print(f"Warning: Could not load message history: {e}")
+            # Fallback: at least include current message
+            messages = [{"role": "user", "content": request.message}]
+
+        # Generate AI response using conversation history
         socratic_response = await socratic_service.generate_socratic_response(
             config.topic,
             messages,
             0  # understanding_level - will be calculated
         )
 
-        # Add AI response to messages array for complete conversation context in evaluation
-        messages.append({"role": "assistant", "content": socratic_response})
-
         # Store AI response in database
-        message_id = None
         try:
             print(f"💬 Saving AI message for student {request.student_id}: {socratic_response[:50]}...")
 
@@ -418,65 +410,33 @@ async def session_chat(session_id: str, request: SessionChatRequest):
             )
             print(f"✅ AI message saved successfully: {result}")
 
-            # Get the user message ID for score record
-            try:
-                from app.models.database_models import Message
-                from app.core.database import AsyncSessionLocal
-                from sqlalchemy import select, and_, desc
-
-                async with AsyncSessionLocal() as db_session:
-                    stmt = select(Message.id).where(
-                        and_(
-                            Message.session_id == session_id,
-                            Message.student_id == request.student_id,
-                            Message.message_type == "user"
-                        )
-                    ).order_by(desc(Message.timestamp)).limit(1)
-                    result = await db_session.execute(stmt)
-                    message_id = result.scalar_one_or_none()
-                    print(f"📝 Found user message ID for scoring: {message_id}")
-            except Exception as msg_id_error:
-                print(f"⚠️ Could not retrieve user message ID: {msg_id_error}")
-                message_id = None
-
         except Exception as e:
             print(f"❌ Error saving AI message: {e}")
             import traceback
             traceback.print_exc()
 
-        # Evaluate understanding using the new message and AI response
+        # Reload complete conversation history from DB for evaluation (includes AI response)
+        try:
+            stored_messages = await storage_service.get_student_messages(session_id, request.student_id)
+            conversation_history = [{"role": msg["message_type"], "content": msg["content"]} for msg in stored_messages]
+            print(f"🔍 Loaded {len(conversation_history)} messages for evaluation")
+        except Exception as e:
+            print(f"Warning: Could not reload conversation history: {e}")
+            conversation_history = messages  # Fallback to previous messages
+
+        # Evaluate understanding using complete conversation history from DB
         evaluation_result = await assessment_service.evaluate_socratic_dimensions(
             config.topic,
             request.message,
             socratic_response,
-            messages,
+            conversation_history,
             config.difficulty
         )
 
         understanding_score = evaluation_result["overall_score"]
         is_completed = evaluation_result["is_completed"]
 
-        # Record score in database
-        if message_id:
-            try:
-                await storage_service.save_score(
-                    message_id=message_id,
-                    student_id=request.student_id,
-                    session_id=session_id,
-                    overall_score=understanding_score,
-                    dimensions=evaluation_result["dimensions"],
-                    evaluation_data={
-                        "insights": evaluation_result.get("insights", []),
-                        "growth_indicators": evaluation_result.get("growth_indicators", []),
-                        "next_focus": evaluation_result.get("next_focus", [])
-                    },
-                    is_completed=is_completed
-                )
-                print(f"✅ Score recorded for student {request.student_id}: {understanding_score}")
-            except Exception as e:
-                print(f"Warning: Could not save score to database: {e}")
-
-        # Update student progress in session service
+        # Update student progress (scores are stored in students table)
         # Note: Message is already saved above, no duplicate save needed
         try:
             await session_service.update_student_progress(
