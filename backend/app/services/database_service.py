@@ -8,6 +8,7 @@ import pytz
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update, delete, and_, or_, func
 from sqlalchemy.orm import selectinload
+from sqlalchemy.orm.attributes import flag_modified
 
 from app.core.database import AsyncSessionLocal
 from app.models.database_models import Teacher, Session, Student, Message, Score
@@ -435,6 +436,8 @@ class DatabaseService:
                         conversation_data = message_record.conversation_data or []
                         conversation_data.append(new_message_entry)
                         message_record.conversation_data = conversation_data
+                        # IMPORTANT: Mark the JSON field as modified for SQLAlchemy to detect changes
+                        flag_modified(message_record, "conversation_data")
                         message_record.timestamp = datetime.now(self.kst)
                         print(f"✅ Appended message to existing conversation (total: {len(conversation_data)} messages)")
                     else:
