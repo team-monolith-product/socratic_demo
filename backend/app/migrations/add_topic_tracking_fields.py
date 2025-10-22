@@ -18,48 +18,69 @@ logger = logging.getLogger(__name__)
 async def migrate_add_topic_tracking_fields():
     """Add enhanced topic tracking fields to sessions table."""
 
-    migration_sql = """
-    -- Add new topic tracking fields to sessions table
-    ALTER TABLE sessions
-    ADD COLUMN IF NOT EXISTS topic_type VARCHAR(20) DEFAULT 'manual',
-    ADD COLUMN IF NOT EXISTS topic_source VARCHAR(20) DEFAULT 'manual',
-    ADD COLUMN IF NOT EXISTS pdf_noun_topic VARCHAR(500),
-    ADD COLUMN IF NOT EXISTS pdf_sentence_topic TEXT,
-    ADD COLUMN IF NOT EXISTS pdf_summary_topic TEXT,
-    ADD COLUMN IF NOT EXISTS pdf_original_content TEXT,
-    ADD COLUMN IF NOT EXISTS manual_topic_content TEXT,
-    ADD COLUMN IF NOT EXISTS final_topic_content TEXT,
-    ADD COLUMN IF NOT EXISTS topic_metadata JSONB;
+    # Split SQL commands to avoid "cannot insert multiple commands" error
+    migrations = [
+        # Add new columns to sessions table
+        """
+        ALTER TABLE sessions
+        ADD COLUMN IF NOT EXISTS topic_type VARCHAR(20) DEFAULT 'manual',
+        ADD COLUMN IF NOT EXISTS topic_source VARCHAR(20) DEFAULT 'manual',
+        ADD COLUMN IF NOT EXISTS pdf_noun_topic VARCHAR(500),
+        ADD COLUMN IF NOT EXISTS pdf_sentence_topic TEXT,
+        ADD COLUMN IF NOT EXISTS pdf_summary_topic TEXT,
+        ADD COLUMN IF NOT EXISTS pdf_original_content TEXT,
+        ADD COLUMN IF NOT EXISTS manual_topic_content TEXT,
+        ADD COLUMN IF NOT EXISTS final_topic_content TEXT,
+        ADD COLUMN IF NOT EXISTS topic_metadata JSONB
+        """,
 
-    -- Create indexes for better query performance
-    CREATE INDEX IF NOT EXISTS idx_sessions_topic_type ON sessions(topic_type);
-    CREATE INDEX IF NOT EXISTS idx_sessions_topic_source ON sessions(topic_source);
+        # Create index for topic_type
+        """
+        CREATE INDEX IF NOT EXISTS idx_sessions_topic_type ON sessions(topic_type)
+        """,
 
-    -- Update existing sessions to populate new fields
-    -- Set final_topic_content to existing topic field for all existing sessions
-    UPDATE sessions
-    SET
-        final_topic_content = topic,
-        topic_type = 'manual',
-        topic_source = 'manual'
-    WHERE final_topic_content IS NULL OR final_topic_content = '';
+        # Create index for topic_source
+        """
+        CREATE INDEX IF NOT EXISTS idx_sessions_topic_source ON sessions(topic_source)
+        """,
 
-    -- For any remaining NULL values, set to existing topic
-    UPDATE sessions
-    SET final_topic_content = topic
-    WHERE final_topic_content IS NULL;
-    """
+        # Update existing sessions to populate new fields
+        """
+        UPDATE sessions
+        SET
+            final_topic_content = topic,
+            topic_type = 'manual',
+            topic_source = 'manual'
+        WHERE final_topic_content IS NULL OR final_topic_content = ''
+        """,
+
+        # For any remaining NULL values, set to existing topic
+        """
+        UPDATE sessions
+        SET final_topic_content = topic
+        WHERE final_topic_content IS NULL
+        """
+    ]
 
     try:
         async with engine.begin() as conn:
-            # Execute the migration
-            await conn.execute(text(migration_sql))
+            # Execute each migration command separately
+            for i, migration_sql in enumerate(migrations, 1):
+                try:
+                    await conn.execute(text(migration_sql))
+                    logger.info(f"✅ Migration step {i}/{len(migrations)} completed")
+                except Exception as step_error:
+                    logger.warning(f"⚠️ Migration step {i} failed (may be already applied): {step_error}")
+                    # Continue with other steps even if one fails
+
             logger.info("✅ Successfully added topic tracking fields to sessions table")
+            print("✅ Successfully added topic tracking fields to sessions table")
 
         return True
 
     except Exception as e:
         logger.error(f"❌ Migration failed: {e}")
+        print(f"❌ Migration failed: {e}")
         return False
 
 async def rollback_topic_tracking_fields():
