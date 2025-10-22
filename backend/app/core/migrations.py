@@ -397,4 +397,8 @@ async def run_migrations():
     from app.migrations.add_topic_tracking_fields import migrate_add_topic_tracking_fields
     await migrate_add_topic_tracking_fields()
 
+    # Migrate messages table to JSON storage
+    from app.migrations.migrate_messages_to_json import migrate_messages_to_json
+    await migrate_messages_to_json()
+
     print("✅ Migrations completed")
