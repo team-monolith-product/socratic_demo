@@ -397,8 +397,4 @@ async def run_migrations():
     from app.migrations.add_topic_tracking_fields import migrate_add_topic_tracking_fields
     await migrate_add_topic_tracking_fields()
 
-    # Add conversation_history column migration
-    from app.migrations.add_conversation_history import migrate_add_conversation_history
-    await migrate_add_conversation_history()
-
     print("✅ Migrations completed")

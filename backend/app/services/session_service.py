@@ -333,9 +333,9 @@ class SessionService:
                         student.engagement_score) / 5.0
         progress_percentage = min(100, int(avg_dimension))
 
-        # Get last message from conversation_history
-        conversation_history = student.conversation_history or []
-        last_message = conversation_history[-1].get('content') if conversation_history else None
+        # Get last message
+        messages = await self.db_service.get_student_messages(student.session_id, student.id)
+        last_message = messages[0]['content'] if messages else None
 
         return {
             'student_id': student.id,

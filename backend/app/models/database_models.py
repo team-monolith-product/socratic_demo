@@ -149,7 +149,6 @@ class Student(Base):
         onupdate=func.now()
     )
     conversation_turns: Mapped[int] = mapped_column(Integer, default=0)
-    conversation_history: Mapped[Optional[list]] = mapped_column(JSON, default=list)  # Store entire conversation as JSON array
     current_score: Mapped[int] = mapped_column(Integer, default=0)
     depth_score: Mapped[int] = mapped_column(Integer, default=0)
     breadth_score: Mapped[int] = mapped_column(Integer, default=0)
