@@ -15,7 +15,7 @@ async def migrate_add_conversation_history():
         # Add conversation_history column
         await conn.execute(text("""
             ALTER TABLE students
-            ADD COLUMN IF NOT EXISTS conversation_history JSON DEFAULT '[]'::json
+            ADD COLUMN IF NOT EXISTS conversation_history JSON DEFAULT CAST('[]' AS json)
         """))
 
         print("✅ conversation_history column added")
@@ -57,7 +57,7 @@ async def migrate_add_conversation_history():
 
                 await conn.execute(text("""
                     UPDATE students
-                    SET conversation_history = :conversation_history::json
+                    SET conversation_history = CAST(:conversation_history AS json)
                     WHERE id = :student_id
                 """), {
                     "student_id": student_id,
