@@ -119,22 +119,28 @@ class SocraticAssessmentService:
     def _analyze_conversation_context(self, conversation_history: List[Dict]) -> Dict:
         """대화 맥락 분석"""
         if not conversation_history:
-            return {"turn_count": 0, "question_evolution": [], "concept_progression": []}
-        
+            return {
+                "turn_count": 0,
+                "question_evolution": [],
+                "concept_progression": [],
+                "full_conversation": []
+            }
+
         # 대화 턴 수
         turn_count = len([msg for msg in conversation_history if msg.get("role") == "user"])
-        
+
         # 질문의 진화 패턴
         user_messages = [msg["content"] for msg in conversation_history if msg.get("role") == "user"]
-        
+
         # 개념 이해의 진행 과정
         concept_progression = self._extract_concept_progression(user_messages)
-        
+
         return {
             "turn_count": turn_count,
             "question_evolution": user_messages,
             "concept_progression": concept_progression,
-            "conversation_depth": min(turn_count * 10, 50)  # 대화 깊이 보너스
+            "conversation_depth": min(turn_count * 10, 50),  # 대화 깊이 보너스
+            "full_conversation": conversation_history  # 전체 대화 포함
         }
 
     def _extract_concept_progression(self, messages: List[str]) -> List[str]:
@@ -146,33 +152,46 @@ class SocraticAssessmentService:
                 progressions.append(f"{stage}: {msg[:50]}...")
         return progressions
 
-    def _build_conversation_summary(self, user_messages: List[str]) -> str:
-        """전체 대화 과정을 요약하여 맥락 제공"""
-        if not user_messages:
+    def _build_conversation_summary(self, conversation_history: List[Dict]) -> str:
+        """전체 대화 과정(AI 질문 + 학생 답변)을 요약하여 맥락 제공"""
+        if not conversation_history:
             return "대화가 시작되지 않았습니다."
-        
+
         summary_parts = []
-        for i, msg in enumerate(user_messages, 1):
-            # 각 턴별로 학생 답변 요약 (너무 길면 자름)
-            truncated_msg = msg[:100] + "..." if len(msg) > 100 else msg
-            summary_parts.append(f"턴 {i}: {truncated_msg}")
-        
+        turn_number = 0
+
+        for msg in conversation_history:
+            role = msg.get("role", "")
+            content = msg.get("content", "")
+
+            if role == "assistant":
+                # AI의 소크라테스식 질문
+                truncated_content = content[:200] + "..." if len(content) > 200 else content
+                turn_number += 1
+                summary_parts.append(f"\n[턴 {turn_number} - AI 질문]")
+                summary_parts.append(f"{truncated_content}")
+            elif role == "user":
+                # 학생의 답변
+                truncated_content = content[:200] + "..." if len(content) > 200 else content
+                summary_parts.append(f"\n[턴 {turn_number} - 학생 답변]")
+                summary_parts.append(f"{truncated_content}")
+
         return "\n".join(summary_parts)
 
     def _build_multidimensional_prompt(
-        self, 
-        topic: str, 
-        student_response: str, 
+        self,
+        topic: str,
+        student_response: str,
         ai_response: str,
         context: Dict,
         difficulty: str
     ) -> str:
         """5차원 평가를 위한 프롬프트 생성"""
-        
+
         criteria = self.difficulty_criteria[difficulty]
-        
-        # 전체 대화 내용을 맥락으로 포함
-        conversation_summary = self._build_conversation_summary(context['question_evolution'])
+
+        # 전체 대화 내용(AI 질문 + 학생 답변)을 맥락으로 포함
+        conversation_summary = self._build_conversation_summary(context.get('full_conversation', []))
         
         return f"""당신은 소크라테스식 5차원 평가 전문가입니다.
 
