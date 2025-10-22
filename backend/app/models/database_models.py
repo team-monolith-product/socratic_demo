@@ -173,7 +173,7 @@ class Student(Base):
 
 
 class Message(Base):
-    """Message model."""
+    """Message model - stores entire conversation as JSON array."""
     __tablename__ = "messages"
 
     id: Mapped[str] = mapped_column(
@@ -185,7 +185,8 @@ class Message(Base):
         String(36),
         ForeignKey("students.id", ondelete="CASCADE"),
         nullable=False,
-        index=True
+        index=True,
+        unique=True  # One message record per student
     )
     session_id: Mapped[str] = mapped_column(
         String(20),
@@ -193,14 +194,12 @@ class Message(Base):
         nullable=False,
         index=True
     )
-    content: Mapped[str] = mapped_column(Text, nullable=False)
-    message_type: Mapped[str] = mapped_column(String(10), nullable=False)
+    conversation_data: Mapped[list] = mapped_column(JSON, nullable=False, default=list)  # [{"role": "user", "content": "..."}, ...]
     timestamp: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
         index=True
     )
-    extra_data: Mapped[Optional[dict]] = mapped_column(JSON)
 
     # Relationships
     student: Mapped["Student"] = relationship("Student", back_populates="messages")

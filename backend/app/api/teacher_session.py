@@ -418,25 +418,22 @@ async def session_chat(session_id: str, request: SessionChatRequest):
             )
             print(f"✅ AI message saved successfully: {result}")
 
-            # Get the user message ID for score record
+            # Get the message record ID for score record (one per student)
             try:
                 from app.models.database_models import Message
                 from app.core.database import AsyncSessionLocal
-                from sqlalchemy import select, and_, desc
+                from sqlalchemy import select
 
                 async with AsyncSessionLocal() as db_session:
                     stmt = select(Message.id).where(
-                        and_(
-                            Message.session_id == session_id,
-                            Message.student_id == request.student_id,
-                            Message.message_type == "user"
-                        )
-                    ).order_by(desc(Message.timestamp)).limit(1)
+                        Message.student_id == request.student_id,
+                        Message.session_id == session_id
+                    )
                     result = await db_session.execute(stmt)
                     message_id = result.scalar_one_or_none()
-                    print(f"📝 Found user message ID for scoring: {message_id}")
+                    print(f"📝 Found message record ID for scoring: {message_id}")
             except Exception as msg_id_error:
-                print(f"⚠️ Could not retrieve user message ID: {msg_id_error}")
+                print(f"⚠️ Could not retrieve message ID: {msg_id_error}")
                 message_id = None
 
         except Exception as e:
