@@ -269,18 +269,17 @@ async def join_session(session_id: str, request: SessionJoinRequest, http_reques
 
             # Save initial AI message to database
             storage_service = get_storage_service()
-            if storage_service and await storage_service.is_database_enabled():
-                try:
-                    print(f"💬 Saving initial AI message for student {student_id}: {initial_message[:50]}...")
-                    result = await storage_service.save_message(
-                        session_id=session_id,
-                        student_id=student_id,
-                        content=initial_message,
-                        message_type="assistant"
-                    )
-                    print(f"✅ Initial AI message saved successfully: {result}")
-                except Exception as e:
-                    print(f"❌ Warning: Could not save initial AI message: {e}")
+            try:
+                print(f"💬 Saving initial AI message for student {student_id}: {initial_message[:50]}...")
+                result = await storage_service.save_message(
+                    session_id=session_id,
+                    student_id=student_id,
+                    content=initial_message,
+                    message_type="assistant"
+                )
+                print(f"✅ Initial AI message saved successfully: {result}")
+            except Exception as e:
+                print(f"❌ Warning: Could not save initial AI message: {e}")
         else:
             # For returning students, we won't show a separate initial message
             # The frontend will load previous chat history instead
@@ -360,30 +359,28 @@ async def session_chat(session_id: str, request: SessionChatRequest):
 
         # Get student's chat history from database if available
         messages = []
-        if storage_service and await storage_service.is_database_enabled():
-            # Get previous messages for this student in this session
-            try:
-                stored_messages = await storage_service.get_student_messages(session_id, request.student_id)
-                # Reverse the order since we get them newest-first from DB, but need oldest-first for conversation context
-                stored_messages.reverse()
-                messages = [{"role": msg["message_type"], "content": msg["content"]} for msg in stored_messages]
-            except Exception as e:
-                print(f"Warning: Could not load message history: {e}")
+        # Get previous messages for this student in this session
+        try:
+            stored_messages = await storage_service.get_student_messages(session_id, request.student_id)
+            # Reverse the order since we get them newest-first from DB, but need oldest-first for conversation context
+            stored_messages.reverse()
+            messages = [{"role": msg["message_type"], "content": msg["content"]} for msg in stored_messages]
+        except Exception as e:
+            print(f"Warning: Could not load message history: {e}")
 
         # Add the new user message
         messages.append({"role": "user", "content": request.message})
 
         # Store user message in database
-        if storage_service and await storage_service.is_database_enabled():
-            try:
-                await storage_service.save_message(
-                    session_id=session_id,
-                    student_id=request.student_id,
-                    content=request.message,
-                    message_type="user"
-                )
-            except Exception as e:
-                print(f"Warning: Could not save user message: {e}")
+        try:
+            await storage_service.save_message(
+                session_id=session_id,
+                student_id=request.student_id,
+                content=request.message,
+                message_type="user"
+            )
+        except Exception as e:
+            print(f"Warning: Could not save user message: {e}")
 
         # Generate AI response
         socratic_response = await socratic_service.generate_socratic_response(
@@ -394,43 +391,42 @@ async def session_chat(session_id: str, request: SessionChatRequest):
 
         # Store AI response in database
         message_id = None
-        if storage_service and await storage_service.is_database_enabled():
+        try:
+            print(f"💬 Saving AI message for student {request.student_id}: {socratic_response[:50]}...")
+
+            result = await storage_service.save_message(
+                session_id=session_id,
+                student_id=request.student_id,
+                content=socratic_response,
+                message_type="assistant"
+            )
+            print(f"✅ AI message saved successfully: {result}")
+
+            # Get the user message ID for score record
             try:
-                print(f"💬 Saving AI message for student {request.student_id}: {socratic_response[:50]}...")
+                from app.models.database_models import Message
+                from app.core.database import AsyncSessionLocal
+                from sqlalchemy import select, and_, desc
 
-                result = await storage_service.save_message(
-                    session_id=session_id,
-                    student_id=request.student_id,
-                    content=socratic_response,
-                    message_type="assistant"
-                )
-                print(f"✅ AI message saved successfully: {result}")
+                async with AsyncSessionLocal() as db_session:
+                    stmt = select(Message.id).where(
+                        and_(
+                            Message.session_id == session_id,
+                            Message.student_id == request.student_id,
+                            Message.message_type == "user"
+                        )
+                    ).order_by(desc(Message.timestamp)).limit(1)
+                    result = await db_session.execute(stmt)
+                    message_id = result.scalar_one_or_none()
+                    print(f"📝 Found user message ID for scoring: {message_id}")
+            except Exception as msg_id_error:
+                print(f"⚠️ Could not retrieve user message ID: {msg_id_error}")
+                message_id = None
 
-                # Get the user message ID for score record
-                try:
-                    from app.models.database_models import Message
-                    from app.core.database import AsyncSessionLocal
-                    from sqlalchemy import select, and_, desc
-
-                    async with AsyncSessionLocal() as db_session:
-                        stmt = select(Message.id).where(
-                            and_(
-                                Message.session_id == session_id,
-                                Message.student_id == request.student_id,
-                                Message.message_type == "user"
-                            )
-                        ).order_by(desc(Message.timestamp)).limit(1)
-                        result = await db_session.execute(stmt)
-                        message_id = result.scalar_one_or_none()
-                        print(f"📝 Found user message ID for scoring: {message_id}")
-                except Exception as msg_id_error:
-                    print(f"⚠️ Could not retrieve user message ID: {msg_id_error}")
-                    message_id = None
-
-            except Exception as e:
-                print(f"❌ Error saving AI message: {e}")
-                import traceback
-                traceback.print_exc()
+        except Exception as e:
+            print(f"❌ Error saving AI message: {e}")
+            import traceback
+            traceback.print_exc()
 
         # Evaluate understanding using the new message and AI response
         evaluation_result = await assessment_service.evaluate_socratic_dimensions(
@@ -445,7 +441,7 @@ async def session_chat(session_id: str, request: SessionChatRequest):
         is_completed = evaluation_result["is_completed"]
 
         # Record score in database
-        if storage_service and await storage_service.is_database_enabled() and message_id:
+        if message_id:
             try:
                 await storage_service.save_score(
                     message_id=message_id,
@@ -591,11 +587,8 @@ async def get_session_scores(session_id: str, request: Request):
             raise HTTPException(status_code=403, detail="Access denied")
 
         # Get scores from database if available
-        if storage_service and await storage_service.is_database_enabled():
-            scores = await storage_service.get_session_scores(session_id)
-            return {"scores": scores}
-        else:
-            return {"scores": [], "message": "Database not available"}
+        scores = await storage_service.get_session_scores(session_id)
+        return {"scores": scores}
 
     except HTTPException:
         raise
@@ -620,12 +613,9 @@ async def get_student_scores(session_id: str, student_id: str, request: Request)
         if session_data.get('teacher_fingerprint') != teacher_fingerprint:
             raise HTTPException(status_code=403, detail="Access denied")
 
-        # Get scores from database if available
-        if storage_service and await storage_service.is_database_enabled():
-            scores = await storage_service.get_student_scores(session_id, student_id)
-            return {"scores": scores}
-        else:
-            return {"scores": [], "message": "Database not available"}
+        # Get scores from database
+        scores = await storage_service.get_student_scores(session_id, student_id)
+        return {"scores": scores}
 
     except HTTPException:
         raise
@@ -655,16 +645,13 @@ async def get_student_chat_history(session_id: str, student_id: str):
         if not student_exists:
             raise HTTPException(status_code=403, detail="Student not authorized for this session")
 
-        # Get chat history from database if available
-        if storage_service and await storage_service.is_database_enabled():
-            try:
-                messages = await storage_service.get_student_messages(session_id, student_id)
-                return {"messages": messages}
-            except Exception as e:
-                print(f"Warning: Could not load message history: {e}")
-                return {"messages": []}
-        else:
-            return {"messages": [], "message": "Database not available"}
+        # Get chat history from database
+        try:
+            messages = await storage_service.get_student_messages(session_id, student_id)
+            return {"messages": messages}
+        except Exception as e:
+            print(f"Warning: Could not load message history: {e}")
+            return {"messages": []}
 
     except HTTPException:
         raise

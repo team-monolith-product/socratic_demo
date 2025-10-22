@@ -16,7 +16,6 @@ class Settings:
         self._allowed_origins_raw = os.getenv("ALLOWED_ORIGINS", "*")
         self.static_root: str | None = os.getenv("STATIC_ROOT")
         self.database_url: str = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./socratic.db")
-        self.use_database: bool = os.getenv("USE_DATABASE", "false").lower() == "true"
         self.frontend_url: str = os.getenv("FRONTEND_URL", "https://socratic-nine.vercel.app")
 
         # PDF 처리 설정 (파일 크기는 10MB로 완화)

@@ -629,6 +629,187 @@ class DatabaseService:
             print(f"Error getting student scores: {e}")
             return []
 
+    async def get_session_by_id(self, session_id: str) -> Optional[Session]:
+        """Get a session by ID."""
+        try:
+            async with await self._get_session() as session:
+                stmt = select(Session).options(selectinload(Session.teacher)).where(
+                    and_(Session.id == session_id, Session.deleted_at.is_(None))
+                )
+                result = await session.execute(stmt)
+                return result.scalar_one_or_none()
+        except Exception as e:
+            print(f"Error getting session {session_id}: {e}")
+            return None
+
+    async def get_student_by_token(self, session_id: str, token: str) -> Optional[Student]:
+        """Get a student by token in a specific session."""
+        try:
+            async with await self._get_session() as session:
+                stmt = select(Student).where(
+                    and_(Student.session_id == session_id, Student.token == token)
+                )
+                result = await session.execute(stmt)
+                return result.scalar_one_or_none()
+        except Exception as e:
+            print(f"Error getting student by token: {e}")
+            return None
+
+    async def get_student_by_name(self, session_id: str, name: str) -> Optional[Student]:
+        """Get a student by name in a specific session."""
+        try:
+            async with await self._get_session() as session:
+                stmt = select(Student).where(
+                    and_(Student.session_id == session_id, func.lower(Student.name) == name.lower())
+                )
+                result = await session.execute(stmt)
+                return result.scalar_one_or_none()
+        except Exception as e:
+            print(f"Error getting student by name: {e}")
+            return None
+
+    async def get_student_by_id(self, student_id: str) -> Optional[Student]:
+        """Get a student by ID."""
+        try:
+            async with await self._get_session() as session:
+                stmt = select(Student).where(Student.id == student_id)
+                result = await session.execute(stmt)
+                return result.scalar_one_or_none()
+        except Exception as e:
+            print(f"Error getting student by ID: {e}")
+            return None
+
+    async def get_students_by_session(self, session_id: str) -> List[Student]:
+        """Get all students in a session."""
+        try:
+            async with await self._get_session() as session:
+                stmt = select(Student).where(Student.session_id == session_id).order_by(Student.joined_at)
+                result = await session.execute(stmt)
+                return result.scalars().all()
+        except Exception as e:
+            print(f"Error getting students for session {session_id}: {e}")
+            return []
+
+    async def get_message_count(self, student_id: str, message_type: str = 'user') -> int:
+        """Get count of messages for a student by type."""
+        try:
+            async with await self._get_session() as session:
+                stmt = select(func.count(Message.id)).where(
+                    and_(Message.student_id == student_id, Message.message_type == message_type)
+                )
+                result = await session.execute(stmt)
+                return result.scalar() or 0
+        except Exception as e:
+            print(f"Error getting message count: {e}")
+            return 0
+
+    async def update_student_progress(
+        self,
+        student_id: str,
+        understanding_score: int,
+        dimensions: Dict[str, int],
+        is_completed: bool = False
+    ) -> bool:
+        """Update student progress in database."""
+        try:
+            async with await self._get_session() as session:
+                stmt = select(Student).where(Student.id == student_id)
+                result = await session.execute(stmt)
+                student = result.scalar_one_or_none()
+
+                if not student:
+                    return False
+
+                # Update student fields
+                student.last_active = datetime.now(self.kst)
+                student.current_score = understanding_score
+                student.conversation_turns += 1
+                student.depth_score = dimensions.get('depth', 0)
+                student.breadth_score = dimensions.get('breadth', 0)
+                student.application_score = dimensions.get('application', 0)
+                student.metacognition_score = dimensions.get('metacognition', 0)
+                student.engagement_score = dimensions.get('engagement', 0)
+
+                if is_completed and not student.is_completed:
+                    student.is_completed = True
+                    student.completed_at = datetime.now(self.kst)
+
+                await session.commit()
+                return True
+        except Exception as e:
+            print(f"Error updating student progress: {e}")
+            return False
+
+    async def create_student(
+        self,
+        student_id: str,
+        session_id: str,
+        name: str,
+        token: str
+    ) -> Optional[Student]:
+        """Create a new student."""
+        try:
+            async with await self._get_session() as session:
+                new_student = Student(
+                    id=student_id,
+                    session_id=session_id,
+                    name=name,
+                    token=token,
+                    joined_at=datetime.now(self.kst),
+                    last_active=datetime.now(self.kst),
+                    conversation_turns=0,
+                    current_score=0,
+                    depth_score=0,
+                    breadth_score=0,
+                    application_score=0,
+                    metacognition_score=0,
+                    engagement_score=0,
+                    is_completed=False
+                )
+                session.add(new_student)
+                await session.commit()
+                await session.refresh(new_student)
+                return new_student
+        except Exception as e:
+            print(f"Error creating student: {e}")
+            return None
+
+    async def update_student_last_active(self, student_id: str) -> bool:
+        """Update student's last active timestamp."""
+        try:
+            async with await self._get_session() as session:
+                stmt = update(Student).where(Student.id == student_id).values(
+                    last_active=datetime.now(self.kst)
+                )
+                await session.execute(stmt)
+                await session.commit()
+                return True
+        except Exception as e:
+            print(f"Error updating student last active: {e}")
+            return False
+
+    async def get_sessions_by_teacher(self, teacher_fingerprint: str) -> List[Session]:
+        """Get all non-deleted sessions for a teacher."""
+        try:
+            async with await self._get_session() as session:
+                # First get teacher
+                teacher_stmt = select(Teacher).where(Teacher.fingerprint == teacher_fingerprint)
+                teacher_result = await session.execute(teacher_stmt)
+                teacher = teacher_result.scalar_one_or_none()
+
+                if not teacher:
+                    return []
+
+                # Get sessions
+                stmt = select(Session).where(
+                    and_(Session.teacher_id == teacher.id, Session.deleted_at.is_(None))
+                ).order_by(Session.created_at.desc())
+                result = await session.execute(stmt)
+                return result.scalars().all()
+        except Exception as e:
+            print(f"Error getting sessions for teacher: {e}")
+            return []
+
 
 
 

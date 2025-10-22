@@ -179,12 +179,6 @@ class StorageService:
 _storage_service = StorageService()
 
 def get_storage_service():
-    """Get storage service based on configuration."""
-    from app.core.config import get_settings
-    settings = get_settings()
-
-    if settings.use_database:
-        from app.services.database_service import get_database_service
-        return get_database_service()
-    else:
-        return _storage_service
+    """Get database storage service."""
+    from app.services.database_service import get_database_service
+    return get_database_service()
